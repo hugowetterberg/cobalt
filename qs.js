@@ -1,14 +1,91 @@
-var sample_ac = [
-  'aliquam', 'tortor', 'nisl', 'lobortis at', 'semper vitae', 'gravida ut', 'est', 'praesent ut', 'justo quis', 
-  'magna auctor', 'sollicitudin', 'duis auctor', 'venenatis tortor', 'donec', 'dapibus', 'mi at quam', 
-  'nunc pretium', 'eros quis', 'dignissim', 'pharetra', 'velit diam', 'vulputate mi', 'ut euismod', 
-  'arcu eros ut metus', 'duis aliquet', 'varius pede'
-];
-
-
 $(document).ready(function(){
-  $('<div id="qs"><div class="left"><input type="text" id="qs-input" /></div><div class="right"></div><ul class="qs-autocomplete"></ul></div>').appendTo('body').hide();
-  var qs = $('#qs');
+  // Initialize database
+  if (window.openDatabase) {
+    var db = openDatabase('quicksilver', '1.0', 'Quicksilver Database', 1024000);
+  }
+  else if (google.gears) {
+    var dbman = google.gears.factory.create('beta.databasemanager');
+    var db = dbman.open('quicksilver', '1.0', 'Quicksilver Database', 1024000);
+  }
+  
+  if (!db) {
+    if (window.console) {
+      console.error('Quicksilver requires either Safari or a browser with Google Gears');
+    }
+    return;
+  }
+  var nullDataHandler = function(transaction, results) { };
+  
+  // Initialize Quicksilver
+  var catalogs = {};
+  var update_queue = [];
+  var q = {
+    'dbErrorHandler': function(transaction, error)
+    {
+      $(document).trigger('quicksilver-db-error');
+      if (window.console) {
+        console.error(error.message+' (Code: '+error.code+')');
+      }
+      return false;
+    },
+    'registerCatalog': function(name, catalog) {
+      catalogs[name] = catalog;
+    },
+    'catalogUpdated': function(catalog, updated) {
+      if (typeof(updated)=='undefined') {
+        updated = new Date().getTime();
+      }
+      db.transaction(function (transaction) {
+        transaction.executeSql("UPDATE catalogs SET updated=? WHERE name = ?;", [ updated, name ], nullDataHandler, q.dbErrorHandler);
+      });
+    },
+    'addEntry': function(name, catalog, classname, active) {
+      if (typeof(active)=='undefined') {
+        active = 1;
+      }
+      db.transaction(function (transaction) {
+        transaction.executeSql("INSERT INTO entries(name, catalog, class, active) VALUES(?,?,?,?);", [ name, catalog, classname, active], nullDataHandler, q.dbErrorHandler);
+      });
+    }
+  };
+  
+  $(document).trigger('quicksilver-pre-init', q);
+  
+  db.transaction(function (transaction) {
+    transaction.executeSql('CREATE TABLE IF NOT EXISTS entries(' +
+      'name TEXT NOT NULL, catalog TEXT NOT NULL, class TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1);', [], nullDataHandler, q.dbErrorHandler);
+    transaction.executeSql('CREATE TABLE IF NOT EXISTS catalogs(' +
+      'name TEXT NOT NULL PRIMARY KEY, updated INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, uninstall INTEGER NOT NULL DEFAULT 0);', [], nullDataHandler, q.dbErrorHandler);
+  });
+  
+  $(document).trigger('quicksilver-init', q);
+  
+  db.transaction(function (transaction) {
+    transaction.executeSql("SELECT * FROM catalogs ORDER BY updated;", [ ], function(transaction, results) {
+      var info = {};
+      
+      // Queue catalogs for update
+      for (var i = 0; i < results.rows.length; i++) {
+        var item = results.rows.item(i);
+        info[item.name] = item;
+        update_queue.push(item.name);
+      }
+      
+      // Install new catalogs and queue them for updates
+      for (var key in catalogs) {
+        if (!info[key] && catalogs[key]['install']) {
+          catalogs[key].install();
+          db.transaction(function (transaction) {
+            transaction.executeSql("INSERT INTO catalogs(name) VALUES(?)", [key], nullDataHandler);
+          });
+          update_queue.unshift(key);
+        }
+      }
+    }, q.dbErrorHandler);
+  });
+  
+  // Initialize GUI
+  var qs = $('<div id="qs"><div class="left"><input type="text" id="qs-input" /></div><div class="right"></div><ul class="qs-autocomplete"></ul></div>').appendTo('body').hide();
   var qs_input = $('#qs-input');
   var qs_ac = $('#qs .qs-autocomplete');
   
@@ -55,18 +132,13 @@ $(document).ready(function(){
       schedule_lookup();
     }
     else {
-      // Dummy lookup process
-      matches = [];
-      for (var i=0; i<sample_ac.length; i++) {
-        if (sample_ac[i].indexOf(current_text)==0) {
-          matches.push(sample_ac[i]);
-        }
-      }
-      lookup_finished();
+      db.transaction(function (transaction) {
+        transaction.executeSql("SELECT * FROM entries WHERE active=1 AND name LIKE ?;", [ current_text+'%' ], lookup_finished, q.dbErrorHandler);
+      });
     }
   };
   
-  var lookup_finished = function() {
+  var lookup_finished = function(transaction, results) {
     lookup_pending = false;
     qs_ac.empty();
     
