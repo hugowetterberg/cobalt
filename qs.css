@@ -1,0 +1,30 @@
+body {
+}
+
+#qs {
+  background-color: rgba(0,0,0,0.5);
+  -moz-border-radius: 40px;
+  -webkit-border-radius: 40px;
+  position: absolute;
+  width: 330px;
+  height: 170px;
+}
+
+#qs .right, #qs .left {
+  background-color: rgba(255,255,255,0.5);
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
+  float: left;
+  margin: 10px 0 0 10px;
+  width: 150px;
+  height: 150px;
+}
+
+#qs_input {
+  margin: 10px;
+  width: 130px;
+  height: 130px;
+  border: 0;
+  background-color: rgba(0,0,0,0);
+  font-size: 20px;
+}
