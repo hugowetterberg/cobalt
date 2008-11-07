@@ -3,11 +3,11 @@ body {
 
 #qs {
   background-color: rgba(0,0,0,0.5);
-  -moz-border-radius: 40px;
-  -webkit-border-radius: 40px;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
   position: absolute;
   width: 330px;
-  height: 170px;
+  padding: 10px 0 0 0;
 }
 
 #qs .right, #qs .left {
@@ -15,16 +15,40 @@ body {
   -moz-border-radius: 20px;
   -webkit-border-radius: 20px;
   float: left;
-  margin: 10px 0 0 10px;
+  margin: 0 0 10px 10px;
   width: 150px;
   height: 150px;
 }
 
-#qs_input {
+#qs-input {
   margin: 10px;
   width: 130px;
   height: 130px;
   border: 0;
   background-color: rgba(0,0,0,0);
-  font-size: 20px;
+  font-size: 32px;
+}
+
+#qs .qs-autocomplete {
+  clear: both;
+  margin: 0 10px 0 10px;
+  padding: 10px;
+  color: #FFFFFF;
+  background-color: rgba(0,0,0,0.5);
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
+}
+
+#qs .qs-autocomplete li {
+  display: block;
+  list-style: none;
+  margin: 4px;
+  padding: 3px;
+  border: 2px solid rgba(255,255,255,0.8);
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+}
+
+#qs .qs-autocomplete li.active {
+  background-color: rgba(255,255,255,0.2);
 }
