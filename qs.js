@@ -53,7 +53,11 @@ $(document).ready(function(){
   
   db.transaction(function (transaction) {
     transaction.executeSql('CREATE TABLE IF NOT EXISTS entries(' +
-      'name TEXT NOT NULL, catalog TEXT NOT NULL, class TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1);', [], nullDataHandler, q.dbErrorHandler);
+      'name TEXT NOT NULL, catalog TEXT NOT NULL, class TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, weight INTEGER NOT NULL DEFAULT 0, abbreviation TEXT NOT NULL DEFAULT "");', [], nullDataHandler, q.dbErrorHandler);
+    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_catalog ON entries(catalog);', [], nullDataHandler, q.dbErrorHandler);
+    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_abbreviation ON entries(abbreviation);', [], nullDataHandler, q.dbErrorHandler);
+    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_active ON entries(active DESC);', [], nullDataHandler, q.dbErrorHandler);
+    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_weight ON entries(weight DESC);', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS catalogs(' +
       'name TEXT NOT NULL PRIMARY KEY, updated INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, uninstall INTEGER NOT NULL DEFAULT 0);', [], nullDataHandler, q.dbErrorHandler);
   });
@@ -133,18 +137,20 @@ $(document).ready(function(){
     }
     else {
       db.transaction(function (transaction) {
-        transaction.executeSql("SELECT * FROM entries WHERE active=1 AND name LIKE ?;", [ current_text+'%' ], lookup_finished, q.dbErrorHandler);
+        transaction.executeSql("SELECT * FROM entries WHERE active=1 AND (abbreviation = ? OR name LIKE ?) ORDER BY nullif(name,?), nullif(abbreviation,?), weight DESC;", [ 
+          current_text, current_text+'%', current_text, current_text ], lookup_finished, q.dbErrorHandler);
       });
     }
   };
   
   var lookup_finished = function(transaction, results) {
     lookup_pending = false;
-    qs_ac.empty();
+    clear_ac();
     
-    if (matches.length) {
-      for (var i=0; i<matches.length; i++) {
-        $('<li class="ac-opt-' + i + '"></li>').text(matches[i]).appendTo(qs_ac);
+    if (results.rows.length) {
+      for (var i=0; i<results.rows.length; i++) {
+        var item = results.rows.item(i);
+        $('<li class="ac-opt-' + i + '"></li>').text(item.name).appendTo(qs_ac);
       }
       qs_ac.show();
     }

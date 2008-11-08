@@ -1,8 +1,9 @@
 $(document).bind('quicksilver-init', function(evt, q) {
-  console.log('Dummy catalog loaded');
+  console.log('Dummy catalog init');
+  $('<div class="dummy-result">Dummy results goes here</div>').appendTo('body');
   
   var sample_ac = [
-    'aliquam', 'tortor', 'nisl', 'lobortis at', 'semper vitae', 'gravida ut', 'est', 'praesent ut', 'justo quis', 
+    'aliquam', 'tortor', 'nisl via', 'nisl', 'nisl due', 'lobortis at', 'semper vitae', 'gravida ut', 'est', 'praesent ut', 'justo quis', 
     'magna auctor', 'sollicitudin', 'duis auctor', 'venenatis tortor', 'donec', 'dapibus', 'mi at quam', 
     'nunc pretium', 'eros quis', 'dignissim', 'pharetra', 'velit diam', 'vulputate mi', 'ut euismod', 
     'arcu eros ut metus', 'duis aliquet', 'varius pede'
