@@ -1,0 +1,17 @@
+.dummy-result {
+  color: rgba(255,255,255,0.5);
+  font-weight: bold;
+  background-color: rgba(0,0,0,0.5);
+  border: 2px solid rgba(255,255,255,0.5);
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 400px;
+  padding: 10px;
+}
+
+#qs .cell .dummy {
+  background: url(dummy.png) center center no-repeat;
+}

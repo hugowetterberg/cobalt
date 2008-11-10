@@ -8,9 +8,13 @@ body {
   position: absolute;
   width: 330px;
   padding: 10px 0 0 0;
+  
+  font-size: 12px;
+  font-family: 'Lucida Grande', sans-serif;
 }
 
-#qs .right, #qs .left {
+#qs .cell {
+  position: relative;
   background-color: rgba(255,255,255,0.5);
   -moz-border-radius: 20px;
   -webkit-border-radius: 20px;
@@ -18,15 +22,31 @@ body {
   margin: 0 0 10px 10px;
   width: 150px;
   height: 150px;
+  font-family: 'Lucida Grande', sans-serif;
 }
 
-#qs-input {
+#qs .cell input {
   margin: 10px;
   width: 130px;
   height: 130px;
   border: 0;
+  color: rgba(0,0,0,0.8);
   background-color: rgba(0,0,0,0);
   font-size: 32px;
+}
+
+#qs .cell label {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  height: 1em;
+  width: 120px;
+  padding: 3px;
+  text-align: center;
+  color: #FFFFFF;
+  background-color: rgba(0,0,0,0.5);
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
 }
 
 #qs .qs-autocomplete {
@@ -47,6 +67,10 @@ body {
   border: 2px solid rgba(255,255,255,0.8);
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
+}
+
+#qs .right .default {
+  background: transparent url(default_action.png) center center no-repeat;
 }
 
 #qs .qs-autocomplete li.active {

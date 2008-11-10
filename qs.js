@@ -18,6 +18,8 @@ $(document).ready(function(){
   
   // Initialize Quicksilver
   var catalogs = {};
+  var global_handlers = [];
+  var handlers = {};
   var update_queue = [];
   var q = {
     'dbErrorHandler': function(transaction, error)
@@ -46,8 +48,26 @@ $(document).ready(function(){
       db.transaction(function (transaction) {
         transaction.executeSql("INSERT INTO entries(name, catalog, class, active) VALUES(?,?,?,?);", [ name, catalog, classname, active], nullDataHandler, q.dbErrorHandler);
       });
+    },
+    'registerHandler': function(handler, catalog) {
+      if (typeof(catalog)=='undefined') {
+        global_handlers.push(handler);
+      }
+      else {
+        if (!handlers[catalog]) {
+          handlers[catalog] = [];
+        }
+        handlers[catalog].push(handler);
+      }
     }
   };
+  
+  q.registerHandler({
+    'name': 'Console log',
+    'handler': function(text, item) {
+      console.log(item.name);
+    }
+  });
   
   $(document).trigger('quicksilver-pre-init', q);
   
@@ -89,7 +109,10 @@ $(document).ready(function(){
   });
   
   // Initialize GUI
-  var qs = $('<div id="qs"><div class="left"><input type="text" id="qs-input" /></div><div class="right"></div><ul class="qs-autocomplete"></ul></div>').appendTo('body').hide();
+  var qs = $('<div id="qs">'+
+    '<div class="cell left"><div class="inner"><input type="text" id="qs-input" /><label></label></div></div>'+ 
+    '<div class="cell right"><div class="inner"><input type="text" id="qs-handler-input" /><label></label></div></div>'+
+    '<ul class="qs-autocomplete"></ul></div>').appendTo('body').hide();
   var qs_input = $('#qs-input');
   var qs_ac = $('#qs .qs-autocomplete');
   
@@ -98,7 +121,7 @@ $(document).ready(function(){
       last_keypress = 0,
       lookup_pending = false,
       qs_visible = false,
-      matches = [], match_idx = 0, current_text;
+      matches = [], match_idx = 0, current_text, handler, item;
   
   var keypress_reaction = function() {
     if(qs_input.val()==current_text) {
@@ -118,6 +141,7 @@ $(document).ready(function(){
   var clear_ac = function() {
     match_idx = 0;
     current_text = "";
+    $('#qs .left label').hide();
     qs_ac.empty().hide();
   };
   
@@ -137,7 +161,7 @@ $(document).ready(function(){
     }
     else {
       db.transaction(function (transaction) {
-        transaction.executeSql("SELECT * FROM entries WHERE active=1 AND (abbreviation = ? OR name LIKE ?) ORDER BY nullif(name,?), nullif(abbreviation,?), weight DESC;", [ 
+        transaction.executeSql("SELECT * FROM entries WHERE active=1 AND (abbreviation = ? OR name LIKE ?) ORDER BY nullif(name,?), nullif(abbreviation,?), weight DESC LIMIT 5;", [ 
           current_text, current_text+'%', current_text, current_text ], lookup_finished, q.dbErrorHandler);
       });
     }
@@ -152,7 +176,15 @@ $(document).ready(function(){
         var item = results.rows.item(i);
         $('<li class="ac-opt-' + i + '"></li>').text(item.name).appendTo(qs_ac);
       }
+      matches = results.rows;
       qs_ac.show();
+    }
+    else {
+      if (matches.length) {
+        var old_item = matches.item(match_idx);
+        $('#qs .left .inner').removeClass(old_item['class']);
+      }      
+      matches = [];
     }
     
     ac_select(0);
@@ -160,12 +192,52 @@ $(document).ready(function(){
   
   var ac_select = function(idx) {
     if (idx<0 || idx >= matches.length) {
+      item = null;
       return;
     }
     
+    item = matches.item(idx);
+    var old_item = matches.item(match_idx);
+    
     $('#qs .ac-opt-' + match_idx).removeClass('active');
+    $('#qs .left .inner').removeClass(old_item['class']);
     match_idx = idx;
+    $('#qs .left .inner').addClass(item['class']);
+    $('#qs .left label').text(item.name).show();
     $('#qs .ac-opt-' + match_idx).addClass('active');
+    
+    if (handlers[item.catalog] && handlers[item.catalog].length) {
+      set_handler(handlers[item.catalog][0]);
+    }
+    else if (global_handlers.length) {
+      set_handler(global_handlers[0]);
+    }
+  };
+  
+  var handler_class = function() {
+    if (handler) {
+      return handler['class'] ? handler['class'] : 'default';
+    }
+  };
+  
+  var set_handler = function(new_handler) {
+    var oldClass = handler_class();
+    if (oldClass) {
+      $('#qs .right .inner').removeClass(oldClass);
+    }
+    
+    handler = new_handler;
+    if (handler) {
+      var newClass = handler_class();
+      $('#qs .right .inner').addClass(newClass);
+      $('#qs .right label').text(handler.name).show();
+    }
+  };
+  
+  var run_handler = function() {
+    if (item && typeof(handler['handler']) == 'function') {
+      handler.handler(current_text, item);
+    }
   };
   
   var toggle = function(arg) {
@@ -190,8 +262,10 @@ $(document).ready(function(){
   };
   
   qs.bind('click', function(e){ return false; });
-  qs.bind('keydown', 'up', function(){ ac_select(match_idx-1); });
-  qs.bind('keydown', 'down', function(){ ac_select(match_idx+1); });
+  qs.bind('keydown', 'esc', hide);
+  qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); });
+  qs_input.bind('keydown', 'down', function(){ ac_select(match_idx+1); });
+  qs_input.bind('keydown', 'return', function(){ run_handler(); });
   qs_input.bind('keyup', keypress_reaction);
   
   $(document).bind('click', hide);
