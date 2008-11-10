@@ -119,6 +119,7 @@ $(document).ready(function(){
     '<ul class="qs-autocomplete"></ul></div>').appendTo('body').hide();
   var qs_input = $('#qs-input');
   var qs_ac = $('#qs .qs-autocomplete');
+  $('#qs .right label').hide();
   
   var schedule_lookup, lookup, keypress_reaction, 
       keypress_time = 200,
