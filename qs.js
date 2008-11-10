@@ -65,7 +65,11 @@ $(document).ready(function(){
   q.registerHandler({
     'name': 'Console log',
     'handler': function(text, item) {
-      console.log(item.name);
+      console.log('------------------');
+      console.log('text:' + text);
+      console.log('name:' + item.name);
+      console.log('catalog:' + item.catalog);
+      console.log('class:' + item['class']);
     }
   });
   
@@ -238,6 +242,7 @@ $(document).ready(function(){
     if (item && typeof(handler['handler']) == 'function') {
       handler.handler(current_text, item);
     }
+    hide();
   };
   
   var toggle = function(arg) {
@@ -263,9 +268,9 @@ $(document).ready(function(){
   
   qs.bind('click', function(e){ return false; });
   qs.bind('keydown', 'esc', hide);
+  qs.bind('keydown', 'return', function(){ run_handler(); });
   qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); });
   qs_input.bind('keydown', 'down', function(){ ac_select(match_idx+1); });
-  qs_input.bind('keydown', 'return', function(){ run_handler(); });
   qs_input.bind('keyup', keypress_reaction);
   
   $(document).bind('click', hide);

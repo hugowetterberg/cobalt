@@ -1,6 +1,6 @@
 $(document).bind('quicksilver-init', function(evt, q) {
   console.log('Dummy catalog init');
-  $('<div class="dummy-result">Dummy results goes here</div>').appendTo('body');
+  var dummy_out = $('<div class="dummy-result">Dummy results goes here</div>').appendTo('body');
   
   var sample_ac = [
     'aliquam', 'tortor', 'nisl via', 'nisl', 'nisl due', 'lobortis at', 'semper vitae', 'gravida ut', 'est', 'praesent ut', 'justo quis', 
@@ -27,4 +27,12 @@ $(document).bind('quicksilver-init', function(evt, q) {
   
   // Registering catalog
   q.registerCatalog('dummy', dummy);
+  
+  // Register handler
+  q.registerHandler({
+    'name': 'Dummy action',
+    'handler': function(text, item) {
+      dummy_out.text(item.name);
+    }
+  }, 'dummy');
 });
