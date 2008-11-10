@@ -1,0 +1,49 @@
+<?php
+
+function quicksilver_init() {
+  if (user_access('use quicksilver')) {
+    global $user;
+    
+    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/gears_init.js');
+    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/jquery.hotkeys.js');
+    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.js');
+    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.menu-catalog.js');
+    drupal_add_js(array('quicksilver'=>array('state'=>$user->uid)), 'setting');
+    
+    drupal_add_css(drupal_get_path('module', 'quicksilver') . '/css/qs.css');
+  }
+}
+
+function quicksilver_perm() {
+  return array('use quicksilver');
+}
+
+function quicksilver_menu() {
+  $items = array();
+  $items['quicksilver/menu_json'] = array(
+    'title' => t('Serialized menu'),
+    'page callback' => 'quicksilver_menu_json',
+    'access arguments' => array('use quicksilver'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function quicksilver_menu_json() {
+   $tree = menu_tree_all_data();
+   $data = array();
+   _quicksilver_menu_data_recursive($tree, $data);
+   print drupal_to_js($data);
+   exit;
+}
+
+function _quicksilver_menu_data_recursive($tree, &$data) {
+  foreach($tree as $key => $item) {
+    if (!$item['link']['hidden'] && $item['link']['access']) {
+      $data[$item['link']['href']] = $item['link']['title'];
+      if ($item['below']) {
+        _quicksilver_menu_data_recursive($item['below'], $data);
+      }
+    }
+  }
+}

@@ -41,7 +41,7 @@ $(document).ready(function(){
         transaction.executeSql("UPDATE catalogs SET updated=? WHERE name = ?;", [ updated, name ], nullDataHandler, q.dbErrorHandler);
       });
     },
-    'addEntry': function(name, catalog, classname, active) {
+    'addEntry': function(name, data, catalog, classname, state, active) {
       if (typeof(active)=='undefined') {
         active = 1;
       }
@@ -77,13 +77,13 @@ $(document).ready(function(){
   
   db.transaction(function (transaction) {
     transaction.executeSql('CREATE TABLE IF NOT EXISTS entries(' +
-      'name TEXT NOT NULL, catalog TEXT NOT NULL, class TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, weight INTEGER NOT NULL DEFAULT 0, abbreviation TEXT NOT NULL DEFAULT "");', [], nullDataHandler, q.dbErrorHandler);
+      'name TEXT NOT NULL, data TEXT NOT NULL DEFAULT "", catalog TEXT NOT NULL, class TEXT NOT NULL, user INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, weight INTEGER NOT NULL DEFAULT 0, abbreviation TEXT NOT NULL DEFAULT "");', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_catalog ON entries(catalog);', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_abbreviation ON entries(abbreviation);', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_active ON entries(active DESC);', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_weight ON entries(weight DESC);', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS catalogs(' +
-      'name TEXT NOT NULL PRIMARY KEY, updated INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, uninstall INTEGER NOT NULL DEFAULT 0);', [], nullDataHandler, q.dbErrorHandler);
+      'name TEXT NOT NULL PRIMARY KEY, updated INTEGER NOT NULL DEFAULT 0, user INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, uninstall INTEGER NOT NULL DEFAULT 0);', [], nullDataHandler, q.dbErrorHandler);
   });
   
   $(document).trigger('quicksilver-init', q);
