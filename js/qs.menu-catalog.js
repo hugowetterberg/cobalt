@@ -22,7 +22,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
   q.registerHandler({
     'name': 'Go to',
     'handler': function(text, item) {
-      window.location.href = item.data;
+      window.location.href = Drupal.settings.basePath + item.data;
     }
   }, 'url_data');
 });
