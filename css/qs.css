@@ -8,6 +8,8 @@
   
   font-size: 12px;
   font-family: 'Lucida Grande', sans-serif;
+  
+  z-index: 1000;
 }
 
 #qs .cell {
@@ -36,7 +38,6 @@
   position: absolute;
   bottom: 10px;
   left: 10px;
-  height: 1em;
   width: 120px;
   padding: 3px;
   text-align: center;
@@ -46,7 +47,7 @@
   -webkit-border-radius: 5px;
 }
 
-#qs .cell .url {
+#qs .cell .url, #qs .cell .url_data {
   background: url(bookmark.png) center center no-repeat;
 }
 

@@ -3,14 +3,15 @@ $(document).bind('quicksilver-init', function(evt, q) {
   
   var menu = {
     'update': function(callback) {
-      console.log('Dummy should have updated');
-      callback();
+      $.getJSON('/quicksilver/menu_json', {}, function (data) {
+        q.emptyCatalog('menu');
+        for (var url in data) {
+          q.addEntry(data[url], url, 'menu', 'url_data');
+        }
+        callback(false);
+      });
     },
     'install': function() {
-      console.log('Installing dummy entries');
-      for (var i=0; i<sample_ac.length; i++) {
-        q.addEntry(sample_ac[i], 'dummy', 'dummy');
-      }
     },
     'uninstall': function() {
       console.log('Removing dummy entries');
@@ -18,13 +19,13 @@ $(document).bind('quicksilver-init', function(evt, q) {
   };
   
   // Registering catalog
-  q.registerCatalog('dummy', dummy);
+  q.registerCatalog('menu', menu);
   
   // Register handler
   q.registerHandler({
-    'name': 'Dummy action',
+    'name': 'Go to',
     'handler': function(text, item) {
-      dummy_out.text(item.name);
+      window.location.href = item.data;
     }
-  }, 'dummy');
+  }, 'url_data');
 });

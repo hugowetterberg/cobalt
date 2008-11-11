@@ -38,15 +38,23 @@ $(document).ready(function(){
         updated = new Date().getTime();
       }
       db.transaction(function (transaction) {
-        transaction.executeSql("UPDATE catalogs SET updated=? WHERE name = ?;", [ updated, name ], nullDataHandler, q.dbErrorHandler);
+        transaction.executeSql("UPDATE catalogs SET updated=?, state=? WHERE name = ?;", [ updated, Drupal.settings.quicksilver.state, name ], nullDataHandler, q.dbErrorHandler);
       });
     },
-    'addEntry': function(name, data, catalog, classname, state, active) {
+    'emptyCatalog': function(name) {
+      db.transaction(function (transaction) {
+        transaction.executeSql("DELETE FROM entries WHERE catalog=?;", [ name ], nullDataHandler, q.dbErrorHandler);
+      });
+    },
+    'addEntry': function(name, data, catalog, classname, active, state) {
+      if (typeof(state)=='undefined') {
+        state = Drupal.settings.quicksilver.state;
+      }
       if (typeof(active)=='undefined') {
         active = 1;
       }
       db.transaction(function (transaction) {
-        transaction.executeSql("INSERT INTO entries(name, catalog, class, active) VALUES(?,?,?,?);", [ name, catalog, classname, active], nullDataHandler, q.dbErrorHandler);
+        transaction.executeSql("INSERT INTO entries(name, data, catalog, class, state, active) VALUES(?,?,?,?,?,?);", [ name, data, catalog, classname, state, active], nullDataHandler, q.dbErrorHandler);
       });
     },
     'registerHandler': function(handler, catalog) {
@@ -77,13 +85,13 @@ $(document).ready(function(){
   
   db.transaction(function (transaction) {
     transaction.executeSql('CREATE TABLE IF NOT EXISTS entries(' +
-      'name TEXT NOT NULL, data TEXT NOT NULL DEFAULT "", catalog TEXT NOT NULL, class TEXT NOT NULL, user INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, weight INTEGER NOT NULL DEFAULT 0, abbreviation TEXT NOT NULL DEFAULT "");', [], nullDataHandler, q.dbErrorHandler);
+      'name TEXT NOT NULL, data TEXT NOT NULL DEFAULT "", catalog TEXT NOT NULL, class TEXT NOT NULL, state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, weight INTEGER NOT NULL DEFAULT 0, abbreviation TEXT NOT NULL DEFAULT "");', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_catalog ON entries(catalog);', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_abbreviation ON entries(abbreviation);', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_active ON entries(active DESC);', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_weight ON entries(weight DESC);', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS catalogs(' +
-      'name TEXT NOT NULL PRIMARY KEY, updated INTEGER NOT NULL DEFAULT 0, user INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, uninstall INTEGER NOT NULL DEFAULT 0);', [], nullDataHandler, q.dbErrorHandler);
+      'name TEXT NOT NULL PRIMARY KEY, updated INTEGER NOT NULL DEFAULT 0, state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, uninstall INTEGER NOT NULL DEFAULT 0);', [], nullDataHandler, q.dbErrorHandler);
   });
   
   $(document).trigger('quicksilver-init', q);
@@ -111,6 +119,29 @@ $(document).ready(function(){
       }
     }, q.dbErrorHandler);
   });
+  
+  // Update loop
+  var update_counter = 0;
+  var update_loop = function() {
+    setTimeout(function() {
+      if(update_queue.length) {
+        var catalogName = update_queue.shift();
+        var catalog = catalogs[catalogName];
+        if (catalog['update']) {
+          catalog.update(function(enqueue){
+            if (enqueue) {
+              update_queue.push(catalogName);
+            }
+            update_counter++;
+            update_loop();
+          });
+        }
+      }
+    },update_counter?1000:100);
+  };
+  update_loop();
+  
+  $(document).trigger('quicksilver-post-init', q);
   
   // Initialize GUI
   var qs = $('<div id="qs">'+
@@ -211,8 +242,8 @@ $(document).ready(function(){
     $('#qs .left label').text(item.name).show();
     $('#qs .ac-opt-' + match_idx).addClass('active');
     
-    if (handlers[item.catalog] && handlers[item.catalog].length) {
-      set_handler(handlers[item.catalog][0]);
+    if (handlers[item['class']] && handlers[item['class']].length) {
+      set_handler(handlers[item['class']][0]);
     }
     else if (global_handlers.length) {
       set_handler(global_handlers[0]);
