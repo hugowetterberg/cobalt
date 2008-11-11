@@ -33,14 +33,18 @@ function quicksilver_menu_json() {
    $tree = menu_tree_all_data();
    $data = array();
    _quicksilver_menu_data_recursive($tree, $data);
+   
+   drupal_alter('quicksilver_menu', $data);
+   
    print drupal_to_js($data);
    exit;
 }
 
 function _quicksilver_menu_data_recursive($tree, &$data) {
   foreach($tree as $key => $item) {
-    if (!$item['link']['hidden'] && $item['link']['access']) {
-      $data[$item['link']['href']] = $item['link']['title'];
+    $link = $item['link'];
+    if (!$link['hidden'] && $link['access']) {
+      $data[$link['mlid']] = array($link['href'], $link['title']);
       if ($item['below']) {
         _quicksilver_menu_data_recursive($item['below'], $data);
       }

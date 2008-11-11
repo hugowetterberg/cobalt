@@ -38,7 +38,7 @@ $(document).ready(function(){
         updated = new Date().getTime();
       }
       db.transaction(function (transaction) {
-        transaction.executeSql("UPDATE catalogs SET updated=?, state=? WHERE name = ?;", [ updated, Drupal.settings.quicksilver.state, name ], nullDataHandler, q.dbErrorHandler);
+        transaction.executeSql("UPDATE catalogs SET updated=?, state=? WHERE name = ?;", [ updated, Drupal.settings.quicksilver.state, catalog ], nullDataHandler, q.dbErrorHandler);
       });
     },
     'emptyCatalog': function(name) {
@@ -46,7 +46,7 @@ $(document).ready(function(){
         transaction.executeSql("DELETE FROM entries WHERE catalog=?;", [ name ], nullDataHandler, q.dbErrorHandler);
       });
     },
-    'addEntry': function(name, data, catalog, classname, active, state) {
+    'addEntry': function(id, name, data, catalog, classname, active, state) {
       if (typeof(state)=='undefined') {
         state = Drupal.settings.quicksilver.state;
       }
@@ -54,8 +54,22 @@ $(document).ready(function(){
         active = 1;
       }
       db.transaction(function (transaction) {
-        transaction.executeSql("INSERT INTO entries(name, data, catalog, class, state, active) VALUES(?,?,?,?,?,?);", [ name, data, catalog, classname, state, active], nullDataHandler, q.dbErrorHandler);
+        transaction.executeSql("INSERT INTO entries(id, name, data, catalog, data_class, state, active) VALUES(?,?,?,?,?,?,?);", [ id, name, data, catalog, classname, state, active], nullDataHandler, q.dbErrorHandler);
       });
+    },
+    'registerUse': function(text, item) {
+      if (item.weight == null) {
+        db.transaction(function (transaction) {
+          transaction.executeSql("INSERT INTO usage_data(catalog, id, weight, abbreviation) VALUES(?,?,?,?)", 
+            [item.catalog, item.id, 1, text], nullDataHandler, q.dbErrorHandler);
+        });
+      } 
+      else {
+        db.transaction(function (transaction) {
+          transaction.executeSql("UPDATE usage_data SET weight=weight+1, abbreviation=? WHERE catalog=? AND id=?", 
+            [text, item.catalog, item.id], nullDataHandler, q.dbErrorHandler);
+        });
+      }
     },
     'registerHandler': function(handler, catalog) {
       if (typeof(catalog)=='undefined') {
@@ -77,7 +91,8 @@ $(document).ready(function(){
       console.log('text:' + text);
       console.log('name:' + item.name);
       console.log('catalog:' + item.catalog);
-      console.log('class:' + item['class']);
+      console.log('class:' + item.data_class);
+      console.log('weight:' + item.weight);
     }
   });
   
@@ -85,11 +100,16 @@ $(document).ready(function(){
   
   db.transaction(function (transaction) {
     transaction.executeSql('CREATE TABLE IF NOT EXISTS entries(' +
-      'name TEXT NOT NULL, data TEXT NOT NULL DEFAULT "", catalog TEXT NOT NULL, class TEXT NOT NULL, state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, weight INTEGER NOT NULL DEFAULT 0, abbreviation TEXT NOT NULL DEFAULT "");', [], nullDataHandler, q.dbErrorHandler);
+      'catalog TEXT NOT NULL, id TEXT NOT NULL, name TEXT NOT NULL, data TEXT NOT NULL DEFAULT "", data_class TEXT NOT NULL, ' + 
+      'state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, ' + 
+      'CONSTRAINT pk_entries PRIMARY KEY(catalog, id));', [], nullDataHandler, q.dbErrorHandler);
+    transaction.executeSql('CREATE TABLE IF NOT EXISTS usage_data(catalog TEXT NOT NULL, id TEXT NOT NULL, ' + 
+      'weight INTEGER NOT NULL DEFAULT 0, abbreviation TEXT NOT NULL DEFAULT "",' +
+      'CONSTRAINT pk_usage_data PRIMARY KEY(catalog, id));', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_catalog ON entries(catalog);', [], nullDataHandler, q.dbErrorHandler);
-    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_abbreviation ON entries(abbreviation);', [], nullDataHandler, q.dbErrorHandler);
+    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_abbreviation ON usage_data(abbreviation);', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_active ON entries(active DESC);', [], nullDataHandler, q.dbErrorHandler);
-    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_weight ON entries(weight DESC);', [], nullDataHandler, q.dbErrorHandler);
+    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_weight ON usage_data(weight DESC);', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS catalogs(' +
       'name TEXT NOT NULL PRIMARY KEY, updated INTEGER NOT NULL DEFAULT 0, state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, uninstall INTEGER NOT NULL DEFAULT 0);', [], nullDataHandler, q.dbErrorHandler);
   });
@@ -132,6 +152,7 @@ $(document).ready(function(){
             if (enqueue) {
               update_queue.push(catalogName);
             }
+            q.catalogUpdated(catalogName);
             update_counter++;
             update_loop();
           });
@@ -154,7 +175,7 @@ $(document).ready(function(){
   
   var schedule_lookup, lookup, keypress_reaction, 
       keypress_time = 200,
-      last_keypress = 0,
+      wait_until = 0,
       lookup_pending = false,
       qs_visible = false,
       matches = [], match_idx = 0, current_text, handler, item;
@@ -166,7 +187,7 @@ $(document).ready(function(){
     current_text = qs_input.val();
     
     if($.trim(current_text)!='') {
-      last_keypress = new Date().getTime();
+      wait_until = new Date().getTime() + keypress_time;
       schedule_lookup();
     }
     else {
@@ -176,7 +197,7 @@ $(document).ready(function(){
   
   var clear_ac = function() {
     match_idx = 0;
-    current_text = "";
+    current_text = '';
     $('#qs .left label').hide();
     qs_ac.empty().hide();
   };
@@ -185,27 +206,40 @@ $(document).ready(function(){
     var time = new Date().getTime();
     if (!lookup_pending) {
       lookup_pending = true;
-      setTimeout(lookup, keypress_time - (time - last_keypress));
+      setTimeout(lookup, wait_until - time + 50);
     }
   };
   
   var lookup = function() {
     var time = new Date().getTime();
-    if (time > keypress_time + last_keypress) {
+    if (time < wait_until) {
       lookup_pending = false;
       schedule_lookup();
     }
     else {
+      if (false && current_text.length==2) {
+        var like_expr = '%' + current_text[0] + '%' + current_text[1] + '%';
+      }
+      else {
+        var like_expr = '%' + current_text + '%';
+      }
+      
       db.transaction(function (transaction) {
-        transaction.executeSql("SELECT * FROM entries WHERE active=1 AND (abbreviation = ? OR name LIKE ?) ORDER BY nullif(name,?), nullif(abbreviation,?), weight DESC LIMIT 5;", [ 
-          current_text, current_text+'%', current_text, current_text ], lookup_finished, q.dbErrorHandler);
+        transaction.executeSql("SELECT e.*, u.weight FROM entries AS e " + 
+          "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
+          "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?) " + 
+          "ORDER BY nullif(?,u.abbreviation), nullif(?,e.name), u.weight DESC LIMIT 5;", [ 
+          current_text, like_expr, current_text, current_text ], lookup_finished, q.dbErrorHandler);
       });
     }
   };
   
   var lookup_finished = function(transaction, results) {
     lookup_pending = false;
-    clear_ac();
+    
+    match_idx = 0;
+    $('#qs .left label').hide();
+    qs_ac.empty().hide();
     
     if (results.rows.length) {
       for (var i=0; i<results.rows.length; i++) {
@@ -236,14 +270,14 @@ $(document).ready(function(){
     var old_item = matches.item(match_idx);
     
     $('#qs .ac-opt-' + match_idx).removeClass('active');
-    $('#qs .left .inner').removeClass(old_item['class']);
+    $('#qs .left .inner').removeClass(old_item.data_class);
     match_idx = idx;
-    $('#qs .left .inner').addClass(item['class']);
+    $('#qs .left .inner').addClass(item.data_class);
     $('#qs .left label').text(item.name).show();
     $('#qs .ac-opt-' + match_idx).addClass('active');
     
-    if (handlers[item['class']] && handlers[item['class']].length) {
-      set_handler(handlers[item['class']][0]);
+    if (handlers[item.data_class] && handlers[item.data_class].length) {
+      set_handler(handlers[item.data_class][0]);
     }
     else if (global_handlers.length) {
       set_handler(global_handlers[0]);
@@ -272,7 +306,9 @@ $(document).ready(function(){
   
   var run_handler = function() {
     if (item && typeof(handler['handler']) == 'function') {
-      handler.handler(current_text, item);
+      var text = $.trim(qs_input.val());
+      q.registerUse(text, item);
+      handler.handler(text, item);
     }
     hide();
   };
@@ -303,7 +339,9 @@ $(document).ready(function(){
   qs.bind('keydown', 'return', function(){ run_handler(); });
   qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); });
   qs_input.bind('keydown', 'down', function(){ ac_select(match_idx+1); });
-  qs_input.bind('keyup', keypress_reaction);
+  qs_input.bind('keyup', function(){
+    setTimeout(keypress_reaction, 10);
+  });
   
   $(document).bind('click', hide);
   $(document).bind('keydown', 'Alt+space', toggle);
