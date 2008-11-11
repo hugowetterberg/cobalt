@@ -1,6 +1,4 @@
-$(document).bind('quicksilver-init', function(evt, q) {
-  console.log('Dummy catalog init');
-  
+$(document).bind('quicksilver-init', function(evt, q) {  
   var menu = {
     'update': function(callback) {
       $.getJSON('/quicksilver/menu_json', {}, function (data) {
@@ -14,7 +12,6 @@ $(document).bind('quicksilver-init', function(evt, q) {
     'install': function() {
     },
     'uninstall': function() {
-      console.log('Removing dummy entries');
     }
   };
   

@@ -4,7 +4,7 @@
   -webkit-border-radius: 20px;
   position: absolute;
   width: 330px;
-  padding: 10px 0 0 0;
+  padding: 10px 0 10px 0;
   
   font-size: 12px;
   font-family: 'Lucida Grande', sans-serif;
@@ -18,7 +18,7 @@
   -moz-border-radius: 20px;
   -webkit-border-radius: 20px;
   float: left;
-  margin: 0 0 10px 10px;
+  margin: 0 0 0 10px;
   width: 150px;
   height: 150px;
   font-family: 'Lucida Grande', sans-serif;
@@ -67,6 +67,7 @@
   margin: 4px;
   padding: 3px;
   border: 2px solid rgba(255,255,255,0.8);
+  background-image: none;
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
 }
