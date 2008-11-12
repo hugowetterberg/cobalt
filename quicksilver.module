@@ -5,6 +5,7 @@ function quicksilver_init() {
     global $user;
     
     drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/gears_init.js');
+    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/minimal-gears-wrapper.js');
     drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/jquery.hotkeys.js');
     drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.js');
     drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.menu-catalog.js');

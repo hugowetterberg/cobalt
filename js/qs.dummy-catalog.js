@@ -17,7 +17,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
     'install': function() {
       console.log('Installing dummy entries');
       for (var i=0; i<sample_ac.length; i++) {
-        q.addEntry(sample_ac[i], '', 'dummy', 'dummy');
+        q.addEntry(i, sample_ac[i], '', 'dummy', 'dummy');
       }
     },
     'uninstall': function() {

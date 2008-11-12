@@ -4,8 +4,9 @@ $(document).ready(function(){
     var db = openDatabase('quicksilver', '1.0', 'Quicksilver Database', 1024000);
   }
   else if (google.gears) {
-    var dbman = google.gears.factory.create('beta.databasemanager');
-    var db = dbman.open('quicksilver', '1.0', 'Quicksilver Database', 1024000);
+    var gdb = google.gears.factory.create('beta.database');
+    gdb.open('quicksilver');
+    var db = gears_db_html5_wrapper(gdb);
   }
   
   if (!db) {
