@@ -55,7 +55,7 @@ $(document).ready(function(){
         active = 1;
       }
       db.transaction(function (transaction) {
-        transaction.executeSql("INSERT INTO entries(id, name, data, catalog, data_class, state, active) VALUES(?,?,?,?,?,?,?);", [ id, name, data, catalog, classname, state, active], nullDataHandler, q.dbErrorHandler);
+        transaction.executeSql("INSERT OR REPLACE INTO entries(id, name, data, catalog, data_class, state, active) VALUES(?,?,?,?,?,?,?);", [ id, name, data, catalog, classname, state, active], nullDataHandler, q.dbErrorHandler);
       });
     },
     'registerUse': function(text, item) {
@@ -72,15 +72,15 @@ $(document).ready(function(){
         });
       }
     },
-    'registerHandler': function(handler, catalog) {
-      if (typeof(catalog)=='undefined') {
+    'registerHandler': function(handler, data_class) {
+      if (typeof(data_class)=='undefined') {
         global_handlers.push(handler);
       }
       else {
-        if (!handlers[catalog]) {
-          handlers[catalog] = [];
+        if (!handlers[data_class]) {
+          handlers[data_class] = [];
         }
-        handlers[catalog].push(handler);
+        handlers[data_class].push(handler);
       }
     }
   };
@@ -125,7 +125,7 @@ $(document).ready(function(){
       for (var i = 0; i < results.rows.length; i++) {
         var item = results.rows.item(i);
         info[item.name] = item;
-        update_queue.push(item.name);
+        update_queue.push(item);
       }
       
       // Install new catalogs and queue them for updates
@@ -137,7 +137,7 @@ $(document).ready(function(){
           db.transaction(function (transaction) {
             transaction.executeSql("INSERT INTO catalogs(name) VALUES(?)", [key], nullDataHandler);
           });
-          update_queue.unshift(key);
+          update_queue.unshift({'name': key, 'updated': 0 });
         }
       }
     }, q.dbErrorHandler);
@@ -148,17 +148,31 @@ $(document).ready(function(){
   var update_loop = function() {
     setTimeout(function() {
       if(update_queue.length) {
-        var catalogName = update_queue.shift();
-        var catalog = catalogs[catalogName];
-        if (catalog['update']) {
-          catalog.update(function(enqueue){
-            if (enqueue) {
-              update_queue.push(catalogName);
-            }
-            q.catalogUpdated(catalogName);
-            update_counter++;
+        var inf = update_queue.shift();
+        var now = new Date().getTime();
+        var catalog = catalogs[inf.name];
+        
+        if (typeof(catalog['update_rate'])!='undefined' && inf.updated + catalog.update_rate > now) {
+          update_queue.push(inf);
+          update_loop();
+        }
+        else {
+          if (catalog['update']) {
+            catalog.update(inf.updated, function(enqueue){
+              var now = new Date().getTime();
+              q.catalogUpdated(inf.name);
+              
+              if (enqueue) {
+                update_queue.push({'name': inf.name, 'updated': now });
+              }
+              
+              update_counter++;
+              update_loop();
+            });
+          }
+          else {
             update_loop();
-          });
+          }
         }
       }
     },update_counter?1000:100);
@@ -171,8 +185,9 @@ $(document).ready(function(){
   var qs = $('<div id="qs">'+
     '<div class="cell left"><div class="inner"><input type="text" id="qs-input" /><label></label></div></div>'+ 
     '<div class="cell right"><div class="inner"><input type="text" id="qs-handler-input" /><label></label></div></div>'+
-    '<ul class="qs-autocomplete"></ul></div>').appendTo('body').hide();
+    '<ul class="qs-autocomplete"></ul><ul class="qs-actions"></ul></div>').appendTo('body').hide();
   var qs_input = $('#qs-input');
+  var qs_h_input = $('#qs-handler-input');
   var qs_ac = $('#qs .qs-autocomplete');
   $('#qs .right label').hide();
   
@@ -181,7 +196,7 @@ $(document).ready(function(){
       wait_until = 0,
       lookup_pending = false,
       qs_visible = false,
-      matches = [], match_idx = 0, current_text, handler, item;
+      matches = [], match_idx = 0, handler_idx = 0, current_text, handler, item, actions;
   
   var keypress_reaction = function() {
     if(qs_input.val()==current_text) {
@@ -228,6 +243,7 @@ $(document).ready(function(){
       }
       
       db.transaction(function (transaction) {
+        console.log("Looking up " + current_text);
         transaction.executeSql("SELECT e.*, u.weight FROM entries AS e " + 
           "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
           "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?) " + 
@@ -273,18 +289,36 @@ $(document).ready(function(){
     var old_item = matches.item(match_idx);
     
     $('#qs .ac-opt-' + match_idx).removeClass('active');
-    $('#qs .left .inner').removeClass(old_item.data_class);
     match_idx = idx;
-    $('#qs .left .inner').addClass(item.data_class);
+    $('#qs .left .inner').attr('class','inner qs-item-' + item.data_class);
     $('#qs .left label').text(item.name).show();
     $('#qs .ac-opt-' + match_idx).addClass('active');
     
-    if (handlers[item.data_class] && handlers[item.data_class].length) {
-      set_handler(handlers[item.data_class][0]);
+    actions = action_candidates(item);
+    set_handler(0);
+  };
+  
+  var action_candidates = function(item) {
+    var candidates = [];
+    var add_applicable = function(handler) {
+      if (typeof(handler['applicable'])=='undefined' || handler.applicable(current_text, item)) {
+        candidates.push(handler);
+      }
+    };
+    
+    if (typeof(handlers[item.data_class])!='undefined') {
+      var cls_count = handlers[item.data_class].length;
+      for (var i=0; i<cls_count; i++) {
+        add_applicable(handlers[item.data_class][i]);
+      }
     }
-    else if (global_handlers.length) {
-      set_handler(global_handlers[0]);
+    
+    var g_count = global_handlers.length;
+    for (var i=0; i<g_count; i++) {
+      add_applicable(global_handlers[i]);
     }
+    
+    return candidates;
   };
   
   var handler_class = function() {
@@ -293,16 +327,18 @@ $(document).ready(function(){
     }
   };
   
-  var set_handler = function(new_handler) {
-    var oldClass = handler_class();
-    if (oldClass) {
-      $('#qs .right .inner').removeClass(oldClass);
+  var set_handler = function(idx) {
+    if (idx<0 || idx >= actions.length) {
+      return;
     }
+    
+    handler_idx = idx;
+    var new_handler = actions[idx];
     
     handler = new_handler;
     if (handler) {
       var newClass = handler_class();
-      $('#qs .right .inner').addClass(newClass);
+      $('#qs .right .inner').attr('class','inner qs-action-' +newClass);
       $('#qs .right label').text(handler.name).show();
     }
   };
@@ -342,6 +378,8 @@ $(document).ready(function(){
   qs.bind('keydown', 'return', function(){ run_handler(); });
   qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); });
   qs_input.bind('keydown', 'down', function(){ ac_select(match_idx+1); });
+  qs_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); });
+  qs_h_input.bind('keydown', 'down', function(){ set_handler(handler_idx+1); });
   qs_input.bind('keyup', function(){
     setTimeout(keypress_reaction, 10);
   });

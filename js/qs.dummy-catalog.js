@@ -10,7 +10,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
   ];
   
   var dummy = {
-    'update': function(callback) {
+    'update': function(last_updated, callback) {
       console.log('Dummy should have updated');
       callback();
     },

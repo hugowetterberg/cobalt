@@ -1,6 +1,6 @@
 $(document).bind('quicksilver-init', function(evt, q) {  
   var menu = {
-    'update': function(callback) {
+    'update': function(last_update, callback) {
       $.getJSON(Drupal.settings.basePath + 'quicksilver/menu_json', {}, function (data) {
         q.emptyCatalog('menu');
         for (var id in data) {
@@ -12,7 +12,8 @@ $(document).bind('quicksilver-init', function(evt, q) {
     'install': function() {
     },
     'uninstall': function() {
-    }
+    },
+    'update_rate': 60000
   };
   
   // Registering catalog

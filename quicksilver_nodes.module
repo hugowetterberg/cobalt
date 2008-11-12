@@ -1,0 +1,47 @@
+<?php
+
+function quicksilver_nodes_init() {
+  if (user_access('use quicksilver')) {
+    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.nodes.js');
+  }
+}
+
+function quicksilver_nodes_menu() {
+  $items = array();
+  $items['quicksilver/nodes_json/%'] = array(
+    'title' => t('Serialized menu'),
+    'page callback' => 'quicksilver_nodes_json',
+    'page arguments' => array(2),
+    'access arguments' => array('use quicksilver'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function quicksilver_nodes_json($last_update) {
+  $res = db_query("SELECT nid, title, type, uid, status, moderate FROM {node}
+    WHERE created > %d OR changed > %d
+    LIMIT 100", $last_update, $last_update);
+  
+  $nodes = array();
+  $access_types = array(
+    'r' => 'view',
+    'w' => 'update',
+    'd' => 'delete',
+  );
+  
+  while ($node = db_fetch_object($res)) {
+    $access = '';
+    foreach ($access_types as $key => $permission) {
+      if (node_access($permission, $node)) {
+        $access .= $key;
+      }
+    }
+    if (!empty($access)) {
+      $nodes[] = array($node->nid, $node->title, $access);
+    }
+  }
+  
+  print drupal_to_js($nodes);
+  exit;
+}

@@ -55,8 +55,12 @@
   -webkit-border-radius: 5px;
 }
 
-#qs .cell .url, #qs .cell .url_data {
+#qs .cell .qs-item-url_data {
   background: url(bookmark.png) center center no-repeat;
+}
+
+#qs .cell .qs-item-node {
+  background: url(drupal.png) center center no-repeat;
 }
 
 #qs .qs-autocomplete {
@@ -80,7 +84,7 @@
   -webkit-border-radius: 10px;
 }
 
-#qs .right .default {
+#qs .right .qs-action-default {
   background: transparent url(default_action.png) center center no-repeat;
 }
 
