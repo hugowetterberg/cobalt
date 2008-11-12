@@ -346,4 +346,5 @@ $(document).ready(function(){
   
   $(document).bind('click', hide);
   $(document).bind('keydown', 'Alt+space', toggle);
+  $(document).bind('keydown', 'Ctrl+space', toggle);
 });
