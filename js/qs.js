@@ -253,7 +253,7 @@ $(document).ready(function(){
     else {
       if (matches.length) {
         var old_item = matches.item(match_idx);
-        $('#qs .left .inner').removeClass(old_item['class']);
+        $('#qs .left .inner').removeClass(old_item['data_class']);
       }      
       matches = [];
     }

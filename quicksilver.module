@@ -31,7 +31,13 @@ function quicksilver_menu() {
 }
 
 function quicksilver_menu_json() {
-   $tree = menu_tree_all_data();
+   $menu_names = menu_get_names();
+   
+   $tree = array();
+   foreach ($menu_names as $name) {
+    $tree += menu_tree_all_data($name);
+   }
+   
    $data = array();
    _quicksilver_menu_data_recursive($tree, $data);
    

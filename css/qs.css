@@ -25,13 +25,21 @@
 }
 
 #qs .cell input {
-  margin: 10px;
-  width: 130px;
-  height: 130px;
+  margin: -4px 0 0 -4px;
+  padding: 4px;
+  width: 134px;
+  height: 134px;
   border: 0;
   color: rgba(0,0,0,0.8);
   background-color: rgba(0,0,0,0);
   font-size: 32px;
+}
+
+#qs .inner {
+  overflow: hidden;
+  width: 130px;
+  height: 130px;
+  margin: 10px;
 }
 
 #qs .cell label {
