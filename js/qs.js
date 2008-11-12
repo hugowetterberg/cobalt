@@ -130,8 +130,10 @@ $(document).ready(function(){
       
       // Install new catalogs and queue them for updates
       for (var key in catalogs) {
-        if (!info[key] && catalogs[key]['install']) {
-          catalogs[key].install();
+        if (!info[key]) {
+          if (catalogs[key]['install']) {
+            catalogs[key].install();
+          }
           db.transaction(function (transaction) {
             transaction.executeSql("INSERT INTO catalogs(name) VALUES(?)", [key], nullDataHandler);
           });
