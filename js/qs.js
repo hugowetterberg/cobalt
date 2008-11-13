@@ -142,6 +142,8 @@ $(document).ready(function(){
           }
         })(key);
       }
+      
+      update_loop();
     }, q.dbErrorHandler);
   });
   
@@ -179,7 +181,6 @@ $(document).ready(function(){
       }
     },update_counter?1000:100);
   };
-  update_loop();
   
   $(document).trigger('quicksilver-post-init', q);
   
