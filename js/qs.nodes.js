@@ -4,7 +4,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
       $.getJSON(Drupal.settings.basePath + 'quicksilver/nodes_json/' + Math.round((last_update/1000)), {}, function (data) {
         var num_nodes = data.length;
         for (var i=0; i<num_nodes; i++) {
-          q.addEntry(data[i][0], data[i][1], data[i][2], 'nodes', 'node');
+          q.addEntry(data[i][0], data[i][1], {'perm': data[i][2]}, 'nodes', 'node');
         }
         callback(true);
       });
@@ -23,7 +23,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
   q.registerHandler({
     'name': 'View',
     'applicable': function(text, item) {
-      return item.data.indexOf('r') >= 0;
+      return item.information.perm.indexOf('r') >= 0;
     },
     'handler': function(text, item) {
       window.location.href = Drupal.settings.basePath + 'node/' + item.id;
@@ -33,7 +33,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
   q.registerHandler({
     'name': 'Edit',
     'applicable': function(text, item) {
-      return item.data.indexOf('w') >= 0;
+      return item.information.perm.indexOf('w') >= 0;
     },
     'handler': function(text, item) {
       window.location.href = Drupal.settings.basePath + 'node/' + item.id + '/edit';
@@ -43,7 +43,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
   q.registerHandler({
     'name': 'Delete',
     'applicable': function(text, item) {
-      return item.data.indexOf('r') >= 0;
+      return item.information.perm.indexOf('r') >= 0;
     },
     'handler': function(text, item) {
       window.location.href = Drupal.settings.basePath + 'node/' + item.id + '/delete';

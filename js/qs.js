@@ -47,7 +47,7 @@ $(document).ready(function(){
         transaction.executeSql("DELETE FROM entries WHERE catalog=?;", [ name ], nullDataHandler, q.dbErrorHandler);
       });
     },
-    'addEntry': function(id, name, data, catalog, classname, active, state) {
+    'addEntry': function(id, name, information, catalog, classname, active, state) {
       if (typeof(state)=='undefined') {
         state = Drupal.settings.quicksilver.state;
       }
@@ -55,7 +55,7 @@ $(document).ready(function(){
         active = 1;
       }
       db.transaction(function (transaction) {
-        transaction.executeSql("INSERT OR REPLACE INTO entries(id, name, data, catalog, data_class, state, active) VALUES(?,?,?,?,?,?,?);", [ id, name, data, catalog, classname, state, active], nullDataHandler, q.dbErrorHandler);
+        transaction.executeSql("INSERT OR REPLACE INTO entries(id, name, data, catalog, data_class, state, active) VALUES(?,?,?,?,?,?,?);", [ id, name, $.toJSON(information), catalog, classname, state, active], nullDataHandler, q.dbErrorHandler);
       });
     },
     'registerUse': function(text, item) {
@@ -289,6 +289,7 @@ $(document).ready(function(){
     }
     
     item = matches.item(idx);
+    item.information = $.evalJSON(item.data);
     var old_item = matches.item(match_idx);
     
     $('#qs .ac-opt-' + match_idx).removeClass('active');
