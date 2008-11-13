@@ -130,15 +130,17 @@ $(document).ready(function(){
       
       // Install new catalogs and queue them for updates
       for (var key in catalogs) {
-        if (!info[key]) {
-          if (catalogs[key]['install']) {
-            catalogs[key].install();
+        (function(key) {
+          if (!info[key]) {
+            if (catalogs[key]['install']) {
+              catalogs[key].install();
+            }
+            db.transaction(function (transaction) {
+              transaction.executeSql("INSERT INTO catalogs(name) VALUES(?)", [key], nullDataHandler, q.dbErrorHandler);
+            });
+            update_queue.unshift({'name': key, 'updated': 0 });
           }
-          db.transaction(function (transaction) {
-            transaction.executeSql("INSERT INTO catalogs(name) VALUES(?)", [key], nullDataHandler);
-          });
-          update_queue.unshift({'name': key, 'updated': 0 });
-        }
+        })(key);
       }
     }, q.dbErrorHandler);
   });
