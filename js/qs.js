@@ -492,17 +492,17 @@ $(document).ready(function(){
   
   qs.bind('click', function(e){ return false; });
   qs_output.bind('click', function(e){ return false; });
-  qs.bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); });
-  qs.bind('keydown', 'return', function(){ run_handler(); });
-  qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); });
-  qs_input.bind('keydown', 'down', function(){ ac_select(match_idx+1); });
-  qs_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); });
-  qs_h_input.bind('keydown', 'down', function(){ set_handler(handler_idx+1); });
+  qs.bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); return false; });
+  qs.bind('keydown', 'return', function(){ run_handler(); return false; });
+  qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); return false; });
+  qs_input.bind('keydown', 'down', function(){ ac_select(match_idx+1); return false; });
+  qs_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); return false; });
+  qs_h_input.bind('keydown', 'down', function(){ set_handler(handler_idx+1); return false; });
   qs_input.bind('keydown', function(){
     setTimeout(keypress_reaction, 10);
   });
   
   $(document).bind('click', function(){ toggle('hide'); toggle_output('hide'); });
-  $(document).bind('keydown', 'Alt+space', toggle);
-  $(document).bind('keydown', 'Ctrl+space', toggle);
+  $(document).bind('keydown', 'Alt+space', function(){ toggle(); return false; });
+  $(document).bind('keydown', 'Ctrl+space', function(){ toggle(); return false; });
 });
