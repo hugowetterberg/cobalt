@@ -23,7 +23,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
   q.registerHandler({
     'name': 'Go to',
     'handler': function(text, item) {
-      var path = item.data;
+      var path = item.information;
       if (path=='<front>') {
         path = '';
       }
