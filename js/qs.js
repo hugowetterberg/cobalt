@@ -498,7 +498,7 @@ $(document).ready(function(){
   qs_input.bind('keydown', 'down', function(){ ac_select(match_idx+1); });
   qs_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); });
   qs_h_input.bind('keydown', 'down', function(){ set_handler(handler_idx+1); });
-  qs_input.bind('keyup', function(){
+  qs_input.bind('keydown', function(){
     setTimeout(keypress_reaction, 10);
   });
   
