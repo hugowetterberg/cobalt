@@ -457,8 +457,8 @@ $(document).ready(function(){
       clear_ac();
       qs_input.val($.trim(qs_input.val()));
       qs.css({
-        'top': $(window).height()/2 + document.body.scrollTop - qs.height()/2,
-        'left': $(window).width()/2 - qs.width()/2
+        'top': $(window).height()/3 + window.pageYOffset - qs.height()/2,
+        'left': $(window).width()/2 + window.pageXOffset - qs.width()/2
       }).show();
       qs_visible = true;
       setTimeout(function(){ qs_input.focus(); qs_input.select(); }, 100);
@@ -472,8 +472,8 @@ $(document).ready(function(){
     }
     else {
       qs_output.css({
-        'top': $(window).height()/2 + document.body.scrollTop - qs_output.height()/2,
-        'left': $(window).width()/2 - qs_output.width()/2
+        'top': $(window).height()/3 + window.pageYOffset - qs.height()/2,
+        'left': $(window).width()/2 + window.pageXOffset - qs.width()/2
       }).show();
       qs_out_visible = true;
     }
@@ -484,15 +484,14 @@ $(document).ready(function(){
   };
   
   qs.bind('click', function(e){ return false; }).
-    bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); }).
-    bind('keydown', 'return', function(){ run_handler(); });
-  qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); }).
-    bind('keydown', 'down', function(){ ac_select(match_idx+1); }).
-    bind('keyup', function(){ setTimeout(keypress_reaction, 10); });
-  qs_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); }).
-    bind('keydown', 'down', function(){ set_handler(handler_idx+1); });
+    bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); return false; }).
+    bind('keydown', 'return', function(){ run_handler(); return false; });
+  qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); return false; }).
+    bind('keydown', 'down', function(){ ac_select(match_idx+1); return false; }).
+    bind('keyup', function(){ setTimeout(keypress_reaction, 10); return false; });
+  qs_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); return false; }).
+    bind('keydown', 'down', function(){ set_handler(handler_idx+1); return false; });
   qs_output.bind('click', function(e){ return false; });
-  
   $(document).bind('click', function(){ toggle('hide'); toggle_output('hide'); })
     .bind('keydown', 'Alt+space', toggle)
     .bind('keydown', 'Ctrl+space', toggle);
