@@ -1,7 +1,7 @@
 $(document).bind('quicksilver-init', function(evt, q) {  
   var nodes = {
     'update': function(last_update, callback) {
-      $.getJSON(Drupal.settings.basePath + 'quicksilver/nodes_json/' + Math.round((last_update/1000)), {}, function (data) {
+      $.getJSON(Drupal.settings.basePath + 'quicksilver/data/nodes_json/' + Math.round((last_update/1000)), {}, function (data) {
         var num_nodes = data.length;
         for (var i=0; i<num_nodes; i++) {
           q.addEntry(data[i][0], data[i][1], {'perm': data[i][2]}, 'nodes', 'node');

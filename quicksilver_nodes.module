@@ -8,7 +8,7 @@ function quicksilver_nodes_init() {
 
 function quicksilver_nodes_menu() {
   $items = array();
-  $items['quicksilver/nodes_json/%'] = array(
+  $items['quicksilver/data/nodes_json/%'] = array(
     'title' => t('Serialized menu'),
     'page callback' => 'quicksilver_nodes_json',
     'page arguments' => array(2),

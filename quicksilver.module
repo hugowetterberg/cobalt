@@ -22,7 +22,7 @@ function quicksilver_perm() {
 
 function quicksilver_menu() {
   $items = array();
-  $items['quicksilver/menu_json'] = array(
+  $items['quicksilver/data/menu_json'] = array(
     'title' => t('Serialized menu'),
     'page callback' => 'quicksilver_menu_json',
     'access arguments' => array('use quicksilver'),
