@@ -19,8 +19,9 @@ $(document).bind('quicksilver-init', function(evt, q) {
   // Registering catalog
   q.registerCatalog('menu', menu);
   
-  // Register handler
+  // Register handlers
   q.registerHandler({
+    'id': 'menu_goto',
     'name': 'Go to',
     'handler': function(text, item) {
       var path = item.information;

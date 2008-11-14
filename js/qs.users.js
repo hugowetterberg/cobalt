@@ -21,6 +21,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
   
   // Register handlers
   q.registerHandler({
+    'id': 'user_view',
     'name': 'View',
     'applicable': function(text, item) {
       return item.information.perm.indexOf('r') >= 0;
@@ -31,6 +32,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
   }, 'user');
   
   q.registerHandler({
+    'id': 'user_edit',
     'name': 'Edit',
     'applicable': function(text, item) {
       return item.information.perm.indexOf('w') >= 0;
@@ -41,6 +43,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
   }, 'user');
   
   q.registerHandler({
+    'id': 'user_delete',
     'name': 'Delete',
     'applicable': function(text, item) {
       return item.information.perm.indexOf('d') >= 0;

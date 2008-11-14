@@ -47,6 +47,33 @@ $(document).ready(function(){
         transaction.executeSql("DELETE FROM entries WHERE catalog=?;", [ name ], nullDataHandler, q.dbErrorHandler);
       });
     },
+    'addKeyBinding': function(binding, catalog, id, handler, active, state) {
+      if (typeof(state)=='undefined') {
+        state = Drupal.settings.quicksilver.state;
+      }
+      if (typeof(active)=='undefined') {
+        active = 1;
+      }
+      bind_key(binding, catalog, id, handler);
+      db.transaction(function (transaction) {
+        transaction.executeSql("INSERT OR REPLACE INTO key_bindings(binding, catalog, id, handler, active, state) VALUES(?,?,?,?,?,?);", [ binding, catalog, id, handler, active, state ], nullDataHandler, q.dbErrorHandler);
+      });
+    },
+    'loadEntry': function(catalog, id, callback) {
+      if (typeof(state)=='undefined') {
+        state = Drupal.settings.quicksilver.state;
+      }
+      db.transaction(function (transaction) {
+        transaction.executeSql("SELECT * FROM entries WHERE catalog=? AND id=? AND state=?;", [ catalog, id, state ], function(transaction, results) {
+          var item = null;
+          if (results.rows.length) {
+            item = results.rows.item(0);
+            item.information = $.evalJSON(item.data);
+          }
+          callback(item);
+        }, q.dbErrorHandler);
+      });
+    },
     'addEntry': function(id, name, information, catalog, classname, active, state) {
       if (typeof(state)=='undefined') {
         state = Drupal.settings.quicksilver.state;
@@ -83,16 +110,42 @@ $(document).ready(function(){
         handlers[data_class].push(handler);
       }
     },
+    'actionCandidates': function(item) {
+      return action_candidates(item);
+    },
     'showHtml': function(html) {
-      qs_output.html(html);
+      if (typeof(html) == 'string') {
+        qs_output.html(html);
+      }
+      else {
+        qs_output.empty().append(html);
+      }
+      
       if (!qs_out_visible) {
         toggle_output();
       }
     }
   };
   
+  var bind_key = function (binding, catalog, id, handler) {
+    q.loadEntry(catalog, id, function(item) {
+      if (item) {
+        $(document).bind('keydown', binding, function(){
+          var cand = q.actionCandidates(item);
+          var cand_count = cand.length;
+          for(var i=0; i<cand_count; i++) {
+            if (cand[i].id == handler) {
+              cand[i].handler(item.name, item);
+            }
+          }
+        });
+      }
+    });
+  };
+  
   q.registerHandler({
-    'name': 'Console log',
+    'id': 'qs_show',
+    'name': 'Show',
     'handler': function(text, item) {
       q.showHtml('<h2>' + item.name + '</h2>' +
         'text: <i>' + text + '</i><br/>' + 
@@ -104,6 +157,40 @@ $(document).ready(function(){
     }
   });
   
+  q.registerHandler({
+    'id': 'qs_abbrev',
+    'name': 'Assign abbreviation',
+    'handler': function(text, item) {
+      var cand = q.actionCandidates(item);
+      var out = $('<div class="abbreviation-add"><h2>' + item.name + '</h2>' + 
+        'The keys <input class="key-combo" type="text" value="Ctrl+"/> should trigger the action:<br/> <select class="action-select"></select>' + 
+        '<button class="ok">Ok</button></div>');
+      var actions = $(out).find('.action-select');
+      var key_combo = $(out).find('.key-combo').css('width',50);
+      var cand_count = cand.length;
+      for(var i=0; i<cand_count; i++) {
+        actions.append('<option value="' + cand[i].id + '">' + cand[i].name + '</option>');
+      }
+      
+      $(out).find('button.ok').bind('click',function(){
+        toggle_output('hide');
+        q.addKeyBinding(key_combo.val(), item.catalog, item.id, actions.val());
+      });
+      
+      q.showHtml(out);
+    }
+  });
+  
+  // Load key bindings
+  db.transaction(function (transaction) {
+    transaction.executeSql('SELECT binding, catalog, id, handler FROM key_bindings', [], function(transaction, results) {
+      for (var i=0; i<results.rows.length; i++) {
+        var b = results.rows.item(i);
+        bind_key(b.binding, b.catalog, b.id, b.handler);
+      }
+    }, q.dbErrorHandler);
+  });
+  
   $(document).trigger('quicksilver-pre-init', q);
   
   db.transaction(function (transaction) {
@@ -111,6 +198,10 @@ $(document).ready(function(){
       'catalog TEXT NOT NULL, id TEXT NOT NULL, name TEXT NOT NULL, data TEXT NOT NULL DEFAULT "", data_class TEXT NOT NULL, ' + 
       'state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, ' + 
       'CONSTRAINT pk_entries PRIMARY KEY(catalog, id));', [], nullDataHandler, q.dbErrorHandler);
+    transaction.executeSql('CREATE TABLE IF NOT EXISTS key_bindings(' +
+      'binding TEXT NOT NULL, catalog TEXT NOT NULL, id TEXT NOT NULL, handler TEXT NOT NULL, ' + 
+      'state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, ' + 
+      'CONSTRAINT pk_bindings PRIMARY KEY(binding, state));', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS usage_data(catalog TEXT NOT NULL, id TEXT NOT NULL, ' + 
       'weight INTEGER NOT NULL DEFAULT 0, abbreviation TEXT NOT NULL DEFAULT "",' +
       'CONSTRAINT pk_usage_data PRIMARY KEY(catalog, id));', [], nullDataHandler, q.dbErrorHandler);
@@ -369,6 +460,7 @@ $(document).ready(function(){
       qs_visible = false;
     }
     else {
+      toggle_output('hide');
       clear_ac();
       qs_input.val($.trim(qs_input.val()));
       qs.css({
@@ -399,6 +491,7 @@ $(document).ready(function(){
   };
   
   qs.bind('click', function(e){ return false; });
+  qs_output.bind('click', function(e){ return false; });
   qs.bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); });
   qs.bind('keydown', 'return', function(){ run_handler(); });
   qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); });
