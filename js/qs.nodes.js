@@ -43,7 +43,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
   q.registerHandler({
     'name': 'Delete',
     'applicable': function(text, item) {
-      return item.information.perm.indexOf('r') >= 0;
+      return item.information.perm.indexOf('d') >= 0;
     },
     'handler': function(text, item) {
       window.location.href = Drupal.settings.basePath + 'node/' + item.id + '/delete';
