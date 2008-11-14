@@ -8,23 +8,42 @@ function quicksilver_nodes_init() {
 
 function quicksilver_nodes_menu() {
   $items = array();
-  $items['quicksilver/data/nodes_json/%'] = array(
+  $items['quicksilver/data/nodes_update/%'] = array(
     'title' => t('Serialized nodes'),
     'page callback' => 'quicksilver_nodes_json',
-    'page arguments' => array(2),
+    'page arguments' => array('update', 3),
+    'access arguments' => array('use quicksilver'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['quicksilver/data/nodes_single/%'] = array(
+    'title' => t('Serialized node'),
+    'page callback' => 'quicksilver_nodes_json',
+    'page arguments' => array('single', 3),
     'access arguments' => array('use quicksilver'),
     'type' => MENU_CALLBACK,
   );
   return $items;
 }
 
-function quicksilver_nodes_json($last_update) {
+function quicksilver_nodes_nodeapi(&$node, $op, $teaser, $page) {
+  if ($op=='view' && $page) {
+    drupal_add_js(array('quicksilver'=>array('nodes_current'=>$node->nid)), 'setting');
+  }
+}
+
+function quicksilver_nodes_json($op, $value) {
   // We're skipping the status check on purpose. As we check with the node_access
   // function later this allows administrators to access unpublished nodes.
-  $res = db_query("SELECT nid, title, type, uid, status, moderate FROM {node}
-    WHERE created > %d OR changed > %d
-    ORDER BY created DESC
-    LIMIT 100", $last_update, $last_update);
+  if ($op=='update') {
+    $res = db_query("SELECT nid, title, type, uid, status, moderate FROM {node}
+      WHERE created > %d OR changed > %d
+      ORDER BY created DESC
+      LIMIT 100", $value, $value);
+  }
+  else if ($op=='single') {
+    $res = db_query("SELECT nid, title, type, uid, status, moderate FROM {node}
+      WHERE nid = %d", $value);
+  }
   
   $nodes = array();
   $access_types = array(
