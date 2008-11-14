@@ -15,13 +15,10 @@ $(document).ready(function(){
     }
     return;
   }
-  var nullDataHandler = function(transaction, results) { };
-  
+  var nullDataHandler = function(transaction, results) { }, 
+    catalogs = {}, global_handlers = [], handlers = {}, update_queue = [];
+    
   // Initialize Quicksilver
-  var catalogs = {};
-  var global_handlers = [];
-  var handlers = {};
-  var update_queue = [];
   var q = {
     'dbErrorHandler': function(transaction, error)
     {
@@ -159,10 +156,10 @@ $(document).ready(function(){
   
   q.registerHandler({
     'id': 'qs_abbrev',
-    'name': 'Assign abbreviation',
+    'name': 'Assign shortcut',
     'handler': function(text, item) {
       var cand = q.actionCandidates(item);
-      var out = $('<div class="abbreviation-add"><h2>' + item.name + '</h2>' + 
+      var out = $('<div class="shortcut-add"><h2>' + item.name + '</h2>' + 
         'The keys <input class="key-combo" type="text" value="Ctrl+"/> should trigger the action:<br/> <select class="action-select"></select>' + 
         '<button class="ok">Ok</button></div>');
       var actions = $(out).find('.action-select');
@@ -292,12 +289,12 @@ $(document).ready(function(){
   var qs_ac = $('#qs .qs-autocomplete');
   $('#qs .right label').hide();
   
-  var schedule_lookup, lookup, keypress_reaction, 
-      keypress_time = 200,
+  var keypress_time = 200,
       wait_until = 0,
       lookup_pending = false,
       qs_visible = false, qs_out_visible = false,
-      matches = [], match_idx = 0, handler_idx = 0, current_text, handler, item, actions;
+      matches = [], match_idx = 0, handler_idx = 0, 
+      current_text, handler, item, actions;
   
   var keypress_reaction = function() {
     if(qs_input.val()==current_text) {
@@ -336,15 +333,8 @@ $(document).ready(function(){
       schedule_lookup();
     }
     else {
-      if (false && current_text.length==2) {
-        var like_expr = '%' + current_text[0] + '%' + current_text[1] + '%';
-      }
-      else {
-        var like_expr = '%' + current_text + '%';
-      }
-      
+      var like_expr = '%' + current_text + '%';
       db.transaction(function (transaction) {
-        console.log("Looking up " + current_text);
         transaction.executeSql("SELECT e.*, u.weight FROM entries AS e " + 
           "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
           "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?) " + 
@@ -490,19 +480,17 @@ $(document).ready(function(){
     toggle('hide');
   };
   
-  qs.bind('click', function(e){ return false; });
+  qs.bind('click', function(e){ return false; }).
+    bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); }).
+    bind('keydown', 'return', function(){ run_handler(); });
+  qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); }).
+    bind('keydown', 'down', function(){ ac_select(match_idx+1); }).
+    bind('keyup', function(){ setTimeout(keypress_reaction, 10); });
+  qs_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); }).
+    bind('keydown', 'down', function(){ set_handler(handler_idx+1); });
   qs_output.bind('click', function(e){ return false; });
-  qs.bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); });
-  qs.bind('keydown', 'return', function(){ run_handler(); });
-  qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); });
-  qs_input.bind('keydown', 'down', function(){ ac_select(match_idx+1); });
-  qs_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); });
-  qs_h_input.bind('keydown', 'down', function(){ set_handler(handler_idx+1); });
-  qs_input.bind('keyup', function(){
-    setTimeout(keypress_reaction, 10);
-  });
   
-  $(document).bind('click', function(){ toggle('hide'); toggle_output('hide'); });
-  $(document).bind('keydown', 'Alt+space', toggle);
-  $(document).bind('keydown', 'Ctrl+space', toggle);
+  $(document).bind('click', function(){ toggle('hide'); toggle_output('hide'); })
+    .bind('keydown', 'Alt+space', toggle)
+    .bind('keydown', 'Ctrl+space', toggle);
 });
