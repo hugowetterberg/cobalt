@@ -1,0 +1,45 @@
+<?php
+
+function quicksilver_users_init() {
+  if (user_access('use quicksilver')) {
+    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.users.js');
+  }
+}
+
+function quicksilver_users_menu() {
+  $items = array();
+  $items['quicksilver/data/users_json/%'] = array(
+    'title' => t('Serialized users'),
+    'page callback' => 'quicksilver_users_json',
+    'page arguments' => array(2),
+    'access arguments' => array('use quicksilver'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function quicksilver_users_json($last_update) {
+  // We're just fetching the bare minimum of what we need for the
+  // user_*_access methods and display.
+  $res = db_query("SELECT uid, name, access, status FROM {users}
+    WHERE created > %d
+    ORDER BY uid DESC
+    LIMIT 100", $last_update);
+  
+  $users = array();
+  while ($account = db_fetch_object($res)) {
+    if (user_access('administer users')) {
+      $access = 'rwd';
+    }
+    else {
+      $access = (user_view_access($account)?'r':'') . (user_edit_access($account)?'w':'');
+    }
+    
+    if (!empty($access)) {
+      $users[] = array($account->uid, $account->name, $access);
+    }
+  }
+  
+  print drupal_to_js($users);
+  exit;
+}
