@@ -82,19 +82,25 @@ $(document).ready(function(){
         }
         handlers[data_class].push(handler);
       }
+    },
+    'showHtml': function(html) {
+      qs_output.html(html);
+      if (!qs_out_visible) {
+        toggle_output();
+      }
     }
   };
   
   q.registerHandler({
     'name': 'Console log',
     'handler': function(text, item) {
-      console.log('------------------');
-      console.log('text:' + text);
-      console.log('name:' + item.name);
-      console.log('catalog:' + item.catalog);
-      console.log('class:' + item.data_class);
-      console.log('data:' + item.data);
-      console.log('weight:' + item.weight);
+      q.showHtml('<h2>' + item.name + '</h2>' +
+        'text: <i>' + text + '</i><br/>' + 
+        'id: ' + item.id + '<br/>' + 
+        'catalog: ' + item.catalog + '<br/>' + 
+        'class: ' + item.data_class + '<br/>' + 
+        'data: ' + item.data + '<br/>' + 
+        'weight: ' + item.weight);
     }
   });
   
@@ -189,6 +195,7 @@ $(document).ready(function(){
     '<div class="cell left"><div class="inner"><input type="text" id="qs-input" /><label></label></div></div>'+ 
     '<div class="cell right"><div class="inner"><input type="text" id="qs-handler-input" /><label></label></div></div>'+
     '<ul class="qs-autocomplete"></ul><ul class="qs-actions"></ul></div>').appendTo('body').hide();
+  var qs_output = $('<div id="qs_out"></div>').appendTo('body').hide();
   var qs_input = $('#qs-input');
   var qs_h_input = $('#qs-handler-input');
   var qs_ac = $('#qs .qs-autocomplete');
@@ -198,7 +205,7 @@ $(document).ready(function(){
       keypress_time = 200,
       wait_until = 0,
       lookup_pending = false,
-      qs_visible = false,
+      qs_visible = false, qs_out_visible = false,
       matches = [], match_idx = 0, handler_idx = 0, current_text, handler, item, actions;
   
   var keypress_reaction = function() {
@@ -365,11 +372,25 @@ $(document).ready(function(){
       clear_ac();
       qs_input.val($.trim(qs_input.val()));
       qs.css({
-        'top': $(window).height()/4 + document.body.scrollTop - qs.height()/2,
-        'left': $(window).width()/4 - qs.width()/2
+        'top': $(window).height()/2 + document.body.scrollTop - qs.height()/2,
+        'left': $(window).width()/2 - qs.width()/2
       }).show();
       qs_visible = true;
       setTimeout(function(){ qs_input.focus(); qs_input.select(); }, 100);
+    }
+  };
+  
+  var toggle_output = function(arg) {
+    if (qs_out_visible || arg=='hide') {
+      qs_output.hide();
+      qs_out_visible = false;
+    }
+    else {
+      qs_output.css({
+        'top': $(window).height()/2 + document.body.scrollTop - qs_output.height()/2,
+        'left': $(window).width()/2 - qs_output.width()/2
+      }).show();
+      qs_out_visible = true;
     }
   };
   
@@ -378,7 +399,7 @@ $(document).ready(function(){
   };
   
   qs.bind('click', function(e){ return false; });
-  qs.bind('keydown', 'esc', hide);
+  qs.bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); });
   qs.bind('keydown', 'return', function(){ run_handler(); });
   qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); });
   qs_input.bind('keydown', 'down', function(){ ac_select(match_idx+1); });
@@ -388,7 +409,7 @@ $(document).ready(function(){
     setTimeout(keypress_reaction, 10);
   });
   
-  $(document).bind('click', hide);
+  $(document).bind('click', function(){ toggle('hide'); toggle_output('hide'); });
   $(document).bind('keydown', 'Alt+space', toggle);
   $(document).bind('keydown', 'Ctrl+space', toggle);
 });

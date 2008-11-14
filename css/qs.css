@@ -1,4 +1,4 @@
-#qs {
+#qs, #qs_out {
   background-color: rgba(0,0,0,0.5);
   -moz-border-radius: 20px;
   -webkit-border-radius: 20px;
@@ -10,6 +10,12 @@
   font-family: 'Lucida Grande', sans-serif;
   
   z-index: 1000;
+}
+
+#qs_out {
+  background-color: rgba(0,0,0,0.8);
+  padding: 10px;
+  color: #FFFFFF;
 }
 
 #qs .cell {
