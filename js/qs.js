@@ -144,44 +144,43 @@ $(document).ready(function(){
         })(key);
       }
       
+      // Update loop
+      var update_counter = 0;
+      var update_loop = function() {
+        setTimeout(function() {
+          if(update_queue.length) {
+            var inf = update_queue.shift();
+            var now = new Date().getTime();
+            var catalog = catalogs[inf.name];
+
+            if (typeof(catalog['update_rate'])!='undefined' && inf.updated + catalog.update_rate > now) {
+              update_queue.push(inf);
+              update_loop();
+            }
+            else {
+              if (catalog['update']) {
+                catalog.update(inf.updated, function(enqueue){
+                  var now = new Date().getTime();
+                  q.catalogUpdated(inf.name);
+
+                  if (enqueue) {
+                    update_queue.push({'name': inf.name, 'updated': now });
+                  }
+
+                  update_counter++;
+                  update_loop();
+                });
+              }
+              else {
+                update_loop();
+              }
+            }
+          }
+        },update_counter?1000:100);
+      };
       update_loop();
     }, q.dbErrorHandler);
   });
-  
-  // Update loop
-  var update_counter = 0;
-  var update_loop = function() {
-    setTimeout(function() {
-      if(update_queue.length) {
-        var inf = update_queue.shift();
-        var now = new Date().getTime();
-        var catalog = catalogs[inf.name];
-        
-        if (typeof(catalog['update_rate'])!='undefined' && inf.updated + catalog.update_rate > now) {
-          update_queue.push(inf);
-          update_loop();
-        }
-        else {
-          if (catalog['update']) {
-            catalog.update(inf.updated, function(enqueue){
-              var now = new Date().getTime();
-              q.catalogUpdated(inf.name);
-              
-              if (enqueue) {
-                update_queue.push({'name': inf.name, 'updated': now });
-              }
-              
-              update_counter++;
-              update_loop();
-            });
-          }
-          else {
-            update_loop();
-          }
-        }
-      }
-    },update_counter?1000:100);
-  };
   
   $(document).trigger('quicksilver-post-init', q);
   
