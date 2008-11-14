@@ -335,6 +335,9 @@ $(document).ready(function(){
       lookup_pending = false;
       schedule_lookup();
     }
+    else if(current_text == '') {
+      lookup_pending = false;
+    }
     else {
       if (false && current_text.length==2) {
         var like_expr = '%' + current_text[0] + '%' + current_text[1] + '%';
