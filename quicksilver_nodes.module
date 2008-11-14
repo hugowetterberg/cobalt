@@ -19,6 +19,8 @@ function quicksilver_nodes_menu() {
 }
 
 function quicksilver_nodes_json($last_update) {
+  // We're skipping the status check on purpose. As we check with the node_access
+  // function later this allows administrators to access unpublished nodes.
   $res = db_query("SELECT nid, title, type, uid, status, moderate FROM {node}
     WHERE created > %d OR changed > %d
     ORDER BY created DESC
