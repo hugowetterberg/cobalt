@@ -93,6 +93,7 @@ $(document).ready(function(){
       console.log('name:' + item.name);
       console.log('catalog:' + item.catalog);
       console.log('class:' + item.data_class);
+      console.log('data:' + item.data);
       console.log('weight:' + item.weight);
     }
   });
