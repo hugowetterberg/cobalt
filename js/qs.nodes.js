@@ -1,23 +1,40 @@
 $(document).bind('quicksilver-init', function(evt, q) {  
+  var get_node_data = function (op, value, callback) {
+    $.getJSON(Drupal.settings.basePath + 'quicksilver/data/nodes_' + op + '/' + value, {}, function (data) {
+      var num_nodes = data.length;
+      for (var i=0; i<num_nodes; i++) {
+        q.addEntry(data[i][0], data[i][1], {'perm': data[i][2]}, 'nodes', 'node');
+      }
+      if (typeof(callback)=='function') {
+        callback();
+      }
+    });
+  };
+  
   var nodes = {
     'update': function(last_update, callback) {
-      $.getJSON(Drupal.settings.basePath + 'quicksilver/data/nodes_json/' + Math.round((last_update/1000)), {}, function (data) {
-        var num_nodes = data.length;
-        for (var i=0; i<num_nodes; i++) {
-          q.addEntry(data[i][0], data[i][1], {'perm': data[i][2]}, 'nodes', 'node');
-        }
-        callback(true);
-      });
+      get_node_data('update', Math.round((last_update/1000)), function(){ callback(true); });
     },
     'install': function() {
     },
     'uninstall': function() {
     },
-    'update_rate': 60000
+    'update_rate': 300000
   };
   
   // Registering catalog
   q.registerCatalog('nodes', nodes);
+  
+  // Make sure that we have the current node among our entries, this is a easy
+  // way to make sure that we have the nodes the user expects
+  if (typeof(Drupal.settings.quicksilver.nodes_current) != 'undefined') {
+    var nid = Drupal.settings.quicksilver.nodes_current;
+    q.loadEntry('nodes', nid, function(item) {
+      if (!item) {
+        get_node_data('single', nid);
+      }
+    });
+  }
   
   // Register handlers
   q.registerHandler({

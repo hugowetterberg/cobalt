@@ -13,7 +13,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
     },
     'uninstall': function() {
     },
-    'update_rate': 60000
+    'update_rate': 300000
   };
   
   // Registering catalog
