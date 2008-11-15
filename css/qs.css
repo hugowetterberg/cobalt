@@ -91,6 +91,10 @@
   background: url(user.png) center center no-repeat;
 }
 
+#qs .cell .qs-item-vocabulary, #qs .cell .qs-item-term {
+  background: url(voc.png) center center no-repeat;
+}
+
 #qs .qs-paging {
   display: block;
   margin: 0;
