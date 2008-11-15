@@ -298,11 +298,12 @@ $(document).ready(function(){
   var qs = $('<div id="qs">'+
     '<div class="cell left"><div class="inner"><input type="text" id="qs-input" /><label></label></div></div>'+ 
     '<div class="cell right"><div class="inner"><input type="text" id="qs-handler-input" /><label></label></div></div>'+
-    '<ul class="qs-autocomplete"></ul><ul class="qs-actions"></ul></div>').appendTo('body').hide();
+    '<ol class="qs-paging"></ol><ul class="qs-autocomplete"></ul><ul class="qs-actions"></ul></div>').appendTo('body').hide();
   var qs_output = $('<div id="qs_out"></div>').appendTo('body').hide();
   var qs_input = $('#qs-input');
   var qs_h_input = $('#qs-handler-input');
   var qs_ac = $('#qs .qs-autocomplete');
+  var qs_paging = $('#qs .qs-paging');
   $('#qs .right label').hide();
   
   var keypress_reaction = function() {
@@ -376,6 +377,14 @@ $(document).ready(function(){
         current_text, like_expr ], function(transaction, results) {
           if (results.rows.length) {
             match_count = results.rows.item(0).match_count;
+            qs_paging.empty();
+            var page_count = Math.ceil(match_count/match_page_size);
+            for (var i=0; i<page_count; i++ ) {
+              var p = $('<li>&nbsp;</li>').appendTo(qs_paging);
+              if (i==match_offset/match_page_size) {
+                p.attr('class','current');
+              }
+            }
           }
         }, q.dbErrorHandler);
     });

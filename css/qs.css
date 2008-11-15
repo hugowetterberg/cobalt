@@ -91,6 +91,29 @@
   background: url(user.png) center center no-repeat;
 }
 
+#qs .qs-paging {
+  display: block;
+  margin: 0;
+  padding: 5px 10px 0 10px;
+  clear: both;
+}
+
+#qs .qs-paging li {
+  display: block;
+  float: left;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  opacity: 0.5;
+  background: url(whitedot.png) top left no-repeat;
+  width: 10px;
+  height: 10px;
+}
+
+#qs .qs-paging li.current {
+  opacity: 1.0;
+}
+
 #qs .qs-autocomplete {
   clear: both;
   margin: 0 10px;
