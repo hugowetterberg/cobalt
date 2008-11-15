@@ -1,4 +1,4 @@
-$(document).bind('quicksilver-init', function(evt, q) {  
+$(document).bind('quicksilver-load', function(evt, q) {  
   var taxonomy = {
     'update': function(last_update, callback) {
       $.getJSON(Drupal.settings.basePath + 'quicksilver/data/taxonomy_json', {}, function (data) {
@@ -21,6 +21,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
     'update_rate': 60000
   };
   
+  q.registerPlugin('quicksilver_taxonomy', {'version':0});
   
   // Registering catalog
   q.registerCatalog('vocabularies', taxonomy);

@@ -1,4 +1,4 @@
-$(document).bind('quicksilver-init', function(evt, q) {
+$(document).bind('quicksilver-load', function(evt, q) {
   console.log('Dummy catalog init');
   var dummy_out = $('<div class="dummy-result">Dummy results goes here</div>').appendTo('body');
   

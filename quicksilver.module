@@ -53,6 +53,15 @@ function quicksilver_menu() {
     'type' => MENU_NORMAL_ITEM,
     'weight' => 0,
   );
+  $items['quicksilver/update'] = array(
+    'title' => t('Quicksilver update'),
+    'page callback' => 'quicksilver_js_update',
+    'page arguments' => array('quicksilver_settings'),
+    'access arguments' => array('use quicksilver'),
+    'file' => 'quicksilver_update.inc.php',
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 0,
+  );
   return $items;
 }
 

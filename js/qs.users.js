@@ -1,4 +1,4 @@
-$(document).bind('quicksilver-init', function(evt, q) {  
+$(document).bind('quicksilver-load', function(evt, q) {  
   var nodes = {
     'update': function(last_update, callback) {
       $.getJSON(Drupal.settings.basePath + 'quicksilver/data/users_json/' + Math.round((last_update/1000)), {}, function (data) {
@@ -15,6 +15,8 @@ $(document).bind('quicksilver-init', function(evt, q) {
     },
     'update_rate': 300000
   };
+  
+  q.registerPlugin('quicksilver_users', {'version':0});
   
   // Registering catalog
   q.registerCatalog('users', nodes);
