@@ -84,7 +84,11 @@
 }
 
 #qs .cell .qs-item-node {
-  background: url(drupal.png) center center no-repeat;
+  background: url(node.png) center center no-repeat;
+}
+
+#qs .cell .qs-item-user {
+  background: url(user.png) center center no-repeat;
 }
 
 #qs .qs-autocomplete {
@@ -108,4 +112,6 @@
 #qs .qs-autocomplete li.active {
   background-color: #FFFFFF;
   background-color: rgba(0,0,0,0.5);
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
 }
