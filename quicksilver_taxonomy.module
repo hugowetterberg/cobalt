@@ -1,0 +1,48 @@
+<?php
+
+function quicksilver_taxonomy_init() {
+  if (user_access('use quicksilver')) {
+    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.taxonomy.js');
+  }
+}
+
+function quicksilver_taxonomy_menu() {
+  $items = array();
+  $items['quicksilver/data/taxonomy_json'] = array(
+    'title' => t('Serialized taxonomies'),
+    'page callback' => 'quicksilver_taxonomy_json',
+    'page arguments' => array('update', 3),
+    'access arguments' => array('use quicksilver'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+
+function quicksilver_taxonomy_json($op, $value) {
+  global $user;
+  
+  $vocabularies = taxonomy_get_vocabularies();
+
+  $voc_data = array();
+  foreach ($vocabularies as $vocabulary) {
+   $voc_data[$vocabulary->vid] = $vocabulary->name;
+  }
+  
+  $term_tree = array();
+  foreach ($vocabularies as $vocabulary) {
+   $term_tree += taxonomy_get_tree($vocabulary->vid);
+  }
+  
+  $term_data = array();
+  
+  foreach($term_tree as $term) {
+    $term_data[$term->tid] = array($term->name, $term->vid);
+  }
+  
+  $data = array('vocabularies' => $voc_data, 'terms' => $term_data, 'access' => user_access('administer taxonomy'));
+
+  print drupal_to_js($data);
+  exit;
+}
+
