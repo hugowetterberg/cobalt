@@ -347,7 +347,14 @@ $(document).ready(function(){
     if (results.rows.length) {
       for (var i=0; i<results.rows.length; i++) {
         var item = results.rows.item(i);
-        $('<li class="ac-opt-' + i + '"></li>').text(item.name).appendTo(qs_ac);
+        item.information = $.evalJSON(item.data);
+        if (typeof(catalogs[item.catalog].item_formatter) == 'function'){
+          var title = catalogs[item.catalog].item_formatter(item);
+        }
+        else {
+          var title = item.name;
+        }
+        $('<li class="ac-opt-' + i + '"></li>').html(title).appendTo(qs_ac);
       }
       matches = results.rows;
       qs_ac.show();

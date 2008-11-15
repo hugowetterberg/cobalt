@@ -19,6 +19,9 @@ $(document).bind('quicksilver-init', function(evt, q) {
     },
     'uninstall': function() {
     },
+    'item_formatter': function(item) {
+      return item.name + ' <small>id: ' + item.id + '</small>';
+    },
     'update_rate': 300000
   };
   

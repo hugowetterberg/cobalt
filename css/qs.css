@@ -105,6 +105,11 @@
   background-image: none;
 }
 
+#qs .qs-autocomplete li small {
+  color: #333333;
+  color: rgba(256,256,256,0.8);
+}
+
 #qs .right .qs-action-default {
   background: transparent url(default_action.png) center center no-repeat;
 }
