@@ -149,8 +149,11 @@ $(document).ready(function(){
     }
   };
   
-  if (typeof(Drupal.settings.quicksilver.upgrade) != 'undefined') {
-    $(document).trigger('quicksilver-upgrade', q, db);
+  if (typeof(Drupal.settings.quicksilver.update) != 'undefined') {
+    q.updateVersion = function(transaction, name, version) {
+      transaction.executeSql('UPDATE versions SET version=? WHERE name=?', [version, name], nullDataHandler, q.dbErrorHandler);
+    };
+    $(document).trigger('quicksilver-update', [q, db, Drupal.settings.quicksilver.update]);
     return;
   }
   
