@@ -321,8 +321,8 @@ $(document).ready(function(){
   var clear_ac = function() {
     match_idx = 0;
     current_text = '';
-    $('#qs .left .inner').attr('class','inner');
-    $('#qs .left label').hide();
+    $('#qs .inner').attr('class','inner');
+    $('#qs .inner label').hide();
     qs_ac.empty().hide();
   };
   
