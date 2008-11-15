@@ -23,6 +23,15 @@ $(document).ready(function(){
   var nullDataHandler = function(transaction, results) { }, 
     catalogs = {}, global_handlers = [], handlers = {}, update_queue = [];
     
+  var current_state = function() {
+    if (typeof(Drupal.settings.quicksilver.state) != 'undefined') {
+      return Drupal.settings.quicksilver.state;
+    }
+    else {
+      return 0;
+    }
+  };
+    
   // Initialize Quicksilver
   var q = {
     'dbErrorHandler': function(transaction, error)
@@ -51,7 +60,7 @@ $(document).ready(function(){
     },
     'addKeyBinding': function(binding, catalog, id, handler, active, state) {
       if (typeof(state)=='undefined') {
-        state = Drupal.settings.quicksilver.state;
+        state = current_state();
       }
       if (typeof(active)=='undefined') {
         active = 1;
@@ -63,7 +72,7 @@ $(document).ready(function(){
     },
     'loadEntry': function(catalog, id, callback) {
       if (typeof(state)=='undefined') {
-        state = Drupal.settings.quicksilver.state;
+        state = current_state();
       }
       db.transaction(function (transaction) {
         transaction.executeSql("SELECT * FROM entries WHERE catalog=? AND id=? AND state=?;", [ catalog, id, state ], function(transaction, results) {
@@ -78,7 +87,7 @@ $(document).ready(function(){
     },
     'addEntry': function(id, name, information, catalog, classname, active, state) {
       if (typeof(state)=='undefined') {
-        state = Drupal.settings.quicksilver.state;
+        state = current_state();
       }
       if (typeof(active)=='undefined') {
         active = 1;
@@ -220,12 +229,13 @@ $(document).ready(function(){
   db.transaction(function (transaction) {
     transaction.executeSql("SELECT * FROM catalogs ORDER BY updated;", [ ], function(transaction, results) {
       var info = {};
+      var state = current_state();
       
       // Queue catalogs for update
       for (var i = 0; i < results.rows.length; i++) {
         var item = results.rows.item(i);
         info[item.name] = item;
-        update_queue.push(item);
+        update_queue.push({'name': item.name, 'updated': (item.state==state?item.updated:0) });
       }
       
       // Install new catalogs and queue them for updates
