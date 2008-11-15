@@ -469,8 +469,8 @@ $(document).ready(function(){
     }
     else {
       qs_output.css({
-        'top': $(window).height()/3 + window.pageYOffset - qs.height()/2,
-        'left': $(window).width()/2 + window.pageXOffset - qs.width()/2
+        'top': $(window).height()/3 + window.pageYOffset - qs_output.height()/2,
+        'left': $(window).width()/2 + window.pageXOffset - qs_output.width()/2
       }).show();
       qs_out_visible = true;
     }
