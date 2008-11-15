@@ -321,7 +321,7 @@ $(document).ready(function(){
   var clear_ac = function() {
     match_idx = 0;
     current_text = '';
-    $('#qs .left .inner').attr('class','inner ');
+    $('#qs .left .inner').attr('class','inner');
     $('#qs .left label').hide();
     qs_ac.empty().hide();
   };
@@ -361,10 +361,7 @@ $(document).ready(function(){
       qs_ac.show();
     }
     else {
-      if (matches.length) {
-        var old_item = matches.item(match_idx);
-        $('#qs .left .inner').removeClass(old_item['data_class']);
-      }      
+      clear_ac();
       matches = [];
     }
     
