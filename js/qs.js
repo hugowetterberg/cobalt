@@ -175,7 +175,7 @@ $(document).ready(function(){
       var cand = q.actionCandidates(item);
       var out = $('<div class="shortcut-add"><h2>' + item.name + '</h2>' + 
         'The keys <input class="key-combo" type="text" value="Ctrl+"/> should trigger the action:<br/> <select class="action-select"></select>' + 
-        '<button class="ok">Ok</button></div>');
+        '<p><button class="ok">Ok</button></p></div>');
       var actions = $(out).find('.action-select');
       var key_combo = $(out).find('.key-combo').css('width',50);
       var cand_count = cand.length;
@@ -189,6 +189,7 @@ $(document).ready(function(){
       });
       
       q.showHtml(out);
+      key_combo.focus();
     }
   });
   
