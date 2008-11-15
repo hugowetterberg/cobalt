@@ -19,7 +19,7 @@ function quicksilver_init() {
     drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/minimal-gears-wrapper.js');
     
     drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.js');
-    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.menu-catalog.js');
+    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.menu.js');
     drupal_add_js(array('quicksilver'=>array('state'=>$user->uid)), 'setting');
     
     drupal_add_css(drupal_get_path('module', 'quicksilver') . '/css/qs.css');
