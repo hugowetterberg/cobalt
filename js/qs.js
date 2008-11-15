@@ -1,4 +1,9 @@
 $(document).ready(function(){
+  var match_count = 0, match_page_size=5, match_offset = 0,
+      qs_visible = false, qs_out_visible = false,
+      matches = [], match_idx = 0, handler_idx = 0, 
+      current_text, handler, item, actions, match_count=0;
+  
   // Initialize database
   if (window.openDatabase) {
     var db = openDatabase('quicksilver', '1.0', 'Quicksilver Database', 1024000);
@@ -289,13 +294,6 @@ $(document).ready(function(){
   var qs_ac = $('#qs .qs-autocomplete');
   $('#qs .right label').hide();
   
-  var keypress_time = 200,
-      wait_until = 0,
-      lookup_pending = false,
-      qs_visible = false, qs_out_visible = false,
-      matches = [], match_idx = 0, handler_idx = 0, 
-      current_text, handler, item, actions;
-  
   var keypress_reaction = function() {
     if(qs_input.val()==current_text) {
       return;
@@ -303,8 +301,7 @@ $(document).ready(function(){
     current_text = qs_input.val();
     
     if($.trim(current_text)!='') {
-      wait_until = new Date().getTime() + keypress_time;
-      schedule_lookup();
+      lookup();
     }
     else {
       clear_ac();
@@ -318,38 +315,21 @@ $(document).ready(function(){
     qs_ac.empty().hide();
   };
   
-  var schedule_lookup = function() {
-    var time = new Date().getTime();
-    if (!lookup_pending) {
-      lookup_pending = true;
-      setTimeout(lookup, wait_until - time + 50);
+  var lookup = function(preserve_offset) {
+    if (!preserve_offset) {
+      match_offset = 0;
     }
-  };
-  
-  var lookup = function() {
-    var time = new Date().getTime();
-    if (time < wait_until) {
-      lookup_pending = false;
-      schedule_lookup();
-    }
-    else if(current_text == '') {
-      lookup_pending = false;
-    }
-    else {
-      var like_expr = '%' + current_text + '%';
-      db.transaction(function (transaction) {
-        transaction.executeSql("SELECT e.*, u.weight FROM entries AS e " + 
-          "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
-          "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?) " + 
-          "ORDER BY nullif(?,u.abbreviation), nullif(?,e.name), u.weight DESC LIMIT 5;", [ 
-          current_text, like_expr, current_text, current_text ], lookup_finished, q.dbErrorHandler);
-      });
-    }
+    var like_expr = '%' + current_text + '%';
+    db.transaction(function (transaction) {
+      transaction.executeSql("SELECT e.*, u.weight FROM entries AS e " + 
+        "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
+        "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?) " + 
+        "ORDER BY nullif(?,u.abbreviation), nullif(?,e.name), u.weight DESC LIMIT ?,?;", [ 
+        current_text, like_expr, current_text, current_text, match_offset, match_page_size ], lookup_finished, q.dbErrorHandler);
+    });
   };
   
   var lookup_finished = function(transaction, results) {
-    lookup_pending = false;
-    
     match_idx = 0;
     $('#qs .left label').hide();
     qs_ac.empty().hide();
@@ -371,6 +351,26 @@ $(document).ready(function(){
     }
     
     ac_select(0);
+    
+    var like_expr = '%' + current_text + '%';
+    db.transaction(function (transaction) {
+      transaction.executeSql("SELECT COUNT(*) as match_count FROM entries AS e " + 
+        "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
+        "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?);", [ 
+        current_text, like_expr ], function(transaction, results) {
+          if (results.rows.length) {
+            match_count = results.rows.item(0).match_count;
+          }
+        }, q.dbErrorHandler);
+    });
+  };
+  
+  var ac_page = function(new_offset) {
+    if (new_offset>=match_count || new_offset<0) {
+      return;
+    }
+    match_offset = new_offset;
+    lookup(true);
   };
   
   var ac_select = function(idx) {
@@ -472,8 +472,8 @@ $(document).ready(function(){
     }
     else {
       qs_output.css({
-        'top': $(window).height()/3 + window.pageYOffset - qs.height()/2,
-        'left': $(window).width()/2 + window.pageXOffset - qs.width()/2
+        'top': $(window).height()/3 + window.pageYOffset - qs_output.height()/2,
+        'left': $(window).width()/2 + window.pageXOffset - qs_output.width()/2
       }).show();
       qs_out_visible = true;
     }
@@ -488,6 +488,8 @@ $(document).ready(function(){
     bind('keydown', 'return', function(){ run_handler(); return false; });
   qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); return false; }).
     bind('keydown', 'down', function(){ ac_select(match_idx+1); return false; }).
+    bind('keydown', 'Alt+left', function(){ ac_page(match_offset-match_page_size); return false; }).
+    bind('keydown', 'Alt+right', function(){ ac_page(match_offset+match_page_size); return false; }).
     bind('keyup', function(){ setTimeout(keypress_reaction, 10); return false; });
   qs_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); return false; }).
     bind('keydown', 'down', function(){ set_handler(handler_idx+1); return false; });
