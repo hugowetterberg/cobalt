@@ -85,6 +85,11 @@ $(document).ready(function(){
         }, q.dbErrorHandler);
       });
     },
+    'deleteEntry': function(catalog, id) {
+      db.transaction(function (transaction) {
+        transaction.executeSql("DELETE FROM entries WHERE catalog=? AND id=?;", [ catalog, id ], nullDataHandler, q.dbErrorHandler);
+      });
+    },
     'addEntry': function(id, name, information, catalog, classname, active, state) {
       if (typeof(state)=='undefined') {
         state = current_state();

@@ -32,6 +32,12 @@ function quicksilver_perm() {
 
 function quicksilver_menu() {
   $items = array();
+  $items['quicksilver/alias'] = array(
+    'title' => t('Forward to the correct alias'),
+    'page callback' => 'quicksilver_forward_to_alias',
+    'access arguments' => array('use quicksilver'),
+    'type' => MENU_CALLBACK,
+  );
   $items['quicksilver/data/menu_json'] = array(
     'title' => t('Serialized menu'),
     'page callback' => 'quicksilver_menu_json',
@@ -48,6 +54,17 @@ function quicksilver_menu() {
     'weight' => 0,
   );
   return $items;
+}
+
+function quicksilver_forward_to_alias() {
+  $url_parts = array();
+  $i = 2;
+  while (arg($i)) {
+    $url_parts[] = arg($i);
+    $i++;
+  }
+  $path = join('/',$url_parts);
+  drupal_goto($path);
 }
 
 function quicksilver_menu_json() {

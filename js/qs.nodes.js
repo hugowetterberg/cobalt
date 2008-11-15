@@ -1,10 +1,21 @@
 $(document).bind('quicksilver-init', function(evt, q) {  
   var get_node_data = function (op, value, callback) {
     $.getJSON(Drupal.settings.basePath + 'quicksilver/data/nodes_' + op + '/' + value, {}, function (data) {
-      var num_nodes = data.length;
-      for (var i=0; i<num_nodes; i++) {
-        q.addEntry(data[i][0], data[i][1], {'perm': data[i][2]}, 'nodes', 'node');
+      
+      if (typeof(data.nodes)!='undefined') {
+        var num_nodes = data.nodes.length;
+        for (var i=0; i<num_nodes; i++) {
+          q.addEntry(data.nodes[i][0], data.nodes[i][1], {'perm': data.nodes[i][2]}, 'nodes', 'node');
+        }
       }
+      
+      if (typeof(data.deleted)!='undefined') {
+        var num_deletes = data.deleted.length;
+        for (var i=0; i<num_deletes; i++) {
+          q.deleteEntry('nodes', data.deleted[i]);
+        }
+      }
+      
       if (typeof(callback)=='function') {
         callback();
       }
@@ -47,7 +58,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
       return item.information.perm.indexOf('r') >= 0;
     },
     'handler': function(text, item) {
-      window.location.href = Drupal.settings.basePath + 'node/' + item.id;
+      window.location.href = Drupal.settings.basePath + 'quicksilver/alias/node/' + item.id;
     }
   }, 'node');
   
