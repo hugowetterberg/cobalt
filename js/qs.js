@@ -254,6 +254,194 @@ $(document).ready(function(){
     }
   };
   
+  var keypress_reaction = function() {
+    if(qs_input.val()==current_text) {
+      return;
+    }
+    current_text = qs_input.val();
+
+    if($.trim(current_text)!='') {
+      lookup();
+    }
+    else {
+      clear_ac();
+    }
+  };
+
+  var clear_ac = function() {
+    match_idx = 0;
+    current_text = '';
+    $('#qs .inner').attr('class','inner');
+    $('#qs .inner label').hide();
+    qs_ac.empty().hide();
+  };
+
+  var lookup = function(preserve_offset) {
+    if (!preserve_offset) {
+      match_offset = 0;
+    }
+    var like_expr = '%' + current_text + '%';
+    db.transaction(function (transaction) {
+      transaction.executeSql("SELECT e.*, u.weight FROM entries AS e " + 
+        "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
+        "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?) " + 
+        "ORDER BY nullif(?,u.abbreviation), nullif(?,e.name), u.weight DESC LIMIT ?,?;", [ 
+        current_text, like_expr, current_text, current_text, match_offset, match_page_size ], lookup_finished, q.dbErrorHandler);
+    });
+  };
+
+  var lookup_finished = function(transaction, results) {
+    match_idx = 0;
+    $('#qs .left label').hide();
+    qs_ac.empty().hide();
+
+    if (results.rows.length) {
+      for (var i=0; i<results.rows.length; i++) {
+        var item = results.rows.item(i);
+        item.information = $.evalJSON(item.data);
+        if (typeof(catalogs[item.catalog].item_formatter) == 'function'){
+          var title = catalogs[item.catalog].item_formatter(item);
+        }
+        else {
+          var title = item.name;
+        }
+        $('<li class="ac-opt-' + i + '"></li>').html(title).appendTo(qs_ac);
+      }
+      matches = results.rows;
+      qs_ac.show();
+    }
+    else {
+      clear_ac();
+      matches = [];
+    }
+
+    ac_select(0);
+
+    var like_expr = '%' + current_text + '%';
+    db.transaction(function (transaction) {
+      transaction.executeSql("SELECT COUNT(*) as match_count FROM entries AS e " + 
+        "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
+        "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?);", [ 
+        current_text, like_expr ], function(transaction, results) {
+          if (results.rows.length) {
+            match_count = results.rows.item(0).match_count;
+            qs_paging.empty();
+            var page_count = Math.ceil(match_count/match_page_size);
+            for (var i=0; i<page_count; i++ ) {
+              var p = $('<li>&nbsp;</li>').appendTo(qs_paging);
+              if (i==match_offset/match_page_size) {
+                p.attr('class','current');
+              }
+            }
+          }
+        }, q.dbErrorHandler);
+    });
+  };
+
+  var ac_page = function(new_offset) {
+    if (new_offset>=match_count || new_offset<0) {
+      return;
+    }
+    match_offset = new_offset;
+    lookup(true);
+  };
+
+  var ac_select = function(idx) {
+    if (idx<0 || idx >= matches.length) {
+      item = null;
+      return;
+    }
+
+    item = matches.item(idx);
+    item.information = $.evalJSON(item.data);
+    var old_item = matches.item(match_idx);
+
+    $('#qs .ac-opt-' + match_idx).removeClass('active');
+    match_idx = idx;
+    $('#qs .left .inner').attr('class','inner qs-item-' + item.data_class);
+    $('#qs .left label').text(item.name).show();
+    $('#qs .ac-opt-' + match_idx).addClass('active');
+
+    actions = action_candidates(item);
+    set_handler(0);
+  };
+
+  var action_candidates = function(item) {
+    var candidates = [];
+    var add_applicable = function(handler) {
+      if (typeof(handler['applicable'])=='undefined' || handler.applicable(current_text, item)) {
+        candidates.push(handler);
+      }
+    };
+
+    if (typeof(handlers[item.data_class])!='undefined') {
+      var cls_count = handlers[item.data_class].length;
+      for (var i=0; i<cls_count; i++) {
+        add_applicable(handlers[item.data_class][i]);
+      }
+    }
+
+    var g_count = global_handlers.length;
+    for (var i=0; i<g_count; i++) {
+      add_applicable(global_handlers[i]);
+    }
+
+    return candidates;
+  };
+
+  var handler_class = function() {
+    if (handler) {
+      return handler['class'] ? handler['class'] : 'default';
+    }
+  };
+
+  var set_handler = function(idx) {
+    if (idx<0 || idx >= actions.length) {
+      return;
+    }
+
+    handler_idx = idx;
+    var new_handler = actions[idx];
+
+    handler = new_handler;
+    if (handler) {
+      var newClass = handler_class();
+      $('#qs .right .inner').attr('class','inner qs-action-' +newClass);
+      $('#qs .right label').text(handler.name).show();
+    }
+  };
+
+  var run_handler = function() {
+    if (item && typeof(handler['handler']) == 'function') {
+      var text = $.trim(qs_input.val());
+      q.registerUse(text, item);
+      handler.handler(text, item);
+    }
+    hide();
+  };
+
+  var toggle = function(arg) {
+    if (qs_visible || arg=='hide') {
+      qs.hide();
+      qs_visible = false;
+    }
+    else {
+      toggle_output('hide');
+      clear_ac();
+      qs_input.val($.trim(qs_input.val()));
+      qs.css({
+        'top': $(window).height()/3 + window.pageYOffset - qs.height()/2,
+        'left': $(window).width()/2 + window.pageXOffset - qs.width()/2
+      }).show();
+      qs_visible = true;
+      setTimeout(function(){ qs_input.focus(); qs_input.select(); }, 100);
+    }
+  };
+
+  var hide = function() {
+    toggle('hide');
+  };
+  
   var init = function() {
     $(document).trigger('quicksilver-init', q);
 
@@ -334,205 +522,6 @@ $(document).ready(function(){
 
     $(document).trigger('quicksilver-post-init', q);
 
-    // Initialize GUI
-    var qs = $('<div id="qs">'+
-      '<div class="cell left"><div class="inner"><input type="text" id="qs-input" /><label></label></div></div>'+ 
-      '<div class="cell right"><div class="inner"><input type="text" id="qs-handler-input" /><label></label></div></div>'+
-      '<ol class="qs-paging"></ol><ul class="qs-autocomplete"></ul><ul class="qs-actions"></ul></div>').appendTo('body').hide();
-    var qs_input = $('#qs-input');
-    var qs_h_input = $('#qs-handler-input');
-    var qs_ac = $('#qs .qs-autocomplete');
-    var qs_paging = $('#qs .qs-paging');
-    $('#qs .right label').hide();
-
-    var keypress_reaction = function() {
-      if(qs_input.val()==current_text) {
-        return;
-      }
-      current_text = qs_input.val();
-
-      if($.trim(current_text)!='') {
-        lookup();
-      }
-      else {
-        clear_ac();
-      }
-    };
-
-    var clear_ac = function() {
-      match_idx = 0;
-      current_text = '';
-      $('#qs .inner').attr('class','inner');
-      $('#qs .inner label').hide();
-      qs_ac.empty().hide();
-    };
-
-    var lookup = function(preserve_offset) {
-      if (!preserve_offset) {
-        match_offset = 0;
-      }
-      var like_expr = '%' + current_text + '%';
-      db.transaction(function (transaction) {
-        transaction.executeSql("SELECT e.*, u.weight FROM entries AS e " + 
-          "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
-          "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?) " + 
-          "ORDER BY nullif(?,u.abbreviation), nullif(?,e.name), u.weight DESC LIMIT ?,?;", [ 
-          current_text, like_expr, current_text, current_text, match_offset, match_page_size ], lookup_finished, q.dbErrorHandler);
-      });
-    };
-
-    var lookup_finished = function(transaction, results) {
-      match_idx = 0;
-      $('#qs .left label').hide();
-      qs_ac.empty().hide();
-
-      if (results.rows.length) {
-        for (var i=0; i<results.rows.length; i++) {
-          var item = results.rows.item(i);
-          item.information = $.evalJSON(item.data);
-          if (typeof(catalogs[item.catalog].item_formatter) == 'function'){
-            var title = catalogs[item.catalog].item_formatter(item);
-          }
-          else {
-            var title = item.name;
-          }
-          $('<li class="ac-opt-' + i + '"></li>').html(title).appendTo(qs_ac);
-        }
-        matches = results.rows;
-        qs_ac.show();
-      }
-      else {
-        clear_ac();
-        matches = [];
-      }
-
-      ac_select(0);
-
-      var like_expr = '%' + current_text + '%';
-      db.transaction(function (transaction) {
-        transaction.executeSql("SELECT COUNT(*) as match_count FROM entries AS e " + 
-          "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
-          "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?);", [ 
-          current_text, like_expr ], function(transaction, results) {
-            if (results.rows.length) {
-              match_count = results.rows.item(0).match_count;
-              qs_paging.empty();
-              var page_count = Math.ceil(match_count/match_page_size);
-              for (var i=0; i<page_count; i++ ) {
-                var p = $('<li>&nbsp;</li>').appendTo(qs_paging);
-                if (i==match_offset/match_page_size) {
-                  p.attr('class','current');
-                }
-              }
-            }
-          }, q.dbErrorHandler);
-      });
-    };
-
-    var ac_page = function(new_offset) {
-      if (new_offset>=match_count || new_offset<0) {
-        return;
-      }
-      match_offset = new_offset;
-      lookup(true);
-    };
-
-    var ac_select = function(idx) {
-      if (idx<0 || idx >= matches.length) {
-        item = null;
-        return;
-      }
-
-      item = matches.item(idx);
-      item.information = $.evalJSON(item.data);
-      var old_item = matches.item(match_idx);
-
-      $('#qs .ac-opt-' + match_idx).removeClass('active');
-      match_idx = idx;
-      $('#qs .left .inner').attr('class','inner qs-item-' + item.data_class);
-      $('#qs .left label').text(item.name).show();
-      $('#qs .ac-opt-' + match_idx).addClass('active');
-
-      actions = action_candidates(item);
-      set_handler(0);
-    };
-
-    var action_candidates = function(item) {
-      var candidates = [];
-      var add_applicable = function(handler) {
-        if (typeof(handler['applicable'])=='undefined' || handler.applicable(current_text, item)) {
-          candidates.push(handler);
-        }
-      };
-
-      if (typeof(handlers[item.data_class])!='undefined') {
-        var cls_count = handlers[item.data_class].length;
-        for (var i=0; i<cls_count; i++) {
-          add_applicable(handlers[item.data_class][i]);
-        }
-      }
-
-      var g_count = global_handlers.length;
-      for (var i=0; i<g_count; i++) {
-        add_applicable(global_handlers[i]);
-      }
-
-      return candidates;
-    };
-
-    var handler_class = function() {
-      if (handler) {
-        return handler['class'] ? handler['class'] : 'default';
-      }
-    };
-
-    var set_handler = function(idx) {
-      if (idx<0 || idx >= actions.length) {
-        return;
-      }
-
-      handler_idx = idx;
-      var new_handler = actions[idx];
-
-      handler = new_handler;
-      if (handler) {
-        var newClass = handler_class();
-        $('#qs .right .inner').attr('class','inner qs-action-' +newClass);
-        $('#qs .right label').text(handler.name).show();
-      }
-    };
-
-    var run_handler = function() {
-      if (item && typeof(handler['handler']) == 'function') {
-        var text = $.trim(qs_input.val());
-        q.registerUse(text, item);
-        handler.handler(text, item);
-      }
-      hide();
-    };
-
-    var toggle = function(arg) {
-      if (qs_visible || arg=='hide') {
-        qs.hide();
-        qs_visible = false;
-      }
-      else {
-        toggle_output('hide');
-        clear_ac();
-        qs_input.val($.trim(qs_input.val()));
-        qs.css({
-          'top': $(window).height()/3 + window.pageYOffset - qs.height()/2,
-          'left': $(window).width()/2 + window.pageXOffset - qs.width()/2
-        }).show();
-        qs_visible = true;
-        setTimeout(function(){ qs_input.focus(); qs_input.select(); }, 100);
-      }
-    };
-
-    var hide = function() {
-      toggle('hide');
-    };
-
     qs.bind('click', function(e){ return false; }).
       bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); return false; }).
       bind('keydown', 'return', function(){ run_handler(); return false; });
@@ -548,6 +537,17 @@ $(document).ready(function(){
       .bind('keydown', 'Alt+space', toggle)
       .bind('keydown', 'Ctrl+space', toggle);
   };
+  
+  // Initialize GUI
+  var qs = $('<div id="qs">'+
+    '<div class="cell left"><div class="inner"><input type="text" id="qs-input" /><label></label></div></div>'+ 
+    '<div class="cell right"><div class="inner"><input type="text" id="qs-handler-input" /><label></label></div></div>'+
+    '<ol class="qs-paging"></ol><ul class="qs-autocomplete"></ul><ul class="qs-actions"></ul></div>').appendTo('body').hide();
+  var qs_input = $('#qs-input');
+  var qs_h_input = $('#qs-handler-input');
+  var qs_ac = $('#qs .qs-autocomplete');
+  var qs_paging = $('#qs .qs-paging');
+  $('#qs .right label').hide();
   
   // Check if we need to update anything before initializing
   db.transaction(function (transaction) {
