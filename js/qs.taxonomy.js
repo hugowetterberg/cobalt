@@ -5,7 +5,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
         q.emptyCatalog('vocabularies');
         var access = data.access ? 'w' : '';
         for (var id in data.vocabularies) {
-          q.addEntry(id, data.terms[id], access, 'vocabularies', 'vocabulary');
+          q.addEntry(id, data.vocabularies[id], access, 'vocabularies', 'vocabulary');
         }
         q.emptyCatalog('terms');
         for (var id in data.terms) {
@@ -24,7 +24,9 @@ $(document).bind('quicksilver-init', function(evt, q) {
   
   // Registering catalog
   q.registerCatalog('vocabularies', taxonomy);
-  q.registerCatalog('terms', taxonomy);
+  // Insert empty catalog, the update function is handled for both catalogs in
+  // the vocabularies catalog.
+  q.registerCatalog('terms', {});
   
   // Register handlers
   q.registerHandler({
