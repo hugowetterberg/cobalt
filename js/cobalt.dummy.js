@@ -1,4 +1,4 @@
-$(document).bind('cobalt-load', function(evt, q) {
+$(document).bind('cobalt-load', function(evt, cobalt) {
   console.log('Dummy catalog init');
   var dummy_out = $('<div class="dummy-result">Dummy results goes here</div>').appendTo('body');
   
@@ -17,7 +17,7 @@ $(document).bind('cobalt-load', function(evt, q) {
     'install': function() {
       console.log('Installing dummy entries');
       for (var i=0; i<sample_ac.length; i++) {
-        q.addEntry(i, sample_ac[i], '', 'dummy', 'dummy');
+       cobalt.addEntry(i, sample_ac[i], '', 'dummy', 'dummy');
       }
     },
     'uninstall': function() {
@@ -26,10 +26,10 @@ $(document).bind('cobalt-load', function(evt, q) {
   };
   
   // Registering catalog
-  q.registerCatalog('dummy', dummy);
+ cobalt.registerCatalog('dummy', dummy);
   
   // Register handler
-  q.registerHandler({
+ cobalt.registerHandler({
     'name': 'Dummy action',
     'handler': function(text, item) {
       dummy_out.text(item.name);

@@ -2,7 +2,7 @@
 
 function cobalt_users_init() {
   if (user_access('use cobalt')) {
-    drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/qs.users.js');
+    drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.users.js');
   }
 }
 

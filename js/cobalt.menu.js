@@ -1,10 +1,10 @@
-$(document).bind('cobalt-load', function(evt, q) {  
+$(document).bind('cobalt-load', function(evt, cobalt) {  
   var menu = {
     'update': function(last_update, callback) {
       $.getJSON(Drupal.settings.basePath + 'cobalt/data/menu_json', {}, function (data) {
-        q.emptyCatalog('menu');
+       cobalt.emptyCatalog('menu');
         for (var id in data) {
-          q.addEntry(id, data[id][1], data[id][0], 'menu', 'url_data');
+         cobalt.addEntry(id, data[id][1], data[id][0], 'menu', 'url_data');
         }
         callback(false);
       });
@@ -19,13 +19,13 @@ $(document).bind('cobalt-load', function(evt, q) {
     'update_rate': 60000
   };
   
-  q.registerPlugin('cobalt_menu', {'version':0});
+ cobalt.registerPlugin('cobalt_menu', {'version':0});
   
   // Registering catalog
-  q.registerCatalog('menu', menu);
+ cobalt.registerCatalog('menu', menu);
   
   // Register handlers
-  q.registerHandler({
+ cobalt.registerHandler({
     'id': 'menu_goto',
     'name': 'Go to',
     'handler': function(text, item) {

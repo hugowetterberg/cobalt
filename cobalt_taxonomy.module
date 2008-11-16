@@ -2,7 +2,7 @@
 
 function cobalt_taxonomy_init() {
   if (user_access('use cobalt')) {
-    drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/qs.taxonomy.js');
+    drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.taxonomy.js');
   }
 }
 

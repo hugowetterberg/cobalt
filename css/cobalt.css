@@ -1,9 +1,9 @@
-#qs * {
+#cobalt * {
   margin: 0;
   padding: 0;
 }
 
-#qs, #qs-out {
+#cobalt, #cobalt-out {
   background-color: #000000;
   background-color: rgba(0,0,0,0.7);
   border-radius: 20px;
@@ -23,13 +23,13 @@
   z-index: 1000;
 }
 
-#qs-out {
+#cobalt-out {
   background-color: rgba(0,0,0,0.8);
   padding: 10px;
   color: #FFFFFF;
 }
 
-#qs .cell {
+#cobalt .cell {
   position: relative;
   background-color: #FFFFFF;
   background-color: rgba(255,255,255,0.5);
@@ -43,7 +43,7 @@
   font-family: 'Lucida Grande', sans-serif;
 }
 
-#qs .cell input {
+#cobalt .cell input {
   text-shadow: 1px 1px 5px #FFFFFF;
   margin: -4px 0 0 -4px;
   padding: 4px;
@@ -57,14 +57,14 @@
   font-size: 32px;
 }
 
-#qs .inner {
+#cobalt .inner {
   overflow: hidden;
   width: 130px;
   height: 130px;
   margin: 10px;
 }
 
-#qs .cell label {
+#cobalt .cell label {
   position: absolute;
   bottom: 10px;
   left: 10px;
@@ -79,26 +79,26 @@
   -webkit-border-radius: 5px;
 }
 
-#qs .cell .qs-item-url_data {
+#cobalt .cell .cobalt-item-url_data {
   background: url(bookmark.png) center center no-repeat;
 }
 
-#qs .cell .qs-item-node {
+#cobalt .cell .cobalt-item-node {
   background: url(node.png) center center no-repeat;
 }
 
-#qs .cell .qs-item-user {
+#cobalt .cell .cobalt-item-user {
   background: url(user.png) center center no-repeat;
 }
 
-#qs .qs-paging {
+#cobalt .cobalt-paging {
   display: block;
   margin: 0;
   padding: 5px 10px 0 10px;
   clear: both;
 }
 
-#qs .qs-paging li {
+#cobalt .cobalt-paging li {
   display: block;
   float: left;
   list-style: none;
@@ -110,41 +110,41 @@
   height: 10px;
 }
 
-#qs .qs-paging li.current {
+#cobalt .cobalt-paging li.current {
   opacity: 1.0;
 }
 
-#qs .qs-autocomplete {
+#cobalt .cobalt-autocomplete {
   clear: both;
   margin: 0 10px;
   padding-top: 10px;
   color: #FFFFFF;
 }
 
-#qs .qs-autocomplete li {
+#cobalt .cobalt-autocomplete li {
   display: block;
   list-style: none;
   padding: 5px;
   background-image: none;
 }
 
-#qs .qs-autocomplete li small {
+#cobalt .cobalt-autocomplete li small {
   color: #333333;
   color: rgba(256,256,256,0.8);
 }
 
-#qs .right .qs-action-default {
+#cobalt .right .cobalt-action-default {
   background: transparent url(default_action.png) center center no-repeat;
 }
 
-#qs .qs-autocomplete li.active {
+#cobalt .cobalt-autocomplete li.active {
   background-color: #FFFFFF;
   background-color: rgba(0,0,0,0.5);
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
 }
 
-#qs-out .qs-update-link {
+#cobalt-out .cobalt-update-link {
   text-transform: uppercase;
   color: #FFFFFF;
 }

@@ -1,15 +1,15 @@
-$(document).bind('cobalt-load', function(evt, q) {  
+$(document).bind('cobalt-load', function(evt, cobalt) {  
   var taxonomy = {
     'update': function(last_update, callback) {
       $.getJSON(Drupal.settings.basePath + 'cobalt/data/taxonomy_json', {}, function (data) {
-        q.emptyCatalog('vocabularies');
+       cobalt.emptyCatalog('vocabularies');
         var access = data.access ? 'w' : '';
         for (var id in data.vocabularies) {
-          q.addEntry(id, data.vocabularies[id], access, 'vocabularies', 'vocabulary');
+         cobalt.addEntry(id, data.vocabularies[id], access, 'vocabularies', 'vocabulary');
         }
-        q.emptyCatalog('terms');
+       cobalt.emptyCatalog('terms');
         for (var id in data.terms) {
-          q.addEntry(id, data.terms[id][0], {'perm': access, 'vid': data.terms[id][1]}, 'terms', 'term');
+         cobalt.addEntry(id, data.terms[id][0], {'perm': access, 'vid': data.terms[id][1]}, 'terms', 'term');
         }
         callback(false);
       });
@@ -21,16 +21,16 @@ $(document).bind('cobalt-load', function(evt, q) {
     'update_rate': 60000
   };
   
-  q.registerPlugin('cobalt_taxonomy', {'version':0});
+ cobalt.registerPlugin('cobalt_taxonomy', {'version':0});
   
   // Registering catalog
-  q.registerCatalog('vocabularies', taxonomy);
+ cobalt.registerCatalog('vocabularies', taxonomy);
   // Insert empty catalog, the update function is handled for both catalogs in
   // the vocabularies catalog.
-  q.registerCatalog('terms', {});
+ cobalt.registerCatalog('terms', {});
   
   // Register handlers
-  q.registerHandler({
+ cobalt.registerHandler({
     'id': 'vocabulary_list',
     'name': 'List terms',
     'applicable': function(text, item) {
@@ -41,7 +41,7 @@ $(document).bind('cobalt-load', function(evt, q) {
     }
   }, 'vocabulary');
   
-  q.registerHandler({
+ cobalt.registerHandler({
     'id': 'vocabulary_edit',
     'name': 'Edit',
     'applicable': function(text, item) {
@@ -52,7 +52,7 @@ $(document).bind('cobalt-load', function(evt, q) {
     }
   }, 'vocabulary');
   
-  q.registerHandler({
+ cobalt.registerHandler({
     'id': 'vocabulary_add',
     'name': 'Add terms',
     'applicable': function(text, item) {
@@ -63,7 +63,7 @@ $(document).bind('cobalt-load', function(evt, q) {
     }
   }, 'vocabulary');
   
-  q.registerHandler({
+ cobalt.registerHandler({
     'id': 'term_view',
     'name': 'View',
     'handler': function(text, item) {
@@ -71,7 +71,7 @@ $(document).bind('cobalt-load', function(evt, q) {
     }
   }, 'term');
   
-  q.registerHandler({
+ cobalt.registerHandler({
     'id': 'term_edit',
     'name': 'Edit',
     'applicable': function(text, item) {
