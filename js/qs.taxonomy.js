@@ -48,7 +48,7 @@ $(document).bind('quicksilver-load', function(evt, q) {
       return item.information == 'w';
     },
     'handler': function(text, item) {
-      window.location.href = Drupal.settings.basePath + 'admin/content/taxonomy/edit/vocabulary/' + item.id;
+      window.location.href = Drupal.settings.basePath + 'admin/content/taxonomy/edit/vocabulary/' + item.id + '?destination=' + Drupal.settings.quicksilver.path;
     }
   }, 'vocabulary');
   
@@ -78,7 +78,7 @@ $(document).bind('quicksilver-load', function(evt, q) {
       return item.information.perm == 'w';
     },
     'handler': function(text, item) {
-      window.location.href = Drupal.settings.basePath + 'admin/content/taxonomy/edit/term/' + item.id;
+      window.location.href = Drupal.settings.basePath + 'admin/content/taxonomy/edit/term/' + item.id + '?destination=' + Drupal.settings.quicksilver.path;
     }
   }, 'term');
 });

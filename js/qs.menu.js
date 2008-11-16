@@ -33,7 +33,7 @@ $(document).bind('quicksilver-load', function(evt, q) {
       if (path=='<front>') {
         path = '';
       }
-      window.location.href = Drupal.settings.basePath + path;
+      window.location.href = Drupal.settings.basePath + path + '?destination=' + Drupal.settings.quicksilver.path;
     }
   }, 'url_data');
 });
