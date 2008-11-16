@@ -1,17 +1,17 @@
 <?php
 
-function quicksilver_nodes_install() {
-  drupal_install_schema('quicksilver_nodes');
+function cobalt_nodes_install() {
+  drupal_install_schema('cobalt_nodes');
 }
 
-function quicksilver_nodes_uninstall() {
-  drupal_uninstall_schema('quicksilver_nodes');
+function cobalt_nodes_uninstall() {
+  drupal_uninstall_schema('cobalt_nodes');
 }
 
-function quicksilver_nodes_schema() {
+function cobalt_nodes_schema() {
   $schema = array();
   
-  $schema['quicksilver_nodes_deletions'] = array(
+  $schema['cobalt_nodes_deletions'] = array(
     'description' => t('Registers node deletions so that deleted nodes can be removed from the index.'),
     'fields' => array(
       'nid' => array(

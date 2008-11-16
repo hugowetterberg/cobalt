@@ -1,6 +1,6 @@
 <?php
 
-function quicksilver_js_update() {
+function cobalt_js_update() {
   $settings = array();
   $out = 'Updating the following: <ul>';
   for ($i=2; arg($i); $i+=3) {
@@ -15,7 +15,7 @@ function quicksilver_js_update() {
       require_once($up_file);
     }
     
-    $up_function = $module . '_quicksilver_js_update';
+    $up_function = $module . '_cobalt_js_update';
     if (is_callable($up_function)) {
       call_user_func($up_function, $from, $to);
     }
@@ -24,6 +24,6 @@ function quicksilver_js_update() {
   }
   $out .= '</ul>';
   
-  drupal_add_js(array('quicksilver'=>array('update'=>$settings)), 'setting');
+  drupal_add_js(array('cobalt'=>array('update'=>$settings)), 'setting');
   return $out;
 }

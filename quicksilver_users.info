@@ -1,6 +1,6 @@
-name = Quicksilver Users
+name = Cobalt Users
 version = "6.x-0.1"
 core = "6.x"
-description = Provides access to users through quicksilver
-dependencies[] = quicksilver
-package = "Quicksilver"
+description = Provides access to users through cobalt
+dependencies[] = cobalt
+package = "Cobalt"

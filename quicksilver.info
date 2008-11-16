@@ -1,5 +1,5 @@
-name = Quicksilver
+name = Cobalt
 version = "6.x-0.1"
 core = "6.x"
-description = Provides a javascript version of Quicksilver
-package = "Quicksilver"
+description = "Cobalt is a javascript implementation of Quicksilver for Drupal"
+package = "Cobalt"

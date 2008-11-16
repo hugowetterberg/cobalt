@@ -1,71 +1,71 @@
 <?php
 
-function quicksilver_init() {
-  if (user_access('use quicksilver')) {
+function cobalt_init() {
+  if (user_access('use cobalt')) {
     global $user;
     
-    if (variable_get('quicksilver_gears_init',1)) {
-      drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/gears_init.js');
+    if (variable_get('cobalt_gears_init',1)) {
+      drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/gears_init.js');
     }
     
-    if (variable_get('quicksilver_jquery_json',1)) {
-      drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/jquery.json-1.3.min.js');
+    if (variable_get('cobalt_jquery_json',1)) {
+      drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/jquery.json-1.3.min.js');
     }
     
-    if (variable_get('quicksilver_jquery_hotkeys',1)) {
-      drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/jquery.hotkeys.js');
+    if (variable_get('cobalt_jquery_hotkeys',1)) {
+      drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/jquery.hotkeys.js');
     }
     
-    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/minimal-gears-wrapper.js');
+    drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/minimal-gears-wrapper.js');
     
-    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.js');
-    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.menu.js');
-    drupal_add_js(array('quicksilver'=>array('state'=>$user->uid, 'path' => $_GET['q'])), 'setting');
+    drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/qs.js');
+    drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/qs.menu.js');
+    drupal_add_js(array('cobalt'=>array('state'=>$user->uid, 'path' => $_GET['q'])), 'setting');
     
-    drupal_add_css(drupal_get_path('module', 'quicksilver') . '/css/qs.css');
+    drupal_add_css(drupal_get_path('module', 'cobalt') . '/css/qs.css');
   }
 }
 
-function quicksilver_perm() {
-  return array('use quicksilver');
+function cobalt_perm() {
+  return array('use cobalt');
 }
 
-function quicksilver_menu() {
+function cobalt_menu() {
   $items = array();
-  $items['quicksilver/alias'] = array(
+  $items['cobalt/alias'] = array(
     'title' => t('Forward to the correct alias'),
-    'page callback' => 'quicksilver_forward_to_alias',
-    'access arguments' => array('use quicksilver'),
+    'page callback' => 'cobalt_forward_to_alias',
+    'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
   );
-  $items['quicksilver/data/menu_json'] = array(
+  $items['cobalt/data/menu_json'] = array(
     'title' => t('Serialized menu'),
-    'page callback' => 'quicksilver_menu_json',
-    'access arguments' => array('use quicksilver'),
+    'page callback' => 'cobalt_menu_json',
+    'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
   );
-  $items['admin/settings/quicksilver'] = array(
-    'title' => t('Quicksilver configuration'),
+  $items['admin/settings/cobalt'] = array(
+    'title' => t('Cobalt configuration'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('quicksilver_settings'),
+    'page arguments' => array('cobalt_settings'),
     'access arguments' => array('administer site configuration'),
-    'file' => 'quicksilver_admin.inc.php',
+    'file' => 'cobalt_admin.inc.php',
     'type' => MENU_NORMAL_ITEM,
     'weight' => 0,
   );
-  $items['quicksilver/update'] = array(
-    'title' => t('Quicksilver update'),
-    'page callback' => 'quicksilver_js_update',
-    'page arguments' => array('quicksilver_settings'),
-    'access arguments' => array('use quicksilver'),
-    'file' => 'quicksilver_update.inc.php',
+  $items['cobalt/update'] = array(
+    'title' => t('Cobalt update'),
+    'page callback' => 'cobalt_js_update',
+    'page arguments' => array('cobalt_settings'),
+    'access arguments' => array('use cobalt'),
+    'file' => 'cobalt_update.inc.php',
     'type' => MENU_CALLBACK,
     'weight' => 0,
   );
   return $items;
 }
 
-function quicksilver_forward_to_alias() {
+function cobalt_forward_to_alias() {
   $url_parts = array();
   $i = 2;
   while (arg($i)) {
@@ -76,7 +76,7 @@ function quicksilver_forward_to_alias() {
   drupal_goto($path);
 }
 
-function quicksilver_menu_json() {
+function cobalt_menu_json() {
    $menu_names = menu_get_names();
    
    $tree = array();
@@ -85,21 +85,21 @@ function quicksilver_menu_json() {
    }
    
    $data = array();
-   _quicksilver_menu_data_recursive($tree, $data);
+   _cobalt_menu_data_recursive($tree, $data);
    
-   drupal_alter('quicksilver_menu', $data);
+   drupal_alter('cobalt_menu', $data);
    
    print drupal_to_js($data);
    exit;
 }
 
-function _quicksilver_menu_data_recursive($tree, &$data) {
+function _cobalt_menu_data_recursive($tree, &$data) {
   foreach($tree as $key => $item) {
     $link = $item['link'];
     if (!$link['hidden'] && $link['access']) {
       $data[$link['mlid']] = array($link['href'], $link['title']);
       if ($item['below']) {
-        _quicksilver_menu_data_recursive($item['below'], $data);
+        _cobalt_menu_data_recursive($item['below'], $data);
       }
     }
   }

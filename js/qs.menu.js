@@ -1,7 +1,7 @@
-$(document).bind('quicksilver-load', function(evt, q) {  
+$(document).bind('cobalt-load', function(evt, q) {  
   var menu = {
     'update': function(last_update, callback) {
-      $.getJSON(Drupal.settings.basePath + 'quicksilver/data/menu_json', {}, function (data) {
+      $.getJSON(Drupal.settings.basePath + 'cobalt/data/menu_json', {}, function (data) {
         q.emptyCatalog('menu');
         for (var id in data) {
           q.addEntry(id, data[id][1], data[id][0], 'menu', 'url_data');
@@ -19,7 +19,7 @@ $(document).bind('quicksilver-load', function(evt, q) {
     'update_rate': 60000
   };
   
-  q.registerPlugin('quicksilver_menu', {'version':0});
+  q.registerPlugin('cobalt_menu', {'version':0});
   
   // Registering catalog
   q.registerCatalog('menu', menu);
@@ -33,7 +33,7 @@ $(document).bind('quicksilver-load', function(evt, q) {
       if (path=='<front>') {
         path = '';
       }
-      window.location.href = Drupal.settings.basePath + path + '?destination=' + Drupal.settings.quicksilver.path;
+      window.location.href = Drupal.settings.basePath + path + '?destination=' + Drupal.settings.cobalt.path;
     }
   }, 'url_data');
 });

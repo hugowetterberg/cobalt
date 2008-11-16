@@ -8,37 +8,37 @@ $(document).ready(function(){
   
   // Initialize database
   if (window.openDatabase) {
-    var db = openDatabase('quicksilver', '1.0', 'Quicksilver Database', 1024000);
+    var db = openDatabase('cobalt', '1.0', 'Cobalt Database', 1024000);
   }
   else if (google.gears) {
     var gdb = google.gears.factory.create('beta.database');
-    gdb.open('quicksilver');
+    gdb.open('cobalt');
     var db = gears_db_html5_wrapper(gdb);
   }
   
   if (!db) {
     if (window.console) {
-      console.error('Quicksilver requires either Safari or a browser with Google Gears');
+      console.error('Cobalt requires either Safari or a browser with Google Gears');
     }
     return;
   }
   var nullDataHandler = function(transaction, results) { };
     
   var current_state = function() {
-    if (typeof(Drupal.settings.quicksilver.state) != 'undefined') {
-      return Drupal.settings.quicksilver.state;
+    if (typeof(Drupal.settings.cobalt.state) != 'undefined') {
+      return Drupal.settings.cobalt.state;
     }
     else {
       return 0;
     }
   };
     
-  // Initialize Quicksilver
+  // Initialize Cobalt
   var q = {
     'version': 0,
     'dbErrorHandler': function(transaction, error)
     {
-      $(document).trigger('quicksilver-db-error');
+      $(document).trigger('cobalt-db-error');
       if (window.console) {
         console.error(error.message+' (Code: '+error.code+')');
       }
@@ -56,7 +56,7 @@ $(document).ready(function(){
         updated = new Date().getTime();
       }
       db.transaction(function (transaction) {
-        transaction.executeSql("UPDATE catalogs SET updated=?, state=? WHERE name = ?;", [ updated, Drupal.settings.quicksilver.state, catalog ], nullDataHandler, q.dbErrorHandler);
+        transaction.executeSql("UPDATE catalogs SET updated=?, state=? WHERE name = ?;", [ updated, Drupal.settings.cobalt.state, catalog ], nullDataHandler, q.dbErrorHandler);
       });
     },
     'emptyCatalog': function(name) {
@@ -149,11 +149,11 @@ $(document).ready(function(){
     }
   };
   
-  if (typeof(Drupal.settings.quicksilver.update) != 'undefined') {
+  if (typeof(Drupal.settings.cobalt.update) != 'undefined') {
     q.updateVersion = function(transaction, name, version) {
       transaction.executeSql('UPDATE versions SET version=? WHERE name=?', [version, name], nullDataHandler, q.dbErrorHandler);
     };
-    $(document).trigger('quicksilver-update', [q, db, Drupal.settings.quicksilver.update]);
+    $(document).trigger('cobalt-update', [q, db, Drupal.settings.cobalt.update]);
     return;
   }
   
@@ -173,9 +173,9 @@ $(document).ready(function(){
     });
   };
   
-  $(document).trigger('quicksilver-load', q);
+  $(document).trigger('cobalt-load', q);
   
-  q.registerPlugin('quicksilver', q);
+  q.registerPlugin('cobalt', q);
   
   q.registerHandler({
     'id': 'qs_show',
@@ -443,7 +443,7 @@ $(document).ready(function(){
   };
   
   var init = function() {
-    $(document).trigger('quicksilver-init', q);
+    $(document).trigger('cobalt-init', q);
 
     // Load key bindings
     db.transaction(function (transaction) {
@@ -520,7 +520,7 @@ $(document).ready(function(){
       }, q.dbErrorHandler);
     });
 
-    $(document).trigger('quicksilver-post-init', q);
+    $(document).trigger('cobalt-post-init', q);
 
     qs.bind('click', function(e){ return false; }).
       bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); return false; }).
@@ -572,12 +572,12 @@ $(document).ready(function(){
         
         if (required_updates.length) {
           var update_notice = function () {
-            var update_url = Drupal.settings.basePath + 'quicksilver/update';
+            var update_url = Drupal.settings.basePath + 'cobalt/update';
             for (var i=0; i<required_updates.length; i++) {
               var u = required_updates[i];
               update_url += '/' + u[0] + '/' + u[1] + '/' + u[2];
             }
-            q.showHtml('<h1>Update required</h1><p>Quicksilver must be updated before it can be used</p>' +
+            q.showHtml('<h1>Update required</h1><p>Cobalt must be updated before it can be used</p>' +
               '<p><a class="qs-update-link" href="' + update_url + '">Click here to update</a></p>');
           };
           $(document).bind('click', function(){ toggle_output('hide'); })

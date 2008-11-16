@@ -1,6 +1,6 @@
-name = Quicksilver Taxonomy
+name = Cobalt Taxonomy
 version = "6.x-0.1"
 core = "6.x"
-description = Provides access to taxonomies through quicksilver
-dependencies[] = quicksilver
-package = "Quicksilver"
+description = Provides access to taxonomies through cobalt
+dependencies[] = cobalt
+package = "Cobalt"

@@ -1,24 +1,24 @@
 <?php
 
-function quicksilver_users_init() {
-  if (user_access('use quicksilver')) {
-    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.users.js');
+function cobalt_users_init() {
+  if (user_access('use cobalt')) {
+    drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/qs.users.js');
   }
 }
 
-function quicksilver_users_menu() {
+function cobalt_users_menu() {
   $items = array();
-  $items['quicksilver/data/users_json/%'] = array(
+  $items['cobalt/data/users_json/%'] = array(
     'title' => t('Serialized users'),
-    'page callback' => 'quicksilver_users_json',
+    'page callback' => 'cobalt_users_json',
     'page arguments' => array(2),
-    'access arguments' => array('use quicksilver'),
+    'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
   );
   return $items;
 }
 
-function quicksilver_users_json($last_update) {
+function cobalt_users_json($last_update) {
   // We're just fetching the bare minimum of what we need for the
   // user_*_access methods and display.
   $res = db_query("SELECT uid, name, access, status FROM {users}

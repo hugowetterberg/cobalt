@@ -1,7 +1,7 @@
-$(document).bind('quicksilver-load', function(evt, q) {  
+$(document).bind('cobalt-load', function(evt, q) {  
   var taxonomy = {
     'update': function(last_update, callback) {
-      $.getJSON(Drupal.settings.basePath + 'quicksilver/data/taxonomy_json', {}, function (data) {
+      $.getJSON(Drupal.settings.basePath + 'cobalt/data/taxonomy_json', {}, function (data) {
         q.emptyCatalog('vocabularies');
         var access = data.access ? 'w' : '';
         for (var id in data.vocabularies) {
@@ -21,7 +21,7 @@ $(document).bind('quicksilver-load', function(evt, q) {
     'update_rate': 60000
   };
   
-  q.registerPlugin('quicksilver_taxonomy', {'version':0});
+  q.registerPlugin('cobalt_taxonomy', {'version':0});
   
   // Registering catalog
   q.registerCatalog('vocabularies', taxonomy);
@@ -48,7 +48,7 @@ $(document).bind('quicksilver-load', function(evt, q) {
       return item.information == 'w';
     },
     'handler': function(text, item) {
-      window.location.href = Drupal.settings.basePath + 'admin/content/taxonomy/edit/vocabulary/' + item.id + '?destination=' + Drupal.settings.quicksilver.path;
+      window.location.href = Drupal.settings.basePath + 'admin/content/taxonomy/edit/vocabulary/' + item.id + '?destination=' + Drupal.settings.cobalt.path;
     }
   }, 'vocabulary');
   
@@ -78,7 +78,7 @@ $(document).bind('quicksilver-load', function(evt, q) {
       return item.information.perm == 'w';
     },
     'handler': function(text, item) {
-      window.location.href = Drupal.settings.basePath + 'admin/content/taxonomy/edit/term/' + item.id + '?destination=' + Drupal.settings.quicksilver.path;
+      window.location.href = Drupal.settings.basePath + 'admin/content/taxonomy/edit/term/' + item.id + '?destination=' + Drupal.settings.cobalt.path;
     }
   }, 'term');
 });
