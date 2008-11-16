@@ -1,10 +1,10 @@
-$(document).bind('quicksilver-load', function(evt, q) {  
+$(document).bind('cobalt-load', function(evt, cobalt) {  
   var nodes = {
     'update': function(last_update, callback) {
-      $.getJSON(Drupal.settings.basePath + 'quicksilver/data/users_json/' + Math.round((last_update/1000)), {}, function (data) {
+      $.getJSON(Drupal.settings.basePath + 'cobalt/data/users_json/' + Math.round((last_update/1000)), {}, function (data) {
         var num_nodes = data.length;
         for (var i=0; i<num_nodes; i++) {
-          q.addEntry(data[i][0], data[i][1], {'perm': data[i][2]}, 'users', 'user');
+         cobalt.addEntry(data[i][0], data[i][1], {'perm': data[i][2]}, 'users', 'user');
         }
         callback(true);
       });
@@ -16,13 +16,13 @@ $(document).bind('quicksilver-load', function(evt, q) {
     'update_rate': 300000
   };
   
-  q.registerPlugin('quicksilver_users', {'version':0});
+ cobalt.registerPlugin('cobalt_users', {'version':0});
   
   // Registering catalog
-  q.registerCatalog('users', nodes);
+ cobalt.registerCatalog('users', nodes);
   
   // Register handlers
-  q.registerHandler({
+ cobalt.registerHandler({
     'id': 'user_view',
     'name': 'View',
     'applicable': function(text, item) {
@@ -33,25 +33,25 @@ $(document).bind('quicksilver-load', function(evt, q) {
     }
   }, 'user');
   
-  q.registerHandler({
+ cobalt.registerHandler({
     'id': 'user_edit',
     'name': 'Edit',
     'applicable': function(text, item) {
       return item.information.perm.indexOf('w') >= 0;
     },
     'handler': function(text, item) {
-      window.location.href = Drupal.settings.basePath + 'user/' + item.id + '/edit?destination=' + Drupal.settings.quicksilver.path;
+      window.location.href = Drupal.settings.basePath + 'user/' + item.id + '/edit?destination=' + Drupal.settings.cobalt.path;
     }
   }, 'user');
   
-  q.registerHandler({
+ cobalt.registerHandler({
     'id': 'user_delete',
     'name': 'Delete',
     'applicable': function(text, item) {
       return item.information.perm.indexOf('d') >= 0;
     },
     'handler': function(text, item) {
-      window.location.href = Drupal.settings.basePath + 'user/' + item.id + '/delete?destination=' + Drupal.settings.quicksilver.path;
+      window.location.href = Drupal.settings.basePath + 'user/' + item.id + '/delete?destination=' + Drupal.settings.cobalt.path;
     }
   }, 'user');
 });

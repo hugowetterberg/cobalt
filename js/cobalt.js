@@ -1,6 +1,6 @@
 $(document).ready(function(){
   var match_count = 0, match_page_size=5, match_offset = 0,
-      qs_visible = false, qs_out_visible = false,
+      cobalt_visible = false, cobalt_out_visible = false,
       matches = [], match_idx = 0, handler_idx = 0, 
       current_text, handler, item, actions, match_count=0,
       plugins = {}, plugin_names=[], catalogs = {}, global_handlers = [], handlers = {}, 
@@ -8,37 +8,37 @@ $(document).ready(function(){
   
   // Initialize database
   if (window.openDatabase) {
-    var db = openDatabase('quicksilver', '1.0', 'Quicksilver Database', 1024000);
+    var db = openDatabase('cobalt', '1.0', 'Cobalt Database', 1024000);
   }
   else if (google.gears) {
     var gdb = google.gears.factory.create('beta.database');
-    gdb.open('quicksilver');
+    gdb.open('cobalt');
     var db = gears_db_html5_wrapper(gdb);
   }
   
   if (!db) {
     if (window.console) {
-      console.error('Quicksilver requires either Safari or a browser with Google Gears');
+      console.error('Cobalt requires either Safari or a browser with Google Gears');
     }
     return;
   }
   var nullDataHandler = function(transaction, results) { };
     
   var current_state = function() {
-    if (typeof(Drupal.settings.quicksilver.state) != 'undefined') {
-      return Drupal.settings.quicksilver.state;
+    if (typeof(Drupal.settings.cobalt.state) != 'undefined') {
+      return Drupal.settings.cobalt.state;
     }
     else {
       return 0;
     }
   };
     
-  // Initialize Quicksilver
-  var q = {
+  // Initialize Cobalt
+  var cobalt = {
     'version': 0,
     'dbErrorHandler': function(transaction, error)
     {
-      $(document).trigger('quicksilver-db-error');
+      $(document).trigger('cobalt-db-error');
       if (window.console) {
         console.error(error.message+' (Code: '+error.code+')');
       }
@@ -56,12 +56,12 @@ $(document).ready(function(){
         updated = new Date().getTime();
       }
       db.transaction(function (transaction) {
-        transaction.executeSql("UPDATE catalogs SET updated=?, state=? WHERE name = ?;", [ updated, Drupal.settings.quicksilver.state, catalog ], nullDataHandler, q.dbErrorHandler);
+        transaction.executeSql("UPDATE catalogs SET updated=?, state=? WHERE name = ?;", [ updated, Drupal.settings.cobalt.state, catalog ], nullDataHandler,cobalt.dbErrorHandler);
       });
     },
     'emptyCatalog': function(name) {
       db.transaction(function (transaction) {
-        transaction.executeSql("DELETE FROM entries WHERE catalog=?;", [ name ], nullDataHandler, q.dbErrorHandler);
+        transaction.executeSql("DELETE FROM entries WHERE catalog=?;", [ name ], nullDataHandler,cobalt.dbErrorHandler);
       });
     },
     'addKeyBinding': function(binding, catalog, id, handler, active, state) {
@@ -73,7 +73,7 @@ $(document).ready(function(){
       }
       bind_key(binding, catalog, id, handler);
       db.transaction(function (transaction) {
-        transaction.executeSql("INSERT OR REPLACE INTO key_bindings(binding, catalog, id, handler, active, state) VALUES(?,?,?,?,?,?);", [ binding, catalog, id, handler, active, state ], nullDataHandler, q.dbErrorHandler);
+        transaction.executeSql("INSERT OR REPLACE INTO key_bindings(binding, catalog, id, handler, active, state) VALUES(?,?,?,?,?,?);", [ binding, catalog, id, handler, active, state ], nullDataHandler,cobalt.dbErrorHandler);
       });
     },
     'loadEntry': function(catalog, id, callback) {
@@ -88,12 +88,12 @@ $(document).ready(function(){
             item.information = $.evalJSON(item.data);
           }
           callback(item);
-        }, q.dbErrorHandler);
+        },cobalt.dbErrorHandler);
       });
     },
     'deleteEntry': function(catalog, id) {
       db.transaction(function (transaction) {
-        transaction.executeSql("DELETE FROM entries WHERE catalog=? AND id=?;", [ catalog, id ], nullDataHandler, q.dbErrorHandler);
+        transaction.executeSql("DELETE FROM entries WHERE catalog=? AND id=?;", [ catalog, id ], nullDataHandler,cobalt.dbErrorHandler);
       });
     },
     'addEntry': function(id, name, information, catalog, classname, active, state) {
@@ -104,20 +104,20 @@ $(document).ready(function(){
         active = 1;
       }
       db.transaction(function (transaction) {
-        transaction.executeSql("INSERT OR REPLACE INTO entries(id, name, data, catalog, data_class, state, active) VALUES(?,?,?,?,?,?,?);", [ id, name, $.toJSON(information), catalog, classname, state, active], nullDataHandler, q.dbErrorHandler);
+        transaction.executeSql("INSERT OR REPLACE INTO entries(id, name, data, catalog, data_class, state, active) VALUES(?,?,?,?,?,?,?);", [ id, name, $.toJSON(information), catalog, classname, state, active], nullDataHandler,cobalt.dbErrorHandler);
       });
     },
     'registerUse': function(text, item) {
       if (item.weight == null) {
         db.transaction(function (transaction) {
           transaction.executeSql("INSERT INTO usage_data(catalog, id, weight, abbreviation) VALUES(?,?,?,?)", 
-            [item.catalog, item.id, 1, text], nullDataHandler, q.dbErrorHandler);
+            [item.catalog, item.id, 1, text], nullDataHandler,cobalt.dbErrorHandler);
         });
       } 
       else {
         db.transaction(function (transaction) {
           transaction.executeSql("UPDATE usage_data SET weight=weight+1, abbreviation=? WHERE catalog=? AND id=?", 
-            [text, item.catalog, item.id], nullDataHandler, q.dbErrorHandler);
+            [text, item.catalog, item.id], nullDataHandler,cobalt.dbErrorHandler);
         });
       }
     },
@@ -137,31 +137,31 @@ $(document).ready(function(){
     },
     'showHtml': function(html) {
       if (typeof(html) == 'string') {
-        qs_output.html(html);
+        cobalt_output.html(html);
       }
       else {
-        qs_output.empty().append(html);
+        cobalt_output.empty().append(html);
       }
       
-      if (!qs_out_visible) {
+      if (!cobalt_out_visible) {
         toggle_output();
       }
     }
   };
   
-  if (typeof(Drupal.settings.quicksilver.update) != 'undefined') {
-    q.updateVersion = function(transaction, name, version) {
-      transaction.executeSql('UPDATE versions SET version=? WHERE name=?', [version, name], nullDataHandler, q.dbErrorHandler);
+  if (typeof(Drupal.settings.cobalt.update) != 'undefined') {
+   cobalt.updateVersion = function(transaction, name, version) {
+      transaction.executeSql('UPDATE versions SET version=? WHERE name=?', [version, name], nullDataHandler,cobalt.dbErrorHandler);
     };
-    $(document).trigger('quicksilver-update', [q, db, Drupal.settings.quicksilver.update]);
+    $(document).trigger('cobalt-update', [cobalt, db, Drupal.settings.cobalt.update]);
     return;
   }
   
   var bind_key = function (binding, catalog, id, handler) {
-    q.loadEntry(catalog, id, function(item) {
+   cobalt.loadEntry(catalog, id, function(item) {
       if (item) {
         $(document).bind('keydown', binding, function(){
-          var cand = q.actionCandidates(item);
+          var cand =cobalt.actionCandidates(item);
           var cand_count = cand.length;
           for(var i=0; i<cand_count; i++) {
             if (cand[i].id == handler) {
@@ -173,15 +173,15 @@ $(document).ready(function(){
     });
   };
   
-  $(document).trigger('quicksilver-load', q);
+  $(document).trigger('cobalt-load', cobalt);
   
-  q.registerPlugin('quicksilver', q);
+ cobalt.registerPlugin('cobalt', cobalt);
   
-  q.registerHandler({
-    'id': 'qs_show',
+ cobalt.registerHandler({
+    'id': 'cobalt_show',
     'name': 'Show',
     'handler': function(text, item) {
-      q.showHtml('<h2>' + item.name + '</h2>' +
+     cobalt.showHtml('<h2>' + item.name + '</h2>' +
         'text: <i>' + text + '</i><br/>' + 
         'id: ' + item.id + '<br/>' + 
         'catalog: ' + item.catalog + '<br/>' + 
@@ -191,11 +191,11 @@ $(document).ready(function(){
     }
   });
   
-  q.registerHandler({
-    'id': 'qs_abbrev',
+ cobalt.registerHandler({
+    'id': 'cobalt_abbrev',
     'name': 'Assign shortcut',
     'handler': function(text, item) {
-      var cand = q.actionCandidates(item);
+      var cand =cobalt.actionCandidates(item);
       var out = $('<div class="shortcut-add"><h2>' + item.name + '</h2>' + 
         'The keys <input class="key-combo" type="text" value="Ctrl+"/> should trigger the action:<br/> <select class="action-select"></select>' + 
         '<p><button class="ok">Ok</button></p></div>');
@@ -208,10 +208,10 @@ $(document).ready(function(){
       
       $(out).find('button.ok').bind('click',function(){
         toggle_output('hide');
-        q.addKeyBinding(key_combo.val(), item.catalog, item.id, actions.val());
+       cobalt.addKeyBinding(key_combo.val(), item.catalog, item.id, actions.val());
       });
       
-      q.showHtml(out);
+     cobalt.showHtml(out);
       key_combo.focus();
     }
   });
@@ -219,46 +219,46 @@ $(document).ready(function(){
   db.transaction(function (transaction) {
     transaction.executeSql('CREATE TABLE IF NOT EXISTS versions(' +
       'name TEXT NOT NULL, version INTEGER NOT NULL DEFAULT 0, ' + 
-      'CONSTRAINT pk_versions PRIMARY KEY(name));', [], nullDataHandler, q.dbErrorHandler);
+      'CONSTRAINT pk_versions PRIMARY KEY(name));', [], nullDataHandler,cobalt.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS entries(' +
       'catalog TEXT NOT NULL, id TEXT NOT NULL, name TEXT NOT NULL, data TEXT NOT NULL DEFAULT "", data_class TEXT NOT NULL, ' + 
       'state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, ' + 
-      'CONSTRAINT pk_entries PRIMARY KEY(catalog, id));', [], nullDataHandler, q.dbErrorHandler);
+      'CONSTRAINT pk_entries PRIMARY KEY(catalog, id));', [], nullDataHandler,cobalt.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS key_bindings(' +
       'binding TEXT NOT NULL, catalog TEXT NOT NULL, id TEXT NOT NULL, handler TEXT NOT NULL, ' + 
       'state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, ' + 
-      'CONSTRAINT pk_bindings PRIMARY KEY(binding, state));', [], nullDataHandler, q.dbErrorHandler);
+      'CONSTRAINT pk_bindings PRIMARY KEY(binding, state));', [], nullDataHandler,cobalt.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS usage_data(catalog TEXT NOT NULL, id TEXT NOT NULL, ' + 
       'weight INTEGER NOT NULL DEFAULT 0, abbreviation TEXT NOT NULL DEFAULT "",' +
-      'CONSTRAINT pk_usage_data PRIMARY KEY(catalog, id));', [], nullDataHandler, q.dbErrorHandler);
-    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_catalog ON entries(catalog);', [], nullDataHandler, q.dbErrorHandler);
-    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_abbreviation ON usage_data(abbreviation);', [], nullDataHandler, q.dbErrorHandler);
-    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_active ON entries(active DESC);', [], nullDataHandler, q.dbErrorHandler);
-    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_weight ON usage_data(weight DESC);', [], nullDataHandler, q.dbErrorHandler);
+      'CONSTRAINT pk_usage_data PRIMARY KEY(catalog, id));', [], nullDataHandler,cobalt.dbErrorHandler);
+    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_catalog ON entries(catalog);', [], nullDataHandler,cobalt.dbErrorHandler);
+    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_abbreviation ON usage_data(abbreviation);', [], nullDataHandler,cobalt.dbErrorHandler);
+    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_active ON entries(active DESC);', [], nullDataHandler,cobalt.dbErrorHandler);
+    transaction.executeSql('CREATE INDEX IF NOT EXISTS idx_entries_weight ON usage_data(weight DESC);', [], nullDataHandler,cobalt.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS catalogs(' +
-      'name TEXT NOT NULL PRIMARY KEY, updated INTEGER NOT NULL DEFAULT 0, state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, uninstall INTEGER NOT NULL DEFAULT 0);', [], nullDataHandler, q.dbErrorHandler);
+      'name TEXT NOT NULL PRIMARY KEY, updated INTEGER NOT NULL DEFAULT 0, state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, uninstall INTEGER NOT NULL DEFAULT 0);', [], nullDataHandler,cobalt.dbErrorHandler);
   });
   
-  var qs_output = $('<div id="qs-out"></div>').appendTo('body').hide();
+  var cobalt_output = $('<div id="cobalt-out"></div>').appendTo('body').hide();
   var toggle_output = function(arg) {
-    if (qs_out_visible || arg=='hide') {
-      qs_output.hide();
-      qs_out_visible = false;
+    if (cobalt_out_visible || arg=='hide') {
+      cobalt_output.hide();
+      cobalt_out_visible = false;
     }
     else {
-      qs_output.css({
-        'top': $(window).height()/3 + window.pageYOffset - qs_output.height()/2,
-        'left': $(window).width()/2 + window.pageXOffset - qs_output.width()/2
+      cobalt_output.css({
+        'top': $(window).height()/3 + window.pageYOffset - cobalt_output.height()/2,
+        'left': $(window).width()/2 + window.pageXOffset - cobalt_output.width()/2
       }).show();
-      qs_out_visible = true;
+      cobalt_out_visible = true;
     }
   };
   
   var keypress_reaction = function() {
-    if(qs_input.val()==current_text) {
+    if(cobalt_input.val()==current_text) {
       return;
     }
-    current_text = qs_input.val();
+    current_text = cobalt_input.val();
 
     if($.trim(current_text)!='') {
       lookup();
@@ -271,9 +271,9 @@ $(document).ready(function(){
   var clear_ac = function() {
     match_idx = 0;
     current_text = '';
-    $('#qs .inner').attr('class','inner');
-    $('#qs .inner label').hide();
-    qs_ac.empty().hide();
+    $('#cobalt .inner').attr('class','inner');
+    $('#cobalt .inner label').hide();
+    cobalt_ac.empty().hide();
   };
 
   var lookup = function(preserve_offset) {
@@ -286,14 +286,14 @@ $(document).ready(function(){
         "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
         "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?) " + 
         "ORDER BY nullif(?,u.abbreviation), nullif(?,e.name), u.weight DESC LIMIT ?,?;", [ 
-        current_text, like_expr, current_text, current_text, match_offset, match_page_size ], lookup_finished, q.dbErrorHandler);
+        current_text, like_expr, current_text, current_text, match_offset, match_page_size ], lookup_finished,cobalt.dbErrorHandler);
     });
   };
 
   var lookup_finished = function(transaction, results) {
     match_idx = 0;
-    $('#qs .left label').hide();
-    qs_ac.empty().hide();
+    $('#cobalt .left label').hide();
+    cobalt_ac.empty().hide();
 
     if (results.rows.length) {
       for (var i=0; i<results.rows.length; i++) {
@@ -305,10 +305,10 @@ $(document).ready(function(){
         else {
           var title = item.name;
         }
-        $('<li class="ac-opt-' + i + '"></li>').html(title).appendTo(qs_ac);
+        $('<li class="ac-opt-' + i + '"></li>').html(title).appendTo(cobalt_ac);
       }
       matches = results.rows;
-      qs_ac.show();
+      cobalt_ac.show();
     }
     else {
       clear_ac();
@@ -325,16 +325,16 @@ $(document).ready(function(){
         current_text, like_expr ], function(transaction, results) {
           if (results.rows.length) {
             match_count = results.rows.item(0).match_count;
-            qs_paging.empty();
+            cobalt_paging.empty();
             var page_count = Math.ceil(match_count/match_page_size);
             for (var i=0; i<page_count; i++ ) {
-              var p = $('<li>&nbsp;</li>').appendTo(qs_paging);
+              var p = $('<li>&nbsp;</li>').appendTo(cobalt_paging);
               if (i==match_offset/match_page_size) {
                 p.attr('class','current');
               }
             }
           }
-        }, q.dbErrorHandler);
+        },cobalt.dbErrorHandler);
     });
   };
 
@@ -356,11 +356,11 @@ $(document).ready(function(){
     item.information = $.evalJSON(item.data);
     var old_item = matches.item(match_idx);
 
-    $('#qs .ac-opt-' + match_idx).removeClass('active');
+    $('#cobalt .ac-opt-' + match_idx).removeClass('active');
     match_idx = idx;
-    $('#qs .left .inner').attr('class','inner qs-item-' + item.data_class);
-    $('#qs .left label').text(item.name).show();
-    $('#qs .ac-opt-' + match_idx).addClass('active');
+    $('#cobalt .left .inner').attr('class','inner cobalt-item-' + item.data_class);
+    $('#cobalt .left label').text(item.name).show();
+    $('#cobalt .ac-opt-' + match_idx).addClass('active');
 
     actions = action_candidates(item);
     set_handler(0);
@@ -406,35 +406,35 @@ $(document).ready(function(){
     handler = new_handler;
     if (handler) {
       var newClass = handler_class();
-      $('#qs .right .inner').attr('class','inner qs-action-' +newClass);
-      $('#qs .right label').text(handler.name).show();
+      $('#cobalt .right .inner').attr('class','inner cobalt-action-' +newClass);
+      $('#cobalt .right label').text(handler.name).show();
     }
   };
 
   var run_handler = function() {
     if (item && typeof(handler['handler']) == 'function') {
-      var text = $.trim(qs_input.val());
-      q.registerUse(text, item);
+      var text = $.trim(cobalt_input.val());
+     cobalt.registerUse(text, item);
       handler.handler(text, item);
     }
     hide();
   };
 
   var toggle = function(arg) {
-    if (qs_visible || arg=='hide') {
-      qs.hide();
-      qs_visible = false;
+    if (cobalt_visible || arg=='hide') {
+      cb.hide();
+      cobalt_visible = false;
     }
     else {
       toggle_output('hide');
       clear_ac();
-      qs_input.val($.trim(qs_input.val()));
-      qs.css({
-        'top': $(window).height()/3 + window.pageYOffset - qs.height()/2,
-        'left': $(window).width()/2 + window.pageXOffset - qs.width()/2
+      cobalt_input.val($.trim(cobalt_input.val()));
+      cb.css({
+        'top': $(window).height()/3 + window.pageYOffset - cb.height()/2,
+        'left': $(window).width()/2 + window.pageXOffset - cb.width()/2
       }).show();
-      qs_visible = true;
-      setTimeout(function(){ qs_input.focus(); qs_input.select(); }, 100);
+      cobalt_visible = true;
+      setTimeout(function(){ cobalt_input.focus(); cobalt_input.select(); }, 100);
     }
   };
 
@@ -443,7 +443,7 @@ $(document).ready(function(){
   };
   
   var init = function() {
-    $(document).trigger('quicksilver-init', q);
+    $(document).trigger('cobalt-init', cobalt);
 
     // Load key bindings
     db.transaction(function (transaction) {
@@ -452,7 +452,7 @@ $(document).ready(function(){
           var b = results.rows.item(i);
           bind_key(b.binding, b.catalog, b.id, b.handler);
         }
-      }, q.dbErrorHandler);
+      },cobalt.dbErrorHandler);
     });
 
     db.transaction(function (transaction) {
@@ -475,7 +475,7 @@ $(document).ready(function(){
                 catalogs[key].install();
               }
               db.transaction(function (transaction) {
-                transaction.executeSql("INSERT INTO catalogs(name) VALUES(?)", [key], nullDataHandler, q.dbErrorHandler);
+                transaction.executeSql("INSERT INTO catalogs(name) VALUES(?)", [key], nullDataHandler,cobalt.dbErrorHandler);
               });
               update_queue.unshift({'name': key, 'updated': 0 });
             }
@@ -499,7 +499,7 @@ $(document).ready(function(){
                 if (catalog['update']) {
                   catalog.update(inf.updated, function(enqueue){
                     var now = new Date().getTime();
-                    q.catalogUpdated(inf.name);
+                   cobalt.catalogUpdated(inf.name);
 
                     if (enqueue) {
                       update_queue.push({'name': inf.name, 'updated': now });
@@ -517,37 +517,37 @@ $(document).ready(function(){
           },update_counter?1000:100);
         };
         update_loop();
-      }, q.dbErrorHandler);
+      },cobalt.dbErrorHandler);
     });
 
-    $(document).trigger('quicksilver-post-init', q);
+    $(document).trigger('cobalt-post-init', cobalt);
 
-    qs.bind('click', function(e){ return false; }).
+    cb.bind('click', function(e){ return false; }).
       bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); return false; }).
       bind('keydown', 'return', function(){ run_handler(); return false; });
-    qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); return false; }).
+    cobalt_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); return false; }).
       bind('keydown', 'down', function(){ ac_select(match_idx+1); return false; }).
       bind('keydown', 'Alt+left', function(){ ac_page(match_offset-match_page_size); return false; }).
       bind('keydown', 'Alt+right', function(){ ac_page(match_offset+match_page_size); return false; }).
       bind('keyup', function(){ setTimeout(keypress_reaction, 10); return false; });
-    qs_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); return false; }).
+    cobalt_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); return false; }).
       bind('keydown', 'down', function(){ set_handler(handler_idx+1); return false; });
-    qs_output.bind('click', function(e){ return false; });
+    cobalt_output.bind('click', function(e){ return false; });
     $(document).bind('click', function(){ toggle('hide'); toggle_output('hide'); })
       .bind('keydown', 'Alt+space', toggle)
       .bind('keydown', 'Ctrl+space', toggle);
   };
   
   // Initialize GUI
-  var qs = $('<div id="qs">'+
-    '<div class="cell left"><div class="inner"><input type="text" id="qs-input" /><label></label></div></div>'+ 
-    '<div class="cell right"><div class="inner"><input type="text" id="qs-handler-input" /><label></label></div></div>'+
-    '<ol class="qs-paging"></ol><ul class="qs-autocomplete"></ul><ul class="qs-actions"></ul></div>').appendTo('body').hide();
-  var qs_input = $('#qs-input');
-  var qs_h_input = $('#qs-handler-input');
-  var qs_ac = $('#qs .qs-autocomplete');
-  var qs_paging = $('#qs .qs-paging');
-  $('#qs .right label').hide();
+  var cb = $('<div id="cobalt">'+
+    '<div class="cell left"><div class="inner"><input type="text" id="cobalt-input" /><label></label></div></div>'+ 
+    '<div class="cell right"><div class="inner"><input type="text" id="cobalt-handler-input" /><label></label></div></div>'+
+    '<ol class="cobalt-paging"></ol><ul class="cobalt-autocomplete"></ul><ul class="cobalt-actions"></ul></div>').appendTo('body').hide();
+  var cobalt_input = $('#cobalt-input');
+  var cobalt_h_input = $('#cobalt-handler-input');
+  var cobalt_ac = $('#cobalt .cobalt-autocomplete');
+  var cobalt_paging = $('#cobalt .cobalt-paging');
+  $('#cobalt .right label').hide();
   
   // Check if we need to update anything before initializing
   db.transaction(function (transaction) {
@@ -563,7 +563,7 @@ $(document).ready(function(){
         for (var i=0; i<plugin_count; i++) {
           var n=plugin_names[i];
           if (typeof(v[n])=='undefined') {
-            transaction.executeSql('INSERT INTO versions(name, version) VALUES(?,?)', [ n, plugins[n].version ], nullDataHandler, q.dbErrorHandler);
+            transaction.executeSql('INSERT INTO versions(name, version) VALUES(?,?)', [ n, plugins[n].version ], nullDataHandler,cobalt.dbErrorHandler);
           }
           else if (v[n]<plugins[n].version) {
             required_updates.push([n, v[n], plugins[n].version]);
@@ -572,13 +572,13 @@ $(document).ready(function(){
         
         if (required_updates.length) {
           var update_notice = function () {
-            var update_url = Drupal.settings.basePath + 'quicksilver/update';
+            var update_url = Drupal.settings.basePath + 'cobalt/update';
             for (var i=0; i<required_updates.length; i++) {
               var u = required_updates[i];
               update_url += '/' + u[0] + '/' + u[1] + '/' + u[2];
             }
-            q.showHtml('<h1>Update required</h1><p>Quicksilver must be updated before it can be used</p>' +
-              '<p><a class="qs-update-link" href="' + update_url + '">Click here to update</a></p>');
+           cobalt.showHtml('<h1>Update required</h1><p>Cobalt must be updated before it can be used</p>' +
+              '<p><a class="cobalt-update-link" href="' + update_url + '">Click here to update</a></p>');
           };
           $(document).bind('click', function(){ toggle_output('hide'); })
             .bind('keydown', 'Alt+space', update_notice)
@@ -588,6 +588,6 @@ $(document).ready(function(){
           init();
         }
       });
-    }, q.dbErrorHandler);
+    },cobalt.dbErrorHandler);
   });
 });

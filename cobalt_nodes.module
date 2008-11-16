@@ -1,45 +1,45 @@
 <?php
 
-function quicksilver_nodes_init() {
-  if (user_access('use quicksilver')) {
-    drupal_add_js(drupal_get_path('module', 'quicksilver') . '/js/qs.nodes.js');
+function cobalt_nodes_init() {
+  if (user_access('use cobalt')) {
+    drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.nodes.js');
   }
 }
 
-function quicksilver_nodes_menu() {
+function cobalt_nodes_menu() {
   $items = array();
-  $items['quicksilver/data/nodes_update/%'] = array(
+  $items['cobalt/data/nodes_update/%'] = array(
     'title' => t('Serialized nodes'),
-    'page callback' => 'quicksilver_nodes_json',
+    'page callback' => 'cobalt_nodes_json',
     'page arguments' => array('update', 3),
-    'access arguments' => array('use quicksilver'),
+    'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
   );
-  $items['quicksilver/data/nodes_single/%'] = array(
+  $items['cobalt/data/nodes_single/%'] = array(
     'title' => t('Serialized node'),
-    'page callback' => 'quicksilver_nodes_json',
+    'page callback' => 'cobalt_nodes_json',
     'page arguments' => array('single', 3),
-    'access arguments' => array('use quicksilver'),
+    'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
   );
   return $items;
 }
 
-function quicksilver_nodes_cron() {
+function cobalt_nodes_cron() {
   // Delete logged deletions older than two weeks
-  db_query("DELETE FROM {quicksilver_nodes_deletions} WHERE deleted<%d", time() - 86400*14);
+  db_query("DELETE FROM {cobalt_nodes_deletions} WHERE deleted<%d", time() - 86400*14);
 }
 
-function quicksilver_nodes_nodeapi(&$node, $op, $teaser, $page) {
+function cobalt_nodes_nodeapi(&$node, $op, $teaser, $page) {
   if ($op=='view' && $page) {
-    drupal_add_js(array('quicksilver'=>array('nodes_current'=>$node->nid)), 'setting');
+    drupal_add_js(array('cobalt'=>array('nodes_current'=>$node->nid)), 'setting');
   }
   if ($op=='delete') {
-    db_query("INSERT INTO {quicksilver_nodes_deletions}(nid, deleted) VALUES(%d, %d)", $node->nid, time()-60*60*24*60*60);
+    db_query("INSERT INTO {cobalt_nodes_deletions}(nid, deleted) VALUES(%d, %d)", $node->nid, time()-60*60*24*60*60);
   }
 }
 
-function quicksilver_nodes_json($op, $value) {
+function cobalt_nodes_json($op, $value) {
   $result = array();
   
   // We're skipping the status check on purpose. As we check with the node_access
@@ -81,7 +81,7 @@ function quicksilver_nodes_json($op, $value) {
   if ($op=='update') {
     $deleted = array();
     // Get deletions
-    $res = db_query("SELECT nid FROM {quicksilver_nodes_deletions} WHERE deleted>%d", $value);
+    $res = db_query("SELECT nid FROM {cobalt_nodes_deletions} WHERE deleted>%d", $value);
     while ($node = db_fetch_object($res)) {
       $deleted[] = $node->nid;
     }
