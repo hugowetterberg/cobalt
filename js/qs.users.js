@@ -40,7 +40,7 @@ $(document).bind('quicksilver-load', function(evt, q) {
       return item.information.perm.indexOf('w') >= 0;
     },
     'handler': function(text, item) {
-      window.location.href = Drupal.settings.basePath + 'user/' + item.id + '/edit';
+      window.location.href = Drupal.settings.basePath + 'user/' + item.id + '/edit?destination=' + Drupal.settings.quicksilver.path;
     }
   }, 'user');
   
@@ -51,7 +51,7 @@ $(document).bind('quicksilver-load', function(evt, q) {
       return item.information.perm.indexOf('d') >= 0;
     },
     'handler': function(text, item) {
-      window.location.href = Drupal.settings.basePath + 'user/' + item.id + '/delete';
+      window.location.href = Drupal.settings.basePath + 'user/' + item.id + '/delete?destination=' + Drupal.settings.quicksilver.path;
     }
   }, 'user');
 });
