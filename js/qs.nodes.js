@@ -1,10 +1,21 @@
-$(document).bind('quicksilver-init', function(evt, q) {  
+$(document).bind('quicksilver-load', function(evt, q) {  
   var get_node_data = function (op, value, callback) {
     $.getJSON(Drupal.settings.basePath + 'quicksilver/data/nodes_' + op + '/' + value, {}, function (data) {
-      var num_nodes = data.length;
-      for (var i=0; i<num_nodes; i++) {
-        q.addEntry(data[i][0], data[i][1], {'perm': data[i][2]}, 'nodes', 'node');
+      
+      if (typeof(data.nodes)!='undefined') {
+        var num_nodes = data.nodes.length;
+        for (var i=0; i<num_nodes; i++) {
+          q.addEntry(data.nodes[i][0], data.nodes[i][1], {'perm': data.nodes[i][2]}, 'nodes', 'node');
+        }
       }
+      
+      if (typeof(data.deleted)!='undefined') {
+        var num_deletes = data.deleted.length;
+        for (var i=0; i<num_deletes; i++) {
+          q.deleteEntry('nodes', data.deleted[i]);
+        }
+      }
+      
       if (typeof(callback)=='function') {
         callback();
       }
@@ -22,22 +33,13 @@ $(document).bind('quicksilver-init', function(evt, q) {
     'item_formatter': function(item) {
       return item.name + ' <small>node/' + item.id + '</small>';
     },
-    'update_rate': 300000
+    'update_rate': 60000
   };
+  
+  q.registerPlugin('quicksilver_nodes', {'version':0});
   
   // Registering catalog
   q.registerCatalog('nodes', nodes);
-  
-  // Make sure that we have the current node among our entries, this is a easy
-  // way to make sure that we have the nodes the user expects
-  if (typeof(Drupal.settings.quicksilver.nodes_current) != 'undefined') {
-    var nid = Drupal.settings.quicksilver.nodes_current;
-    q.loadEntry('nodes', nid, function(item) {
-      if (!item) {
-        get_node_data('single', nid);
-      }
-    });
-  }
   
   // Register handlers
   q.registerHandler({
@@ -47,7 +49,7 @@ $(document).bind('quicksilver-init', function(evt, q) {
       return item.information.perm.indexOf('r') >= 0;
     },
     'handler': function(text, item) {
-      window.location.href = Drupal.settings.basePath + 'node/' + item.id;
+      window.location.href = Drupal.settings.basePath + 'quicksilver/alias/node/' + item.id;
     }
   }, 'node');
   
@@ -72,4 +74,17 @@ $(document).bind('quicksilver-init', function(evt, q) {
       window.location.href = Drupal.settings.basePath + 'node/' + item.id + '/delete';
     }
   }, 'node');
+  
+  $(document).bind('quicksilver-init', function(evt, q) {  
+    // Make sure that we have the current node among our entries, this is a easy
+    // way to make sure that we have the nodes the user expects
+    if (typeof(Drupal.settings.quicksilver.nodes_current) != 'undefined') {
+      var nid = Drupal.settings.quicksilver.nodes_current;
+      q.loadEntry('nodes', nid, function(item) {
+        if (!item) {
+          get_node_data('single', nid);
+        }
+      });
+    }
+  });
 });

@@ -2,7 +2,9 @@ $(document).ready(function(){
   var match_count = 0, match_page_size=5, match_offset = 0,
       qs_visible = false, qs_out_visible = false,
       matches = [], match_idx = 0, handler_idx = 0, 
-      current_text, handler, item, actions, match_count=0;
+      current_text, handler, item, actions, match_count=0,
+      plugins = {}, plugin_names=[], catalogs = {}, global_handlers = [], handlers = {}, 
+      update_queue = [], required_updates = [];
   
   // Initialize database
   if (window.openDatabase) {
@@ -20,8 +22,7 @@ $(document).ready(function(){
     }
     return;
   }
-  var nullDataHandler = function(transaction, results) { }, 
-    catalogs = {}, global_handlers = [], handlers = {}, update_queue = [];
+  var nullDataHandler = function(transaction, results) { };
     
   var current_state = function() {
     if (typeof(Drupal.settings.quicksilver.state) != 'undefined') {
@@ -34,6 +35,7 @@ $(document).ready(function(){
     
   // Initialize Quicksilver
   var q = {
+    'version': 0,
     'dbErrorHandler': function(transaction, error)
     {
       $(document).trigger('quicksilver-db-error');
@@ -41,6 +43,10 @@ $(document).ready(function(){
         console.error(error.message+' (Code: '+error.code+')');
       }
       return false;
+    },
+    'registerPlugin': function(name, plugin) {
+      plugin_names.push(name);
+      plugins[name] = plugin;
     },
     'registerCatalog': function(name, catalog) {
       catalogs[name] = catalog;
@@ -83,6 +89,11 @@ $(document).ready(function(){
           }
           callback(item);
         }, q.dbErrorHandler);
+      });
+    },
+    'deleteEntry': function(catalog, id) {
+      db.transaction(function (transaction) {
+        transaction.executeSql("DELETE FROM entries WHERE catalog=? AND id=?;", [ catalog, id ], nullDataHandler, q.dbErrorHandler);
       });
     },
     'addEntry': function(id, name, information, catalog, classname, active, state) {
@@ -138,6 +149,14 @@ $(document).ready(function(){
     }
   };
   
+  if (typeof(Drupal.settings.quicksilver.update) != 'undefined') {
+    q.updateVersion = function(transaction, name, version) {
+      transaction.executeSql('UPDATE versions SET version=? WHERE name=?', [version, name], nullDataHandler, q.dbErrorHandler);
+    };
+    $(document).trigger('quicksilver-update', [q, db, Drupal.settings.quicksilver.update]);
+    return;
+  }
+  
   var bind_key = function (binding, catalog, id, handler) {
     q.loadEntry(catalog, id, function(item) {
       if (item) {
@@ -153,6 +172,10 @@ $(document).ready(function(){
       }
     });
   };
+  
+  $(document).trigger('quicksilver-load', q);
+  
+  q.registerPlugin('quicksilver', q);
   
   q.registerHandler({
     'id': 'qs_show',
@@ -193,19 +216,10 @@ $(document).ready(function(){
     }
   });
   
-  // Load key bindings
   db.transaction(function (transaction) {
-    transaction.executeSql('SELECT binding, catalog, id, handler FROM key_bindings', [], function(transaction, results) {
-      for (var i=0; i<results.rows.length; i++) {
-        var b = results.rows.item(i);
-        bind_key(b.binding, b.catalog, b.id, b.handler);
-      }
-    }, q.dbErrorHandler);
-  });
-  
-  $(document).trigger('quicksilver-pre-init', q);
-  
-  db.transaction(function (transaction) {
+    transaction.executeSql('CREATE TABLE IF NOT EXISTS versions(' +
+      'name TEXT NOT NULL, version INTEGER NOT NULL DEFAULT 0, ' + 
+      'CONSTRAINT pk_versions PRIMARY KEY(name));', [], nullDataHandler, q.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS entries(' +
       'catalog TEXT NOT NULL, id TEXT NOT NULL, name TEXT NOT NULL, data TEXT NOT NULL DEFAULT "", data_class TEXT NOT NULL, ' + 
       'state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, ' + 
@@ -225,93 +239,27 @@ $(document).ready(function(){
       'name TEXT NOT NULL PRIMARY KEY, updated INTEGER NOT NULL DEFAULT 0, state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, uninstall INTEGER NOT NULL DEFAULT 0);', [], nullDataHandler, q.dbErrorHandler);
   });
   
-  $(document).trigger('quicksilver-init', q);
-  
-  db.transaction(function (transaction) {
-    transaction.executeSql("SELECT * FROM catalogs ORDER BY updated;", [ ], function(transaction, results) {
-      var info = {};
-      var state = current_state();
-      
-      // Queue catalogs for update
-      for (var i = 0; i < results.rows.length; i++) {
-        var item = results.rows.item(i);
-        info[item.name] = item;
-        update_queue.push({'name': item.name, 'updated': (item.state==state?item.updated:0) });
-      }
-      
-      // Install new catalogs and queue them for updates
-      for (var key in catalogs) {
-        (function(key) {
-          if (!info[key]) {
-            if (catalogs[key]['install']) {
-              catalogs[key].install();
-            }
-            db.transaction(function (transaction) {
-              transaction.executeSql("INSERT INTO catalogs(name) VALUES(?)", [key], nullDataHandler, q.dbErrorHandler);
-            });
-            update_queue.unshift({'name': key, 'updated': 0 });
-          }
-        })(key);
-      }
-      
-      // Update loop
-      var update_counter = 0;
-      var update_loop = function() {
-        setTimeout(function() {
-          if(update_queue.length) {
-            var inf = update_queue.shift();
-            var now = new Date().getTime();
-            var catalog = catalogs[inf.name];
-
-            if (typeof(catalog['update_rate'])!='undefined' && inf.updated + catalog.update_rate > now) {
-              update_queue.push(inf);
-              update_loop();
-            }
-            else {
-              if (catalog['update']) {
-                catalog.update(inf.updated, function(enqueue){
-                  var now = new Date().getTime();
-                  q.catalogUpdated(inf.name);
-
-                  if (enqueue) {
-                    update_queue.push({'name': inf.name, 'updated': now });
-                  }
-
-                  update_counter++;
-                  update_loop();
-                });
-              }
-              else {
-                update_loop();
-              }
-            }
-          }
-        },update_counter?1000:100);
-      };
-      update_loop();
-    }, q.dbErrorHandler);
-  });
-  
-  $(document).trigger('quicksilver-post-init', q);
-  
-  // Initialize GUI
-  var qs = $('<div id="qs">'+
-    '<div class="cell left"><div class="inner"><input type="text" id="qs-input" /><label></label></div></div>'+ 
-    '<div class="cell right"><div class="inner"><input type="text" id="qs-handler-input" /><label></label></div></div>'+
-    '<ol class="qs-paging"></ol><ul class="qs-autocomplete"></ul><ul class="qs-actions"></ul></div>').appendTo('body').hide();
-  var qs_output = $('<div id="qs_out"></div>').appendTo('body').hide();
-  var qs_input = $('#qs-input');
-  var qs_h_input = $('#qs-handler-input');
-  var qs_ac = $('#qs .qs-autocomplete');
-  var qs_paging = $('#qs .qs-paging');
-  $('#qs .right label').hide();
+  var qs_output = $('<div id="qs-out"></div>').appendTo('body').hide();
+  var toggle_output = function(arg) {
+    if (qs_out_visible || arg=='hide') {
+      qs_output.hide();
+      qs_out_visible = false;
+    }
+    else {
+      qs_output.css({
+        'top': $(window).height()/3 + window.pageYOffset - qs_output.height()/2,
+        'left': $(window).width()/2 + window.pageXOffset - qs_output.width()/2
+      }).show();
+      qs_out_visible = true;
+    }
+  };
   
   var keypress_reaction = function() {
     if(qs_input.val()==current_text) {
       return;
     }
     current_text = qs_input.val();
-    
+
     if($.trim(current_text)!='') {
       lookup();
     }
@@ -319,7 +267,7 @@ $(document).ready(function(){
       clear_ac();
     }
   };
-  
+
   var clear_ac = function() {
     match_idx = 0;
     current_text = '';
@@ -327,7 +275,7 @@ $(document).ready(function(){
     $('#qs .inner label').hide();
     qs_ac.empty().hide();
   };
-  
+
   var lookup = function(preserve_offset) {
     if (!preserve_offset) {
       match_offset = 0;
@@ -341,12 +289,12 @@ $(document).ready(function(){
         current_text, like_expr, current_text, current_text, match_offset, match_page_size ], lookup_finished, q.dbErrorHandler);
     });
   };
-  
+
   var lookup_finished = function(transaction, results) {
     match_idx = 0;
     $('#qs .left label').hide();
     qs_ac.empty().hide();
-    
+
     if (results.rows.length) {
       for (var i=0; i<results.rows.length; i++) {
         var item = results.rows.item(i);
@@ -366,9 +314,9 @@ $(document).ready(function(){
       clear_ac();
       matches = [];
     }
-    
+
     ac_select(0);
-    
+
     var like_expr = '%' + current_text + '%';
     db.transaction(function (transaction) {
       transaction.executeSql("SELECT COUNT(*) as match_count FROM entries AS e " + 
@@ -389,7 +337,7 @@ $(document).ready(function(){
         }, q.dbErrorHandler);
     });
   };
-  
+
   var ac_page = function(new_offset) {
     if (new_offset>=match_count || new_offset<0) {
       return;
@@ -397,27 +345,27 @@ $(document).ready(function(){
     match_offset = new_offset;
     lookup(true);
   };
-  
+
   var ac_select = function(idx) {
     if (idx<0 || idx >= matches.length) {
       item = null;
       return;
     }
-    
+
     item = matches.item(idx);
     item.information = $.evalJSON(item.data);
     var old_item = matches.item(match_idx);
-    
+
     $('#qs .ac-opt-' + match_idx).removeClass('active');
     match_idx = idx;
     $('#qs .left .inner').attr('class','inner qs-item-' + item.data_class);
     $('#qs .left label').text(item.name).show();
     $('#qs .ac-opt-' + match_idx).addClass('active');
-    
+
     actions = action_candidates(item);
     set_handler(0);
   };
-  
+
   var action_candidates = function(item) {
     var candidates = [];
     var add_applicable = function(handler) {
@@ -425,36 +373,36 @@ $(document).ready(function(){
         candidates.push(handler);
       }
     };
-    
+
     if (typeof(handlers[item.data_class])!='undefined') {
       var cls_count = handlers[item.data_class].length;
       for (var i=0; i<cls_count; i++) {
         add_applicable(handlers[item.data_class][i]);
       }
     }
-    
+
     var g_count = global_handlers.length;
     for (var i=0; i<g_count; i++) {
       add_applicable(global_handlers[i]);
     }
-    
+
     return candidates;
   };
-  
+
   var handler_class = function() {
     if (handler) {
       return handler['class'] ? handler['class'] : 'default';
     }
   };
-  
+
   var set_handler = function(idx) {
     if (idx<0 || idx >= actions.length) {
       return;
     }
-    
+
     handler_idx = idx;
     var new_handler = actions[idx];
-    
+
     handler = new_handler;
     if (handler) {
       var newClass = handler_class();
@@ -462,7 +410,7 @@ $(document).ready(function(){
       $('#qs .right label').text(handler.name).show();
     }
   };
-  
+
   var run_handler = function() {
     if (item && typeof(handler['handler']) == 'function') {
       var text = $.trim(qs_input.val());
@@ -471,7 +419,7 @@ $(document).ready(function(){
     }
     hide();
   };
-  
+
   var toggle = function(arg) {
     if (qs_visible || arg=='hide') {
       qs.hide();
@@ -489,37 +437,157 @@ $(document).ready(function(){
       setTimeout(function(){ qs_input.focus(); qs_input.select(); }, 100);
     }
   };
-  
-  var toggle_output = function(arg) {
-    if (qs_out_visible || arg=='hide') {
-      qs_output.hide();
-      qs_out_visible = false;
-    }
-    else {
-      qs_output.css({
-        'top': $(window).height()/3 + window.pageYOffset - qs_output.height()/2,
-        'left': $(window).width()/2 + window.pageXOffset - qs_output.width()/2
-      }).show();
-      qs_out_visible = true;
-    }
-  };
-  
+
   var hide = function() {
     toggle('hide');
   };
   
-  qs.bind('click', function(e){ return false; }).
-    bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); return false; }).
-    bind('keydown', 'return', function(){ run_handler(); return false; });
-  qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); return false; }).
-    bind('keydown', 'down', function(){ ac_select(match_idx+1); return false; }).
-    bind('keydown', 'Alt+left', function(){ ac_page(match_offset-match_page_size); return false; }).
-    bind('keydown', 'Alt+right', function(){ ac_page(match_offset+match_page_size); return false; }).
-    bind('keyup', function(){ setTimeout(keypress_reaction, 10); return false; });
-  qs_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); return false; }).
-    bind('keydown', 'down', function(){ set_handler(handler_idx+1); return false; });
-  qs_output.bind('click', function(e){ return false; });
-  $(document).bind('click', function(){ toggle('hide'); toggle_output('hide'); })
-    .bind('keydown', 'Alt+space', toggle)
-    .bind('keydown', 'Ctrl+space', toggle);
+  var init = function() {
+    $(document).trigger('quicksilver-init', q);
+
+    // Load key bindings
+    db.transaction(function (transaction) {
+      transaction.executeSql('SELECT binding, catalog, id, handler FROM key_bindings', [], function(transaction, results) {
+        for (var i=0; i<results.rows.length; i++) {
+          var b = results.rows.item(i);
+          bind_key(b.binding, b.catalog, b.id, b.handler);
+        }
+      }, q.dbErrorHandler);
+    });
+
+    db.transaction(function (transaction) {
+      transaction.executeSql("SELECT * FROM catalogs ORDER BY updated;", [ ], function(transaction, results) {
+        var info = {};
+        var state = current_state();
+
+        // Queue catalogs for update
+        for (var i = 0; i < results.rows.length; i++) {
+          var item = results.rows.item(i);
+          info[item.name] = item;
+          update_queue.push({'name': item.name, 'updated': (item.state==state?item.updated:0) });
+        }
+
+        // Install new catalogs and queue them for updates
+        for (var key in catalogs) {
+          (function(key) {
+            if (!info[key]) {
+              if (catalogs[key]['install']) {
+                catalogs[key].install();
+              }
+              db.transaction(function (transaction) {
+                transaction.executeSql("INSERT INTO catalogs(name) VALUES(?)", [key], nullDataHandler, q.dbErrorHandler);
+              });
+              update_queue.unshift({'name': key, 'updated': 0 });
+            }
+          })(key);
+        }
+
+        // Update loop
+        var update_counter = 0;
+        var update_loop = function() {
+          setTimeout(function() {
+            if(update_queue.length) {
+              var inf = update_queue.shift();
+              var now = new Date().getTime();
+              var catalog = catalogs[inf.name];
+
+              if (typeof(catalog['update_rate'])!='undefined' && inf.updated + catalog.update_rate > now) {
+                update_queue.push(inf);
+                update_loop();
+              }
+              else {
+                if (catalog['update']) {
+                  catalog.update(inf.updated, function(enqueue){
+                    var now = new Date().getTime();
+                    q.catalogUpdated(inf.name);
+
+                    if (enqueue) {
+                      update_queue.push({'name': inf.name, 'updated': now });
+                    }
+
+                    update_counter++;
+                    update_loop();
+                  });
+                }
+                else {
+                  update_loop();
+                }
+              }
+            }
+          },update_counter?1000:100);
+        };
+        update_loop();
+      }, q.dbErrorHandler);
+    });
+
+    $(document).trigger('quicksilver-post-init', q);
+
+    qs.bind('click', function(e){ return false; }).
+      bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); return false; }).
+      bind('keydown', 'return', function(){ run_handler(); return false; });
+    qs_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); return false; }).
+      bind('keydown', 'down', function(){ ac_select(match_idx+1); return false; }).
+      bind('keydown', 'Alt+left', function(){ ac_page(match_offset-match_page_size); return false; }).
+      bind('keydown', 'Alt+right', function(){ ac_page(match_offset+match_page_size); return false; }).
+      bind('keyup', function(){ setTimeout(keypress_reaction, 10); return false; });
+    qs_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); return false; }).
+      bind('keydown', 'down', function(){ set_handler(handler_idx+1); return false; });
+    qs_output.bind('click', function(e){ return false; });
+    $(document).bind('click', function(){ toggle('hide'); toggle_output('hide'); })
+      .bind('keydown', 'Alt+space', toggle)
+      .bind('keydown', 'Ctrl+space', toggle);
+  };
+  
+  // Initialize GUI
+  var qs = $('<div id="qs">'+
+    '<div class="cell left"><div class="inner"><input type="text" id="qs-input" /><label></label></div></div>'+ 
+    '<div class="cell right"><div class="inner"><input type="text" id="qs-handler-input" /><label></label></div></div>'+
+    '<ol class="qs-paging"></ol><ul class="qs-autocomplete"></ul><ul class="qs-actions"></ul></div>').appendTo('body').hide();
+  var qs_input = $('#qs-input');
+  var qs_h_input = $('#qs-handler-input');
+  var qs_ac = $('#qs .qs-autocomplete');
+  var qs_paging = $('#qs .qs-paging');
+  $('#qs .right label').hide();
+  
+  // Check if we need to update anything before initializing
+  db.transaction(function (transaction) {
+    transaction.executeSql('SELECT name, version FROM versions', [], function(transaction, results) {
+      var v = {};
+      for (var i=0; i<results.rows.length; i++) {
+        var vi = results.rows.item(i);
+        v[vi.name] = vi.version;
+      }
+      
+      db.transaction(function (transaction) {
+        var plugin_count = plugin_names.length;
+        for (var i=0; i<plugin_count; i++) {
+          var n=plugin_names[i];
+          if (typeof(v[n])=='undefined') {
+            transaction.executeSql('INSERT INTO versions(name, version) VALUES(?,?)', [ n, plugins[n].version ], nullDataHandler, q.dbErrorHandler);
+          }
+          else if (v[n]<plugins[n].version) {
+            required_updates.push([n, v[n], plugins[n].version]);
+          }
+        }
+        
+        if (required_updates.length) {
+          var update_notice = function () {
+            var update_url = Drupal.settings.basePath + 'quicksilver/update';
+            for (var i=0; i<required_updates.length; i++) {
+              var u = required_updates[i];
+              update_url += '/' + u[0] + '/' + u[1] + '/' + u[2];
+            }
+            q.showHtml('<h1>Update required</h1><p>Quicksilver must be updated before it can be used</p>' +
+              '<p><a class="qs-update-link" href="' + update_url + '">Click here to update</a></p>');
+          };
+          $(document).bind('click', function(){ toggle_output('hide'); })
+            .bind('keydown', 'Alt+space', update_notice)
+            .bind('keydown', 'Ctrl+space', update_notice);
+        }
+        else {
+          init();
+        }
+      });
+    }, q.dbErrorHandler);
+  });
 });

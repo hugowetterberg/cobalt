@@ -3,7 +3,7 @@
   padding: 0;
 }
 
-#qs, #qs_out {
+#qs, #qs-out {
   background-color: #000000;
   background-color: rgba(0,0,0,0.7);
   border-radius: 20px;
@@ -23,7 +23,7 @@
   z-index: 1000;
 }
 
-#qs_out {
+#qs-out {
   background-color: rgba(0,0,0,0.8);
   padding: 10px;
   color: #FFFFFF;
@@ -146,4 +146,9 @@
   background-color: rgba(0,0,0,0.5);
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
+}
+
+#qs-out .qs-update-link {
+  text-transform: uppercase;
+  color: #FFFFFF;
 }
