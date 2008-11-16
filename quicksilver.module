@@ -59,7 +59,7 @@ function quicksilver_menu() {
     'page arguments' => array('quicksilver_settings'),
     'access arguments' => array('use quicksilver'),
     'file' => 'quicksilver_update.inc.php',
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
     'weight' => 0,
   );
   return $items;
