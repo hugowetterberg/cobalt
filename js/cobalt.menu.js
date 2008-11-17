@@ -1,5 +1,11 @@
 $(document).bind('cobalt-load', function(evt, cobalt) {  
-  var menu = {
+  var plugin = {
+    'version': 0,
+    'catalogs': {},
+    'handlers': []
+  };
+  
+  plugin['catalogs']['menu'] = {
     'update': function(last_update, callback) {
       $.getJSON(Drupal.settings.basePath + 'cobalt/data/menu_json', {}, function (data) {
        cobalt.emptyCatalog('menu');
@@ -19,15 +25,10 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
     'update_rate': 60000
   };
   
- cobalt.registerPlugin('cobalt_menu', {'version':0});
-  
-  // Registering catalog
- cobalt.registerCatalog('menu', menu);
-  
-  // Register handlers
- cobalt.registerHandler({
+  plugin['handlers'].push({
     'id': 'menu_goto',
     'name': 'Go to',
+    'data_class': 'url_data',
     'handler': function(text, item) {
       var path = item.information;
       if (path=='<front>') {
@@ -35,5 +36,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
       }
       window.location.href = Drupal.settings.basePath + path + '?destination=' + Drupal.settings.cobalt.path;
     }
-  }, 'url_data');
+  });
+  
+  cobalt.registerPlugin('cobalt_menu', plugin);
 });

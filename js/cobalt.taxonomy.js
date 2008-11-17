@@ -1,5 +1,11 @@
 $(document).bind('cobalt-load', function(evt, cobalt) {  
-  var taxonomy = {
+  var plugin = {
+    'version': 0,
+    'catalogs': {},
+    'handlers': []
+  };
+  
+  plugin['catalogs']['vocabularies'] = {
     'update': function(last_update, callback) {
       $.getJSON(Drupal.settings.basePath + 'cobalt/data/taxonomy_json', {}, function (data) {
        cobalt.emptyCatalog('vocabularies');
@@ -21,65 +27,69 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
     'update_rate': 60000
   };
   
- cobalt.registerPlugin('cobalt_taxonomy', {'version':0});
-  
-  // Registering catalog
- cobalt.registerCatalog('vocabularies', taxonomy);
   // Insert empty catalog, the update function is handled for both catalogs in
   // the vocabularies catalog.
- cobalt.registerCatalog('terms', {});
+  plugin['catalogs']['terms'] = {};
+  
   
   // Register handlers
- cobalt.registerHandler({
+  plugin['handlers'].push({
     'id': 'vocabulary_list',
     'name': 'List terms',
+    'data_class': 'vocabulary',
     'applicable': function(text, item) {
       return item.information == 'w';
     },
     'handler': function(text, item) {
       window.location.href = Drupal.settings.basePath + 'admin/content/taxonomy/' + item.id;
     }
-  }, 'vocabulary');
+  });
   
- cobalt.registerHandler({
+  plugin['handlers'].push({
     'id': 'vocabulary_edit',
     'name': 'Edit',
+    'data_class': 'vocabulary',
     'applicable': function(text, item) {
       return item.information == 'w';
     },
     'handler': function(text, item) {
       window.location.href = Drupal.settings.basePath + 'admin/content/taxonomy/edit/vocabulary/' + item.id + '?destination=' + Drupal.settings.cobalt.path;
     }
-  }, 'vocabulary');
+  });
   
- cobalt.registerHandler({
+  plugin['handlers'].push({
     'id': 'vocabulary_add',
     'name': 'Add terms',
+    'data_class': 'vocabulary',
     'applicable': function(text, item) {
       return item.information == 'w';
     },
     'handler': function(text, item) {
       window.location.href = Drupal.settings.basePath + 'admin/content/taxonomy/' + item.id + '/add/term';
     }
-  }, 'vocabulary');
+  });
   
- cobalt.registerHandler({
+  plugin['handlers'].push({
     'id': 'term_view',
     'name': 'View',
+    'data_class': 'term',
     'handler': function(text, item) {
       window.location.href = Drupal.settings.basePath + 'taxonomy/term/' + item.id;
     }
-  }, 'term');
+  });
   
- cobalt.registerHandler({
+  plugin['handlers'].push({
     'id': 'term_edit',
     'name': 'Edit',
+    'data_class': 'term',
     'applicable': function(text, item) {
       return item.information.perm == 'w';
     },
     'handler': function(text, item) {
       window.location.href = Drupal.settings.basePath + 'admin/content/taxonomy/edit/term/' + item.id + '?destination=' + Drupal.settings.cobalt.path;
     }
-  }, 'term');
+  });
+  
+  cobalt.registerPlugin('cobalt_taxonomy', plugin);
 });
 
