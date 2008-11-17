@@ -35,7 +35,6 @@ $(document).ready(function(){
     
   // Initialize Cobalt
   var cobalt = {
-    'version': 0,
     'dbErrorHandler': function(transaction, error)
     {
       $(document).trigger('cobalt-db-error');
@@ -47,9 +46,19 @@ $(document).ready(function(){
     'registerPlugin': function(name, plugin) {
       plugin_names.push(name);
       plugins[name] = plugin;
-    },
-    'registerCatalog': function(name, catalog) {
-      catalogs[name] = catalog;
+      
+      if(typeof(plugin['catalogs'])!='undefined') {
+        for(var c_name in plugin.catalogs) {
+          catalogs[c_name] = plugin.catalogs[c_name];
+        }
+      }
+      
+      if(typeof(plugin['handlers'])!='undefined') {
+        var h_len = plugin.handlers.length;
+        for(var i=0; i<h_len; i++) {
+          register_handler(plugin.handlers[i]);
+        }
+      }
     },
     'catalogUpdated': function(catalog, updated) {
       if (typeof(updated)=='undefined') {
@@ -107,31 +116,6 @@ $(document).ready(function(){
         transaction.executeSql("INSERT OR REPLACE INTO entries(id, name, data, catalog, data_class, state, active) VALUES(?,?,?,?,?,?,?);", [ id, name, $.toJSON(information), catalog, classname, state, active], nullDataHandler,cobalt.dbErrorHandler);
       });
     },
-    'registerUse': function(text, item) {
-      if (item.weight == null) {
-        db.transaction(function (transaction) {
-          transaction.executeSql("INSERT INTO usage_data(catalog, id, weight, abbreviation) VALUES(?,?,?,?)", 
-            [item.catalog, item.id, 1, text], nullDataHandler,cobalt.dbErrorHandler);
-        });
-      } 
-      else {
-        db.transaction(function (transaction) {
-          transaction.executeSql("UPDATE usage_data SET weight=weight+1, abbreviation=? WHERE catalog=? AND id=?", 
-            [text, item.catalog, item.id], nullDataHandler,cobalt.dbErrorHandler);
-        });
-      }
-    },
-    'registerHandler': function(handler, data_class) {
-      if (typeof(data_class)=='undefined') {
-        global_handlers.push(handler);
-      }
-      else {
-        if (!handlers[data_class]) {
-          handlers[data_class] = [];
-        }
-        handlers[data_class].push(handler);
-      }
-    },
     'actionCandidates': function(item) {
       return action_candidates(item);
     },
@@ -157,63 +141,76 @@ $(document).ready(function(){
     return;
   }
   
-  var bind_key = function (binding, catalog, id, handler) {
-   cobalt.loadEntry(catalog, id, function(item) {
-      if (item) {
-        $(document).bind('keydown', binding, function(){
-          var cand =cobalt.actionCandidates(item);
-          var cand_count = cand.length;
-          for(var i=0; i<cand_count; i++) {
-            if (cand[i].id == handler) {
-              cand[i].handler(item.name, item);
-            }
-          }
-        });
+  var register_use = function(text, item) {
+    if (item.weight == null) {
+      db.transaction(function (transaction) {
+        transaction.executeSql("INSERT INTO usage_data(catalog, id, weight, abbreviation) VALUES(?,?,?,?)", 
+          [item.catalog, item.id, 1, text], nullDataHandler,cobalt.dbErrorHandler);
+      });
+    } 
+    else {
+      db.transaction(function (transaction) {
+        transaction.executeSql("UPDATE usage_data SET weight=weight+1, abbreviation=? WHERE catalog=? AND id=?", 
+          [text, item.catalog, item.id], nullDataHandler,cobalt.dbErrorHandler);
+      });
+    }
+  };
+  
+  var register_handler = function(handler) {
+    if (typeof(handler['data_class'])=='undefined') {
+      global_handlers.push(handler);
+    }
+    else {
+      if (!handlers[handler.data_class]) {
+        handlers[handler.data_class] = [];
       }
-    });
+      handlers[handler.data_class].push(handler);
+    }
   };
   
   $(document).trigger('cobalt-load', cobalt);
   
- cobalt.registerPlugin('cobalt', cobalt);
-  
- cobalt.registerHandler({
-    'id': 'cobalt_show',
-    'name': 'Show',
-    'handler': function(text, item) {
-     cobalt.showHtml('<h2>' + item.name + '</h2>' +
-        'text: <i>' + text + '</i><br/>' + 
-        'id: ' + item.id + '<br/>' + 
-        'catalog: ' + item.catalog + '<br/>' + 
-        'class: ' + item.data_class + '<br/>' + 
-        'data: ' + item.data + '<br/>' + 
-        'weight: ' + item.weight);
-    }
-  });
-  
- cobalt.registerHandler({
-    'id': 'cobalt_abbrev',
-    'name': 'Assign shortcut',
-    'handler': function(text, item) {
-      var cand =cobalt.actionCandidates(item);
-      var out = $('<div class="shortcut-add"><h2>' + item.name + '</h2>' + 
-        'The keys <input class="key-combo" type="text" value="Ctrl+"/> should trigger the action:<br/> <select class="action-select"></select>' + 
-        '<p><button class="ok">Ok</button></p></div>');
-      var actions = $(out).find('.action-select');
-      var key_combo = $(out).find('.key-combo').css('width',50);
-      var cand_count = cand.length;
-      for(var i=0; i<cand_count; i++) {
-        actions.append('<option value="' + cand[i].id + '">' + cand[i].name + '</option>');
+  cobalt.registerPlugin('cobalt', {
+    'version': 0,
+    'handlers': [
+      {
+        'id': 'cobalt_show',
+        'name': 'Show',
+        'handler': function(text, item) {
+          cobalt.showHtml('<h2>' + item.name + '</h2>' +
+            'text: <i>' + text + '</i><br/>' + 
+            'id: ' + item.id + '<br/>' + 
+            'catalog: ' + item.catalog + '<br/>' + 
+            'class: ' + item.data_class + '<br/>' + 
+            'data: ' + item.data + '<br/>' + 
+            'weight: ' + item.weight);
+        }
+      },
+      {
+        'id': 'cobalt_abbrev',
+        'name': 'Assign shortcut',
+        'handler': function(text, item) {
+          var cand =cobalt.actionCandidates(item);
+          var out = $('<div class="shortcut-add"><h2>' + item.name + '</h2>' + 
+            'The keys <input class="key-combo" type="text" value="Ctrl+"/> should trigger the action:<br/> <select class="action-select"></select>' + 
+            '<p><button class="ok">Ok</button></p></div>');
+          var actions = $(out).find('.action-select');
+          var key_combo = $(out).find('.key-combo').css('width',50);
+          var cand_count = cand.length;
+          for(var i=0; i<cand_count; i++) {
+            actions.append('<option value="' + cand[i].id + '">' + cand[i].name + '</option>');
+          }
+
+          $(out).find('button.ok').bind('click',function(){
+            toggle_output('hide');
+           cobalt.addKeyBinding(key_combo.val(), item.catalog, item.id, actions.val());
+          });
+
+         cobalt.showHtml(out);
+          key_combo.focus();
+        }
       }
-      
-      $(out).find('button.ok').bind('click',function(){
-        toggle_output('hide');
-       cobalt.addKeyBinding(key_combo.val(), item.catalog, item.id, actions.val());
-      });
-      
-     cobalt.showHtml(out);
-      key_combo.focus();
-    }
+    ]
   });
   
   db.transaction(function (transaction) {
@@ -240,6 +237,23 @@ $(document).ready(function(){
   });
   
   var cobalt_output = $('<div id="cobalt-out"></div>').appendTo('body').hide();
+  
+  var bind_key = function (binding, catalog, id, handler) {
+   cobalt.loadEntry(catalog, id, function(item) {
+      if (item) {
+        $(document).bind('keydown', binding, function(){
+          var cand =cobalt.actionCandidates(item);
+          var cand_count = cand.length;
+          for(var i=0; i<cand_count; i++) {
+            if (cand[i].id == handler) {
+              cand[i].handler(item.name, item);
+            }
+          }
+        });
+      }
+    });
+  };
+  
   var toggle_output = function(arg) {
     if (cobalt_out_visible || arg=='hide') {
       cobalt_output.hide();
@@ -414,7 +428,7 @@ $(document).ready(function(){
   var run_handler = function() {
     if (item && typeof(handler['handler']) == 'function') {
       var text = $.trim(cobalt_input.val());
-     cobalt.registerUse(text, item);
+      register_use(text, item);
       handler.handler(text, item);
     }
     hide();
