@@ -105,6 +105,9 @@ $(document).ready(function(){
         transaction.executeSql("DELETE FROM entries WHERE catalog=? AND id=?;", [ catalog, id ], nullDataHandler,cobalt.dbErrorHandler);
       });
     },
+    'addTemporaryEntry': function(id, name, information, classname) {
+      cobalt.addEntry(id, name, information, '*temporary*', classname, 1, current_state());
+    },
     'addEntry': function(id, name, information, catalog, classname, active, state) {
       if (typeof(state)=='undefined') {
         state = current_state();
@@ -221,6 +224,7 @@ $(document).ready(function(){
       'catalog TEXT NOT NULL, id TEXT NOT NULL, name TEXT NOT NULL, data TEXT NOT NULL DEFAULT "", data_class TEXT NOT NULL, ' + 
       'state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, ' + 
       'CONSTRAINT pk_entries PRIMARY KEY(catalog, id));', [], nullDataHandler,cobalt.dbErrorHandler);
+    transaction.executeSql('DELETE FROM entries WHERE catalog=?', ['*temporary*'], nullDataHandler, cobalt.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS key_bindings(' +
       'binding TEXT NOT NULL, catalog TEXT NOT NULL, id TEXT NOT NULL, handler TEXT NOT NULL, ' + 
       'state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, ' + 
@@ -260,10 +264,7 @@ $(document).ready(function(){
       cobalt_out_visible = false;
     }
     else {
-      cobalt_output.css({
-        'top': $(window).height()/3 + window.pageYOffset - cobalt_output.height()/2,
-        'left': $(window).width()/2 + window.pageXOffset - cobalt_output.width()/2
-      }).show();
+      cobalt_output.show();
       cobalt_out_visible = true;
     }
   };
@@ -313,7 +314,7 @@ $(document).ready(function(){
       for (var i=0; i<results.rows.length; i++) {
         var item = results.rows.item(i);
         item.information = $.evalJSON(item.data);
-        if (typeof(catalogs[item.catalog].item_formatter) == 'function'){
+        if (typeof(catalogs[item.catalog]) !='undefined' && typeof(catalogs[item.catalog].item_formatter) == 'function'){
           var title = catalogs[item.catalog].item_formatter(item);
         }
         else {
@@ -443,10 +444,7 @@ $(document).ready(function(){
       toggle_output('hide');
       clear_ac();
       cobalt_input.val($.trim(cobalt_input.val()));
-      cb.css({
-        'top': $(window).height()/3 + window.pageYOffset - cb.height()/2,
-        'left': $(window).width()/2 + window.pageXOffset - cb.width()/2
-      }).show();
+      cb.show();
       cobalt_visible = true;
       setTimeout(function(){ cobalt_input.focus(); cobalt_input.select(); }, 100);
     }

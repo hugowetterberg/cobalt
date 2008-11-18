@@ -4,7 +4,7 @@
 }
 
 #cobalt, #cobalt-out {
-  background-color: #000000;
+  background-color: #000;
   background-color: rgba(0,0,0,0.7);
   border-radius: 20px;
   box-shadow: rgba(255, 255, 255, 0.5) 1px 1px 5px;
@@ -12,9 +12,12 @@
   -webkit-border-radius: 20px;
   -webkit-box-shadow: rgba(255, 255, 255, 0.5) 1px 1px 5px;
   
-  position: absolute;
+  position: fixed;
+  top: 38%;
+  left: 50%;
+  margin: -85px 0 0 -165px;
   width: 330px;
-  padding: 10px 0 10px 0;
+  padding: 5px 0;
   
   font-size: 12px;
   font-family: 'Lucida Grande', sans-serif;
@@ -26,31 +29,31 @@
 #cobalt-out {
   background-color: rgba(0,0,0,0.8);
   padding: 10px;
-  color: #FFFFFF;
+  color: #FFF;
 }
 
 #cobalt .cell {
   position: relative;
-  background-color: #FFFFFF;
+  background-color: #FFF;
   background-color: rgba(255,255,255,0.5);
-  border-radius: 20px;
-  -moz-border-radius: 20px;
-  -webkit-border-radius: 20px;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
   float: left;
-  margin: 0 0 0 10px;
+  margin: 5px 0 5px 10px;
   width: 150px;
   height: 150px;
   font-family: 'Lucida Grande', sans-serif;
 }
 
 #cobalt .cell input {
-  text-shadow: 1px 1px 5px #FFFFFF;
+  text-shadow: 1px 1px 5px #FFF;
   margin: -4px 0 0 -4px;
   padding: 4px;
   width: 134px;
   height: 134px;
   border: 0;
-  color: #000000;
+  color: #000;
   color: rgba(0,0,0,0.8);
   background-color: transparent;
   background-color: rgba(0,0,0,0);
@@ -71,8 +74,8 @@
   width: 120px;
   padding: 3px;
   text-align: center;
-  color: #FFFFFF;
-  background-color: #000000;
+  color: #FFF;
+  background-color: #000;
   background-color: rgba(0,0,0,0.5);
   border-radius: 5px;
   -moz-border-radius: 5px;
@@ -98,17 +101,17 @@
 #cobalt .cobalt-paging {
   display: block;
   margin: 0;
-  padding: 5px 10px 0 10px;
+  padding: 0 20px;
   clear: both;
+  text-align: center;
 }
 
 #cobalt .cobalt-paging li {
-  display: block;
-  float: left;
+  display: inline-block;
   list-style: none;
-  margin: 0;
+  margin: 5px 0 0;
   padding: 0;
-  opacity: 0.5;
+  opacity: .5;
   background: url(whitedot.png) top left no-repeat;
   width: 10px;
   height: 10px;
@@ -121,34 +124,35 @@
 #cobalt .cobalt-autocomplete {
   clear: both;
   margin: 0 10px;
-  padding-top: 10px;
-  color: #FFFFFF;
+  padding: 10px 0 5px;
+  color: #FFF;
 }
 
 #cobalt .cobalt-autocomplete li {
   display: block;
   list-style: none;
-  padding: 5px;
+  padding: 5px 10px;
   background-image: none;
 }
 
 #cobalt .cobalt-autocomplete li small {
-  color: #333333;
+  color: #333;
   color: rgba(256,256,256,0.8);
 }
 
 #cobalt .right .cobalt-action-default {
-  background: transparent url(default_action.png) center center no-repeat;
+  background: url(default_action.png) center center no-repeat;
 }
 
 #cobalt .cobalt-autocomplete li.active {
-  background-color: #FFFFFF;
+  background-color: #FFF;
   background-color: rgba(0,0,0,0.5);
+  border-radius: 10px;
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
 }
 
 #cobalt-out .cobalt-update-link {
   text-transform: uppercase;
-  color: #FFFFFF;
+  color: #FFF;
 }

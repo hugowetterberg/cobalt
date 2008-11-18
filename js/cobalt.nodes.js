@@ -25,7 +25,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
       }
       
       if (typeof(callback)=='function') {
-        callback();
+        callback(data);
       }
     });
   };
@@ -82,15 +82,29 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   
   cobalt.registerPlugin('cobalt_nodes', plugin);
   
+  var add_temporary_entries = function(nid, perm) {
+    if (perm.indexOf('w') >= 0) {
+      cobalt.addTemporaryEntry('node_context_edit', 'Edit current node', 'node/' + nid + '/edit', 'url_data');
+    }
+  };
+  
   //Run the current-node-check on init
-  $(document).bind('cobalt-init', function(evt, q) {  
+  $(document).bind('cobalt-init', function(evt, cobalt) {  
     // Make sure that we have the current node among our entries, this is a easy
-    // way to make sure that we have the nodes the user expects
+    // way to make sure that we have the nodes the user expects.
     if (typeof(Drupal.settings.cobalt.nodes_current) != 'undefined') {
       var nid = Drupal.settings.cobalt.nodes_current;
-     cobalt.loadEntry('nodes', nid, function(item) {
+      cobalt.loadEntry('nodes', nid, function(item) {
+        // Make sure that context sensitive items are added 
         if (!item) {
-          get_node_data('single', nid);
+          get_node_data('single', nid, function(data){
+            if (typeof(data['nodes'])!='undefined' && data.nodes.length) {
+              add_temporary_entries(nid, data.nodes[0][2]);
+            }
+          });
+        }
+        else {
+          add_temporary_entries(nid, item.information.perm);
         }
       });
     }
