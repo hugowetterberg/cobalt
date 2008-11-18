@@ -264,10 +264,7 @@ $(document).ready(function(){
       cobalt_out_visible = false;
     }
     else {
-      cobalt_output.css({
-        'top': $(window).height()/3 + window.pageYOffset - cobalt_output.height()/2,
-        'left': $(window).width()/2 + window.pageXOffset - cobalt_output.width()/2
-      }).show();
+      cobalt_output.show();
       cobalt_out_visible = true;
     }
   };
@@ -447,10 +444,7 @@ $(document).ready(function(){
       toggle_output('hide');
       clear_ac();
       cobalt_input.val($.trim(cobalt_input.val()));
-      cb.css({
-        'top': $(window).height()/3 + window.pageYOffset - cb.height()/2,
-        'left': $(window).width()/2 + window.pageXOffset - cb.width()/2
-      }).show();
+      cb.show();
       cobalt_visible = true;
       setTimeout(function(){ cobalt_input.focus(); cobalt_input.select(); }, 100);
     }
