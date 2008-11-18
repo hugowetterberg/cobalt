@@ -317,7 +317,7 @@ $(document).ready(function(){
       for (var i=0; i<results.rows.length; i++) {
         var item = results.rows.item(i);
         item.information = $.evalJSON(item.data);
-        if (typeof(catalogs[item.catalog].item_formatter) == 'function'){
+        if (typeof(catalogs[item.catalog]) !='undefined' && typeof(catalogs[item.catalog].item_formatter) == 'function'){
           var title = catalogs[item.catalog].item_formatter(item);
         }
         else {
