@@ -15,7 +15,7 @@ $(document).ready(function(){
   
   var db = null;
   // Initialize database
-  if (google.gears) {
+  if (typeof(google) != 'undefined' && typeof(google.gears) != 'undefined') {
     try {
       var gdb = google.gears.factory.create('beta.database');
       gdb.open('cobalt');
@@ -26,7 +26,7 @@ $(document).ready(function(){
     }
   }
   
-  if (!db && typeof(window.openDatabase)=='function') {
+  if (!db && typeof(openDatabase)=='function') {
     try {
       var db = openDatabase('cobalt', '1.0', 'Cobalt Database', 204800);
     }
