@@ -94,6 +94,10 @@
   background: url(user.png) center center no-repeat;
 }
 
+#cobalt .cell .cobalt-item-vocabulary, #cobalt .cell .cobalt-item-term {
+  background: url(voc.png) center center no-repeat;
+}
+
 #cobalt .cobalt-paging {
   display: block;
   margin: 0;
