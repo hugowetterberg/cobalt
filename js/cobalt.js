@@ -105,6 +105,9 @@ $(document).ready(function(){
         transaction.executeSql("DELETE FROM entries WHERE catalog=? AND id=?;", [ catalog, id ], nullDataHandler,cobalt.dbErrorHandler);
       });
     },
+    'addTemporaryEntry': function(id, name, information, classname) {
+      cobalt.addEntry(id, name, information, '*temporary*', classname, 1, current_state());
+    },
     'addEntry': function(id, name, information, catalog, classname, active, state) {
       if (typeof(state)=='undefined') {
         state = current_state();
@@ -221,6 +224,7 @@ $(document).ready(function(){
       'catalog TEXT NOT NULL, id TEXT NOT NULL, name TEXT NOT NULL, data TEXT NOT NULL DEFAULT "", data_class TEXT NOT NULL, ' + 
       'state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, ' + 
       'CONSTRAINT pk_entries PRIMARY KEY(catalog, id));', [], nullDataHandler,cobalt.dbErrorHandler);
+    transaction.executeSql('DELETE FROM entries WHERE catalog=?', ['*temporary*'], nullDataHandler, cobalt.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS key_bindings(' +
       'binding TEXT NOT NULL, catalog TEXT NOT NULL, id TEXT NOT NULL, handler TEXT NOT NULL, ' + 
       'state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, ' + 
