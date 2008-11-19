@@ -5,23 +5,41 @@ $(document).ready(function(){
       current_text, handler, item, actions, match_count=0,
       plugins = {}, plugin_names=[], catalogs = {}, global_handlers = [], handlers = {}, 
       update_queue = [], required_updates = [];
+      
+  var log_error = function(message, err) {
+     if (typeof(window.console) != 'undefined') {
+       console.error(message);
+       console.log(err);
+     }
+  };
   
+  var db = null;
   // Initialize database
-  if (window.openDatabase) {
-    var db = openDatabase('cobalt', '1.0', 'Cobalt Database', 1024000);
+  if (typeof(google) != 'undefined' && typeof(google.gears) != 'undefined') {
+    try {
+      var gdb = google.gears.factory.create('beta.database');
+      gdb.open('cobalt');
+      var db = gears_db_html5_wrapper(gdb);
+    }
+    catch (err) {
+      log_error('Failed to open database using the Google Gears api', err);
+    }
   }
-  else if (google.gears) {
-    var gdb = google.gears.factory.create('beta.database');
-    gdb.open('cobalt');
-    var db = gears_db_html5_wrapper(gdb);
+  
+  if (!db && typeof(openDatabase)=='function') {
+    try {
+      var db = openDatabase('cobalt', '1.0', 'Cobalt Database', 204800);
+    }
+    catch (err) {
+      log_error('Failed to open database using the HTML5-api');
+    }
   }
   
   if (!db) {
-    if (window.console) {
-      console.error('Cobalt requires either Safari or a browser with Google Gears');
-    }
+    log_error('Could not open a client-side database. Cobalt requires a browser that implements the HTML5 database api or had Google Gears installed');
     return;
   }
+  
   var nullDataHandler = function(transaction, results) { };
     
   var current_state = function() {

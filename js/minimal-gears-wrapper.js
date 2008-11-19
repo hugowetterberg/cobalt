@@ -1,5 +1,5 @@
 function gears_db_html5_wrapper(gears_db) {
-  function wrap_results(res) {
+  var wrap_results = function(res) {
     var items = [];
     var fieldCount = res.fieldCount();
     while (res.isValidRow()) {
@@ -10,6 +10,7 @@ function gears_db_html5_wrapper(gears_db) {
       items.push(item);
       res.next();
     }
+    res.close();
     
     return {
       'rows': {
@@ -19,21 +20,46 @@ function gears_db_html5_wrapper(gears_db) {
         }
       }
     };
-  }
+  };
   
   return {
     'transaction': function(action_callback) {
+      var fatal_failure = false;
+      
+      gears_db.execute('BEGIN');
+      
       action_callback({
         'executeSql': function(query, params, callback, on_error) {
+          if (fatal_failure) {
+            return false;
+          }
+          
           try {
-            var res = gears_db.execute(query, params);
-            callback(null, wrap_results(res));
+            var res = wrap_results(gears_db.execute(query, params));
+            
+            setTimeout(function() {
+              callback(null, res);
+            }, 1);
+            
+            return true;
           }
           catch (err) {
-            on_error(null, err);
+            fatal_failure = true;
+            if (typeof(on_error)=='function') {
+              fatal_failure = on_error(null, err);
+            }
+            
+            if(fatal_failure) {
+              gears_db.execute('ROLLBACK');
+            }
+            return false;
           }
         }
       });
+      
+      if (!fatal_failure) {
+        gears_db.execute('COMMIT');
+      }
     }
   };
 }
