@@ -81,7 +81,11 @@ function cobalt_menu_json() {
    
    $tree = array();
    foreach ($menu_names as $name) {
-    $tree += menu_tree_all_data($name);
+    // Ignore the menu created by the admin_menu module which creates a lot of
+    // duplicates.
+    if ($name != 'admin_menu') {
+      $tree += menu_tree_all_data($name);
+    }
    }
    
    $data = array();
