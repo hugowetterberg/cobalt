@@ -297,13 +297,13 @@ $(document).ready(function(){
       lookup();
     }
     else {
+      cobalt_paging.empty();
       clear_ac();
     }
   };
 
   var clear_ac = function() {
     match_idx = 0;
-    current_text = '';
     $('#cobalt .inner').attr('class','inner');
     $('#cobalt .inner label').hide();
     cobalt_ac.empty().hide();
@@ -359,7 +359,8 @@ $(document).ready(function(){
           if (results.rows.length) {
             match_count = results.rows.item(0).match_count;
             cobalt_paging.empty();
-            var page_count = Math.ceil(match_count/match_page_size);
+            
+            var page_count = Math.min(Math.ceil(match_count/match_page_size),25);
             for (var i=0; i<page_count; i++ ) {
               var p = $('<li>&nbsp;</li>').appendTo(cobalt_paging);
               if (i==match_offset/match_page_size) {

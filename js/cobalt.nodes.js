@@ -83,8 +83,18 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   cobalt.registerPlugin('cobalt_nodes', plugin);
   
   var add_temporary_entries = function(nid, perm) {
-    if (perm.indexOf('w') >= 0) {
-      cobalt.addTemporaryEntry('node_context_edit', 'Edit current node', 'node/' + nid + '/edit', 'url_data');
+    var rp = 'node/' + nid;
+    var ep = 'node/' + nid + '/edit';
+    var dp = 'node/' + nid + '/delete';
+    
+    if (perm.indexOf('r') >= 0 && Drupal.settings.cobalt.path != rp) {
+      cobalt.addTemporaryEntry('node_context_view', 'View current node', rp, 'url_data');
+    }
+    if (perm.indexOf('w') >= 0 && Drupal.settings.cobalt.path != ep) {
+      cobalt.addTemporaryEntry('node_context_edit', 'Edit current node', ep, 'url_data');
+    }
+    if (perm.indexOf('d') >= 0 && Drupal.settings.cobalt.path != dp) {
+      cobalt.addTemporaryEntry('node_context_delete', 'Delete current node', dp, 'url_data');
     }
   };
   
