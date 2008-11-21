@@ -109,12 +109,12 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
         if (!item) {
           get_node_data('single', nid, function(data){
             if (typeof(data['nodes'])!='undefined' && data.nodes.length) {
-              add_temporary_entries(nid, data.nodes[0][2]);
+              add_temporary_entries(data.nodes[0][0], data.nodes[0][2]);
             }
           });
         }
         else {
-          add_temporary_entries(nid, item.information.perm);
+          add_temporary_entries(item.nid, item.information.perm);
         }
       });
     }
