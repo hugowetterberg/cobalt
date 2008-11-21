@@ -112,9 +112,7 @@ $(document).ready(function(){
       });
     },
     'loadEntry': function(catalog, id, callback) {
-      if (typeof(state)=='undefined') {
-        state = current_state();
-      }
+      var state = current_state();
       db.transaction(function (transaction) {
         transaction.executeSql("SELECT * FROM entries WHERE catalog=? AND id=? AND state=?;", [ catalog, id, state ], function(transaction, results) {
           var item = null;
