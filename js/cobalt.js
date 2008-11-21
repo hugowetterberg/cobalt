@@ -2,7 +2,7 @@ $(document).ready(function(){
   var match_count = 0, match_page_size=5, match_offset = 0,
       cobalt_visible = false, cobalt_out_visible = false,
       matches = [], match_idx = 0, handler_idx = 0, 
-      current_text, handler, item, actions, match_count=0,
+      current_text, current_action_text='', handler, item, actions, match_count=0,
       plugins = {}, plugin_names=[], catalogs = {}, global_handlers = [], handlers = {}, 
       update_queue = [], required_updates = [];
       
@@ -301,6 +301,16 @@ $(document).ready(function(){
       clear_ac();
     }
   };
+  
+  var action_keypress_reaction = function() {
+    if(cobalt_h_input.val()==current_action_text) {
+      return;
+    }
+    current_action_text = cobalt_h_input.val();
+
+    actions = action_candidates(item);
+    set_handler(0, true);
+  };
 
   var clear_ac = function() {
     match_idx = 0;
@@ -397,13 +407,14 @@ $(document).ready(function(){
     $('#cobalt .ac-opt-' + match_idx).addClass('active');
 
     actions = action_candidates(item);
-    set_handler(0);
+    set_handler(0, true);
   };
 
   var action_candidates = function(item) {
     var candidates = [];
     var add_applicable = function(handler) {
-      if (typeof(handler['applicable'])=='undefined' || handler.applicable(current_text, item)) {
+      if ((current_action_text=='' || handler['name'].toLowerCase().indexOf(current_action_text)!=-1) && 
+          (typeof(handler['applicable'])=='undefined' || handler.applicable(current_text, item))) {
         candidates.push(handler);
       }
     };
@@ -429,18 +440,28 @@ $(document).ready(function(){
     }
   };
 
-  var set_handler = function(idx) {
+  var set_handler = function(idx, update) {
+    if (update) {
+      cobalt_actions.empty();
+      var a_count = actions.length;
+      for(var i=0; i<a_count; i++) {
+        $('<li class="action-opt-' + i + '"></li>').html(actions[i]['name']).appendTo(cobalt_actions);
+      }
+    }
+    
     if (idx<0 || idx >= actions.length) {
       return;
     }
 
+    $('#cobalt .action-opt-' + handler_idx).removeClass('active');
+    $('#cobalt .action-opt-' + idx).addClass('active');
     handler_idx = idx;
     var new_handler = actions[idx];
 
     handler = new_handler;
     if (handler) {
       var newClass = handler_class();
-      $('#cobalt .right .inner').attr('class','inner cobalt-action-' +newClass);
+      $('#cobalt .right .inner').attr('class','inner cobalt-action-' + newClass);
       $('#cobalt .right label').text(handler.name).show();
     }
   };
@@ -560,9 +581,12 @@ $(document).ready(function(){
       bind('keydown', 'down', function(){ ac_select(match_idx+1); return false; }).
       bind('keydown', 'Alt+left', function(){ ac_page(match_offset-match_page_size); return false; }).
       bind('keydown', 'Alt+right', function(){ ac_page(match_offset+match_page_size); return false; }).
-      bind('keyup', function(){ setTimeout(keypress_reaction, 10); return false; });
+      bind('keyup', function(){ keypress_reaction(); return false; }).
+      bind('focus', function(){ cobalt_actions.hide(); cobalt_ac.show(); cobalt_paging.show(); });
     cobalt_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); return false; }).
-      bind('keydown', 'down', function(){ set_handler(handler_idx+1); return false; });
+      bind('keydown', 'down', function(){ set_handler(handler_idx+1); return false; }).
+      bind('keyup', function(){ action_keypress_reaction(); return false; }).
+      bind('focus', function(){ cobalt_paging.hide(); cobalt_ac.hide(); cobalt_actions.show(); });
     cobalt_output.bind('click', function(e){ return false; });
     $(document).bind('click', function(){ toggle('hide'); toggle_output('hide'); })
       .bind('keydown', 'Alt+space', toggle)
@@ -577,6 +601,7 @@ $(document).ready(function(){
   var cobalt_input = $('#cobalt-input');
   var cobalt_h_input = $('#cobalt-handler-input');
   var cobalt_ac = $('#cobalt .cobalt-autocomplete');
+  var cobalt_actions = $('#cobalt .cobalt-actions');
   var cobalt_paging = $('#cobalt .cobalt-paging');
   $('#cobalt .right label').hide();
   
