@@ -261,9 +261,9 @@ $(document).ready(function(){
   var cobalt_output = $('<div id="cobalt-out"></div>').appendTo('body').hide();
   
   var bind_key = function (binding, catalog, id, handler) {
-   cobalt.loadEntry(catalog, id, function(item) {
-      if (item) {
-        $(document).bind('keydown', binding, function(){
+    $(document).bind('keydown', binding, function(){
+      cobalt.loadEntry(catalog, id, function(item) {
+        if (item) {
           var cand =cobalt.actionCandidates(item);
           var cand_count = cand.length;
           for(var i=0; i<cand_count; i++) {
@@ -271,8 +271,8 @@ $(document).ready(function(){
               cand[i].handler(item.name, item);
             }
           }
-        });
-      }
+        }
+      });
     });
   };
   
