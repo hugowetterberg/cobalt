@@ -9,7 +9,15 @@ $(document).ready(function(){
   var log_error = function(message, err) {
      if (typeof(window.console) != 'undefined') {
        console.error(message);
-       console.log(err);
+       if(err) {
+        console.log(err); 
+       }
+     }
+  };
+  
+  var log_msg = function(message) {
+     if (typeof(window.console) != 'undefined') {
+       console.log(message);
      }
   };
   
@@ -22,7 +30,7 @@ $(document).ready(function(){
       var db = gears_db_html5_wrapper(gdb);
     }
     catch (err) {
-      log_error('Failed to open database using the Google Gears api', err);
+      log_msg('Failed to open database using the Google Gears api', err);
     }
   }
   
@@ -31,7 +39,7 @@ $(document).ready(function(){
       var db = openDatabase('cobalt', '1.0', 'Cobalt Database', 204800);
     }
     catch (err) {
-      log_error('Failed to open database using the HTML5-api');
+      log_msg('Failed to open database using the HTML5-api');
     }
   }
   
