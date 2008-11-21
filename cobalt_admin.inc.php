@@ -3,6 +3,19 @@
 function cobalt_settings() {
   $form = array();
   
+  $themes = cobalt_themes();
+  $theme_options = array();
+  foreach ($themes as $key => $info) {
+    $theme_options[$key] = $info['name'];
+  }
+  
+  $form['cobalt_theme'] = array(
+    '#type' => 'select',
+    '#options' => $theme_options,
+    '#default_value' => variable_get('cobalt_theme',''),
+    '#title' => t('Select a theme for cobalt'),
+  );
+  
   $form['javascript_includes'] = array(
     '#type' => 'fieldset',
     '#title' => t('Javascript includes'),
