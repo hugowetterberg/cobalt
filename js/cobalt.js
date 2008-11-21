@@ -320,6 +320,7 @@ $(document).ready(function(){
 
   var clear_ac = function() {
     match_idx = 0;
+    item = 0;
     $('#cobalt .inner').attr('class','inner');
     $('#cobalt .inner label').hide();
     cobalt_ac.empty().hide();
@@ -483,12 +484,12 @@ $(document).ready(function(){
 
   var toggle = function(arg) {
     if (cobalt_visible || arg=='hide') {
+      cobalt_h_input.focus();
       cb.hide();
       cobalt_visible = false;
     }
     else {
       toggle_output('hide');
-      clear_ac();
       cobalt_input.val($.trim(cobalt_input.val()));
       cb.show();
       cobalt_visible = true;
