@@ -22,8 +22,45 @@ function cobalt_init() {
     drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.menu.js');
     drupal_add_js(array('cobalt'=>array('state'=>$user->uid, 'path' => $_GET['q'])), 'setting');
     
-    drupal_add_css(drupal_get_path('module', 'cobalt') . '/css/cobalt.css');
+    $themes = cobalt_themes();
+    $theme_key = variable_get('cobalt_theme','');
+    foreach ($themes as $key => $info) {
+      if ($key==$theme_key) {
+        $theme = $info;
+        break;
+      }
+    }
+    
+    if (!isset($theme) || !isset($theme['css']) || !isset($theme['replace']) || !$theme['replace']) {
+      drupal_add_css(drupal_get_path('module', 'cobalt') . '/css/cobalt.css');
+    }
+    if (isset($theme) && isset($theme['css'])) {
+      drupal_add_css($theme['css']);
+    }
   }
+}
+
+function cobalt_themes() {
+  static $themes;
+  
+  if (!$themes) {
+    $themes = array(
+      '' => array(
+        'name' => t('Default theme'), 
+      ),
+    );
+    drupal_alter('cobalt_themes', $themes);
+  }
+  
+  return $themes;
+}
+
+function cobalt_cobalt_themes_alter(&$themes) {
+  $themes['cobalt_blue'] = array(
+    'name' => t('Cobalt blue'),
+    'css' => drupal_get_path('module', 'cobalt') . '/css/cobalt_blue.css',
+    'replace' => FALSE,
+  );
 }
 
 function cobalt_perm() {

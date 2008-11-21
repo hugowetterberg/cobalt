@@ -121,14 +121,19 @@
   opacity: 1.0;
 }
 
-#cobalt .cobalt-autocomplete {
+
+#cobalt .cobalt-actions {
+  display: none;
+}
+
+#cobalt .cobalt-autocomplete, #cobalt .cobalt-actions {
   clear: both;
   margin: 0 10px;
   padding: 10px 0 5px;
   color: #FFF;
 }
 
-#cobalt .cobalt-autocomplete li {
+#cobalt .cobalt-autocomplete li, #cobalt .cobalt-actions li {
   display: block;
   list-style: none;
   padding: 5px 10px;
@@ -144,7 +149,7 @@
   background: url(default_action.png) center center no-repeat;
 }
 
-#cobalt .cobalt-autocomplete li.active {
+#cobalt .cobalt-autocomplete li.active, #cobalt .cobalt-actions li.active {
   background-color: #FFF;
   background-color: rgba(0,0,0,0.5);
   border-radius: 10px;
