@@ -31,7 +31,7 @@ function cobalt_nodes_cron() {
 }
 
 function cobalt_nodes_nodeapi(&$node, $op, $teaser, $page) {
-  if ($page || $op == 'prepare') {
+  if (($page && $op!='alter') || $op == 'prepare') {
     drupal_add_js(array('cobalt'=>array('nodes_current'=>$node->nid)), 'setting');
   }
   if ($op=='delete') {
