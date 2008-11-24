@@ -24,6 +24,6 @@ function cobalt_js_update() {
   }
   $out .= '</ul>';
   
-  drupal_add_js(array('cobalt'=>array('update'=>$settings)), 'setting');
+  drupal_add_js(array('cobalt' => array('update' => $settings)), 'setting');
   return $out;
 }

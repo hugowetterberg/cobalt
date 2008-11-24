@@ -4,15 +4,15 @@ function cobalt_init() {
   if (user_access('use cobalt')) {
     global $user;
     
-    if (variable_get('cobalt_gears_init',1)) {
+    if (variable_get('cobalt_gears_init', 1)) {
       drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/gears_init.js');
     }
     
-    if (variable_get('cobalt_jquery_json',1)) {
+    if (variable_get('cobalt_jquery_json', 1)) {
       drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/jquery.json-1.3.min.js');
     }
     
-    if (variable_get('cobalt_jquery_hotkeys',1)) {
+    if (variable_get('cobalt_jquery_hotkeys', 1)) {
       drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/jquery.hotkeys.js');
     }
     
@@ -20,10 +20,10 @@ function cobalt_init() {
     
     drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.js');
     drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.menu.js');
-    drupal_add_js(array('cobalt'=>array('state'=>$user->uid, 'path' => $_GET['q'])), 'setting');
+    drupal_add_js(array('cobalt' => array('state' => $user->uid, 'path' => $_GET['q'])), 'setting');
     
     $themes = cobalt_themes();
-    $theme_key = variable_get('cobalt_theme','');
+    $theme_key = variable_get('cobalt_theme', '');
     foreach ($themes as $key => $info) {
       if ($key==$theme_key) {
         $theme = $info;
@@ -46,7 +46,7 @@ function cobalt_themes() {
   if (!$themes) {
     $themes = array(
       '' => array(
-        'name' => t('Default theme'), 
+        'name' => t('Default theme'),
       ),
     );
     drupal_alter('cobalt_themes', $themes);
@@ -70,19 +70,19 @@ function cobalt_perm() {
 function cobalt_menu() {
   $items = array();
   $items['cobalt/alias'] = array(
-    'title' => t('Forward to the correct alias'),
+    'title' => 'Forward to the correct alias',
     'page callback' => 'cobalt_forward_to_alias',
     'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
   );
   $items['cobalt/data/menu_json'] = array(
-    'title' => t('Serialized menu'),
+    'title' => 'Serialized menu',
     'page callback' => 'cobalt_menu_json',
     'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
   );
   $items['admin/settings/cobalt'] = array(
-    'title' => t('Cobalt configuration'),
+    'title' => 'Cobalt configuration',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('cobalt_settings'),
     'access arguments' => array('administer site configuration'),
@@ -91,7 +91,7 @@ function cobalt_menu() {
     'weight' => 0,
   );
   $items['cobalt/update'] = array(
-    'title' => t('Cobalt update'),
+    'title' => 'Cobalt update',
     'page callback' => 'cobalt_js_update',
     'page arguments' => array('cobalt_settings'),
     'access arguments' => array('use cobalt'),
@@ -109,33 +109,33 @@ function cobalt_forward_to_alias() {
     $url_parts[] = arg($i);
     $i++;
   }
-  $path = join('/',$url_parts);
+  $path = join('/', $url_parts);
   drupal_goto($path);
 }
 
 function cobalt_menu_json() {
-   $menu_names = menu_get_names();
-   
-   $tree = array();
-   foreach ($menu_names as $name) {
+  $menu_names = menu_get_names();
+
+  $tree = array();
+  foreach ($menu_names as $name) {
     // Ignore the menu created by the admin_menu module which creates a lot of
     // duplicates.
     if ($name != 'admin_menu') {
       $tree += menu_tree_all_data($name);
     }
-   }
-   
-   $data = array();
-   _cobalt_menu_data_recursive($tree, $data);
-   
-   drupal_alter('cobalt_menu', $data);
-   
-   print drupal_to_js($data);
-   exit;
+  }
+
+  $data = array();
+  _cobalt_menu_data_recursive($tree, $data);
+
+  drupal_alter('cobalt_menu', $data);
+
+  print drupal_to_js($data);
+  exit;
 }
 
 function _cobalt_menu_data_recursive($tree, &$data) {
-  foreach($tree as $key => $item) {
+  foreach ($tree as $key => $item) {
     $link = $item['link'];
     if (!$link['hidden'] && $link['access']) {
       $data[$link['mlid']] = array($link['href'], $link['title']);
