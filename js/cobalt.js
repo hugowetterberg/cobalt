@@ -9,7 +9,15 @@ $(document).ready(function(){
   var log_error = function(message, err) {
      if (typeof(window.console) != 'undefined') {
        console.error(message);
-       console.log(err);
+       if(err) {
+        console.log(err); 
+       }
+     }
+  };
+  
+  var log_msg = function(message) {
+     if (typeof(window.console) != 'undefined') {
+       console.log(message);
      }
   };
   
@@ -22,7 +30,7 @@ $(document).ready(function(){
       var db = gears_db_html5_wrapper(gdb);
     }
     catch (err) {
-      log_error('Failed to open database using the Google Gears api', err);
+      log_msg('Failed to open database using the Google Gears api', err);
     }
   }
   
@@ -31,7 +39,7 @@ $(document).ready(function(){
       var db = openDatabase('cobalt', '1.0', 'Cobalt Database', 204800);
     }
     catch (err) {
-      log_error('Failed to open database using the HTML5-api');
+      log_msg('Failed to open database using the HTML5-api');
     }
   }
   
@@ -104,9 +112,7 @@ $(document).ready(function(){
       });
     },
     'loadEntry': function(catalog, id, callback) {
-      if (typeof(state)=='undefined') {
-        state = current_state();
-      }
+      var state = current_state();
       db.transaction(function (transaction) {
         transaction.executeSql("SELECT * FROM entries WHERE catalog=? AND id=? AND state=?;", [ catalog, id, state ], function(transaction, results) {
           var item = null;
@@ -261,9 +267,9 @@ $(document).ready(function(){
   var cobalt_output = $('<div id="cobalt-out"></div>').appendTo('body').hide();
   
   var bind_key = function (binding, catalog, id, handler) {
-   cobalt.loadEntry(catalog, id, function(item) {
-      if (item) {
-        $(document).bind('keydown', binding, function(){
+    $(document).bind('keydown', binding, function(){
+      cobalt.loadEntry(catalog, id, function(item) {
+        if (item) {
           var cand =cobalt.actionCandidates(item);
           var cand_count = cand.length;
           for(var i=0; i<cand_count; i++) {
@@ -271,8 +277,8 @@ $(document).ready(function(){
               cand[i].handler(item.name, item);
             }
           }
-        });
-      }
+        }
+      });
     });
   };
   
@@ -315,6 +321,7 @@ $(document).ready(function(){
   var clear_ac = function() {
     match_idx = 0;
     matches = null;
+    item = 0;
     $('#cobalt .inner').attr('class','inner');
     $('#cobalt .inner label').hide();
     cobalt_ac.hide().empty();
@@ -362,7 +369,6 @@ $(document).ready(function(){
       else if (matches.length==match_page_size) {
         var like_expr = '%' + current_text + '%';
         db.transaction(function (transaction) {
-          console.log('Getting match count for ' + like_expr);
           transaction.executeSql("SELECT COUNT(*) as match_count FROM entries AS e " + 
             "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
             "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?);", [ 
@@ -377,7 +383,6 @@ $(document).ready(function(){
       else {
         update_pager(matches.length);
       }
-      
       cobalt_ac.show();
     }
     else {
@@ -498,12 +503,12 @@ $(document).ready(function(){
 
   var toggle = function(arg) {
     if (cobalt_visible || arg=='hide') {
+      cobalt_h_input.focus();
       cb.hide();
       cobalt_visible = false;
     }
     else {
       toggle_output('hide');
-      clear_ac();
       cobalt_input.val($.trim(cobalt_input.val()));
       cb.show();
       cobalt_visible = true;

@@ -68,6 +68,7 @@
 }
 
 #cobalt .cell label {
+  display: none;
   position: absolute;
   bottom: 10px;
   left: 10px;
@@ -104,12 +105,13 @@
   padding: 0 20px;
   clear: both;
   text-align: center;
+  line-height: 0;
 }
 
 #cobalt .cobalt-paging li {
   display: inline-block;
   list-style: none;
-  margin: 5px 0 0;
+  margin: 6px 0 0;
   padding: 0;
   opacity: .5;
   background: url(whitedot.png) top left no-repeat;

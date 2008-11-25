@@ -9,7 +9,7 @@ function cobalt_taxonomy_init() {
 function cobalt_taxonomy_menu() {
   $items = array();
   $items['cobalt/data/taxonomy_json'] = array(
-    'title' => t('Serialized taxonomies'),
+    'title' => 'Serialized taxonomies',
     'page callback' => 'cobalt_taxonomy_json',
     'page arguments' => array('update', 3),
     'access arguments' => array('use cobalt'),
@@ -26,17 +26,17 @@ function cobalt_taxonomy_json($op, $value) {
 
   $voc_data = array();
   foreach ($vocabularies as $vocabulary) {
-   $voc_data[$vocabulary->vid] = $vocabulary->name;
+    $voc_data[$vocabulary->vid] = $vocabulary->name;
   }
   
   $term_tree = array();
   foreach ($vocabularies as $vocabulary) {
-   $term_tree += taxonomy_get_tree($vocabulary->vid);
+    $term_tree += taxonomy_get_tree($vocabulary->vid);
   }
   
   $term_data = array();
   
-  foreach($term_tree as $term) {
+  foreach ($term_tree as $term) {
     $term_data[$term->tid] = array($term->name, $term->vid);
   }
   

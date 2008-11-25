@@ -9,7 +9,7 @@ function cobalt_users_init() {
 function cobalt_users_menu() {
   $items = array();
   $items['cobalt/data/users_json/%'] = array(
-    'title' => t('Serialized users'),
+    'title' => 'Serialized users',
     'page callback' => 'cobalt_users_json',
     'page arguments' => array(2),
     'access arguments' => array('use cobalt'),

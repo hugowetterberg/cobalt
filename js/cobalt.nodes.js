@@ -114,7 +114,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
           });
         }
         else {
-          add_temporary_entries(item.nid, item.information.perm);
+          add_temporary_entries(item.id, item.information.perm);
         }
       });
     }

@@ -9,14 +9,14 @@ function cobalt_nodes_init() {
 function cobalt_nodes_menu() {
   $items = array();
   $items['cobalt/data/nodes_update/%'] = array(
-    'title' => t('Serialized nodes'),
+    'title' => 'Serialized nodes',
     'page callback' => 'cobalt_nodes_json',
     'page arguments' => array('update', 3),
     'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
   );
   $items['cobalt/data/nodes_single/%'] = array(
-    'title' => t('Serialized node'),
+    'title' => 'Serialized node',
     'page callback' => 'cobalt_nodes_json',
     'page arguments' => array('single', 3),
     'access arguments' => array('use cobalt'),
@@ -31,8 +31,8 @@ function cobalt_nodes_cron() {
 }
 
 function cobalt_nodes_nodeapi(&$node, $op, $teaser, $page) {
-  if ($page || $op == 'prepare') {
-    drupal_add_js(array('cobalt'=>array('nodes_current'=>$node->nid)), 'setting');
+  if (($page && $op!='alter') || $op == 'prepare') {
+    drupal_add_js(array('cobalt' => array('nodes_current' => $node->nid)), 'setting');
   }
   if ($op=='delete') {
     db_query("INSERT INTO {cobalt_nodes_deletions}(nid, deleted) VALUES(%d, %d)", $node->nid, time()-60*60*24*60*60);
