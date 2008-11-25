@@ -283,11 +283,11 @@ $(document).ready(function(){
   };
   
   var toggle_output = function(arg) {
-    if (cobalt_out_visible || arg=='hide') {
+    if (cobalt_out_visible) {
       cobalt_output.hide();
       cobalt_out_visible = false;
     }
-    else {
+    else if (arg!='hide') {
       cobalt_output.show();
       cobalt_out_visible = true;
     }
@@ -502,12 +502,12 @@ $(document).ready(function(){
   };
 
   var toggle = function(arg) {
-    if (cobalt_visible || arg=='hide') {
+    if (cobalt_visible) {
       cobalt_h_input.focus();
       cb.hide();
       cobalt_visible = false;
     }
-    else {
+    else if (arg!='hide') {
       toggle_output('hide');
       cobalt_input.val($.trim(cobalt_input.val()));
       cb.show();
