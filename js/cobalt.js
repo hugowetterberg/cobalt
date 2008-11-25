@@ -314,9 +314,11 @@ $(document).ready(function(){
 
   var clear_ac = function() {
     match_idx = 0;
+    matches = null;
     $('#cobalt .inner').attr('class','inner');
     $('#cobalt .inner label').hide();
-    cobalt_ac.empty().hide();
+    cobalt_ac.hide().empty();
+    cobalt_paging.hide().empty();
   };
 
   var lookup = function(preserve_offset) {
@@ -351,6 +353,31 @@ $(document).ready(function(){
         $('<li class="ac-opt-' + i + '"></li>').html(title).appendTo(cobalt_ac);
       }
       matches = results.rows;
+      
+      //Only count for paging when we're not already offsetting the result and
+      //have a match count equal to the page size
+      if (match_offset) {
+        update_pager(match_count);
+      }
+      else if (matches.length==match_page_size) {
+        var like_expr = '%' + current_text + '%';
+        db.transaction(function (transaction) {
+          console.log('Getting match count for ' + like_expr);
+          transaction.executeSql("SELECT COUNT(*) as match_count FROM entries AS e " + 
+            "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
+            "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?);", [ 
+            current_text, like_expr ], function(transaction, results) {
+              if (results.rows.length) {
+                match_count = results.rows.item(0).match_count;
+                update_pager(match_count);
+              }
+            },cobalt.dbErrorHandler);
+        });
+      }
+      else {
+        update_pager(matches.length);
+      }
+      
       cobalt_ac.show();
     }
     else {
@@ -359,27 +386,21 @@ $(document).ready(function(){
     }
 
     ac_select(0);
+  };
+  
+  var update_pager = function(new_match_count) {
+    match_count = new_match_count;
+    cobalt_paging.hide().empty();
 
-    var like_expr = '%' + current_text + '%';
-    db.transaction(function (transaction) {
-      transaction.executeSql("SELECT COUNT(*) as match_count FROM entries AS e " + 
-        "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
-        "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?);", [ 
-        current_text, like_expr ], function(transaction, results) {
-          if (results.rows.length) {
-            match_count = results.rows.item(0).match_count;
-            cobalt_paging.empty();
-            
-            var page_count = Math.min(Math.ceil(match_count/match_page_size),25);
-            for (var i=0; i<page_count; i++ ) {
-              var p = $('<li>&nbsp;</li>').appendTo(cobalt_paging);
-              if (i==match_offset/match_page_size) {
-                p.attr('class','current');
-              }
-            }
-          }
-        },cobalt.dbErrorHandler);
-    });
+    var page_count = Math.min(Math.ceil(match_count/match_page_size),25);
+    for (var i=0; i<page_count; i++ ) {
+      var p = $('<li>&nbsp;</li>').appendTo(cobalt_paging);
+      if (i==match_offset/match_page_size) {
+        p.attr('class','current');
+      }
+    }
+
+    cobalt_paging.show();
   };
 
   var ac_page = function(new_offset) {
@@ -405,7 +426,7 @@ $(document).ready(function(){
     $('#cobalt .left .inner').attr('class','inner cobalt-item-' + item.data_class);
     $('#cobalt .left label').text(item.name).show();
     $('#cobalt .ac-opt-' + match_idx).addClass('active');
-
+    
     actions = action_candidates(item);
     set_handler(0, true);
   };
@@ -582,7 +603,13 @@ $(document).ready(function(){
       bind('keydown', 'Alt+left', function(){ ac_page(match_offset-match_page_size); return false; }).
       bind('keydown', 'Alt+right', function(){ ac_page(match_offset+match_page_size); return false; }).
       bind('keyup', function(){ keypress_reaction(); return false; }).
-      bind('focus', function(){ cobalt_actions.hide(); cobalt_ac.show(); cobalt_paging.show(); });
+      bind('focus', function() { 
+        if (matches && matches.length) {
+          cobalt_ac.show();
+          cobalt_paging.show();
+        }
+        cobalt_actions.hide(); 
+      });
     cobalt_h_input.bind('keydown', 'up', function(){ set_handler(handler_idx-1); return false; }).
       bind('keydown', 'down', function(){ set_handler(handler_idx+1); return false; }).
       bind('keyup', function(){ action_keypress_reaction(); return false; }).

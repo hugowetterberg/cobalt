@@ -99,7 +99,7 @@
 }
 
 #cobalt .cobalt-paging {
-  display: block;
+  display: none;
   margin: 0;
   padding: 0 20px;
   clear: both;
@@ -121,12 +121,8 @@
   opacity: 1.0;
 }
 
-
-#cobalt .cobalt-actions {
-  display: none;
-}
-
 #cobalt .cobalt-autocomplete, #cobalt .cobalt-actions {
+  display: none;
   clear: both;
   margin: 0 10px;
   padding: 10px 0 5px;
