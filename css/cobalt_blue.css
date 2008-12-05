@@ -1,0 +1,46 @@
+#cobalt, #cobalt-out {
+  background-color: #000;
+  background-color: rgba(0,0,100,0.7);
+}
+
+#cobalt-out {
+  background-color: rgba(0,0,100,0.8);
+  color: #FFF;
+}
+
+#cobalt .cell {
+  background-color: #FFF;
+  background-color: rgba(255,255,255,0.5);
+}
+
+#cobalt .cell input {
+  text-shadow: 1px 1px 5px #FFF;
+  color: #000;
+  color: rgba(0,0,100,0.8);
+  background-color: transparent;
+  background-color: rgba(0,0,100,0);
+}
+
+#cobalt .cell label {
+  color: #FFF;
+  background-color: #000;
+  background-color: rgba(0,0,100,0.5);
+}
+
+#cobalt .cobalt-autocomplete, #cobalt .cobalt-actions {
+  color: #FFF;
+}
+
+#cobalt .cobalt-autocomplete li small {
+  color: #333;
+  color: rgba(256,256,256,0.8);
+}
+
+#cobalt .cobalt-autocomplete li.active, #cobalt .cobalt-actions li.active {
+  background-color: #FFF;
+  background-color: rgba(0,0,100,0.5);
+}
+
+#cobalt-out .cobalt-update-link {
+  color: #FFF;
+}

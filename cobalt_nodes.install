@@ -1,0 +1,33 @@
+<?php
+
+function cobalt_nodes_install() {
+  drupal_install_schema('cobalt_nodes');
+}
+
+function cobalt_nodes_uninstall() {
+  drupal_uninstall_schema('cobalt_nodes');
+}
+
+function cobalt_nodes_schema() {
+  $schema = array();
+  
+  $schema['cobalt_nodes_deletions'] = array(
+    'description' => t('Registers node deletions so that deleted nodes can be removed from the index.'),
+    'fields' => array(
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => t('Node id'),
+      ),
+      'deleted' => array(
+        'description' => t('The Unix timestamp when the node was deleted.'),
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0),
+    ),
+    'primary key' => array('nid'),
+  );
+  
+  return $schema;
+}
