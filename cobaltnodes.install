@@ -1,14 +1,15 @@
 <?php
+// $Id: cobalt_nodes.install,v 1.2 2008/12/05 15:31:49 hugowetterberg Exp $
 
-function cobalt_nodes_install() {
-  drupal_install_schema('cobalt_nodes');
+function cobaltnodes_install() {
+  drupal_install_schema('cobaltnodes');
 }
 
-function cobalt_nodes_uninstall() {
-  drupal_uninstall_schema('cobalt_nodes');
+function cobaltnodes_uninstall() {
+  drupal_uninstall_schema('cobaltnodes');
 }
 
-function cobalt_nodes_schema() {
+function cobaltnodes_schema() {
   $schema = array();
   
   $schema['cobalt_nodes_deletions'] = array(

@@ -1,16 +1,17 @@
 <?php
+// $Id: cobalt_taxonomy.module,v 1.2 2008/12/05 15:31:49 hugowetterberg Exp $
 
-function cobalt_taxonomy_init() {
+function cobalttaxonomy_init() {
   if (user_access('use cobalt')) {
     drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.taxonomy.js');
   }
 }
 
-function cobalt_taxonomy_menu() {
+function cobalttaxonomy_menu() {
   $items = array();
   $items['cobalt/data/taxonomy_json'] = array(
     'title' => 'Serialized taxonomies',
-    'page callback' => 'cobalt_taxonomy_json',
+    'page callback' => 'cobalttaxonomy_json',
     'page arguments' => array('update', 3),
     'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
@@ -19,7 +20,7 @@ function cobalt_taxonomy_menu() {
 }
 
 
-function cobalt_taxonomy_json($op, $value) {
+function cobalttaxonomy_json($op, $value) {
   global $user;
   
   $vocabularies = taxonomy_get_vocabularies();

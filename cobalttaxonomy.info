@@ -1,3 +1,4 @@
+; $Id: cobalt_taxonomy.info,v 1.2 2008/12/05 15:31:49 hugowetterberg Exp $
 name = Cobalt Taxonomy
 version = "6.x-0.1"
 core = "6.x"
