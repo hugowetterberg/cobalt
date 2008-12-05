@@ -1,5 +1,5 @@
 <?php
-// $Id: cobalt_nodes.module,v 1.2 2008/12/05 15:31:49 hugowetterberg Exp $
+// $Id: cobaltnodes.module,v 1.1 2008/12/05 16:00:25 hugowetterberg Exp $
 
 function cobaltnodes_init() {
   if (user_access('use cobalt')) {
