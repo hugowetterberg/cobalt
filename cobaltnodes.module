@@ -11,14 +11,14 @@ function cobaltnodes_menu() {
   $items = array();
   $items['cobalt/data/nodes_update/%'] = array(
     'title' => 'Serialized nodes',
-    'page callback' => 'cobalt_nodes_json',
+    'page callback' => 'cobaltnodes_json',
     'page arguments' => array('update', 3),
     'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
   );
   $items['cobalt/data/nodes_single/%'] = array(
     'title' => 'Serialized node',
-    'page callback' => 'cobalt_nodes_json',
+    'page callback' => 'cobaltnodes_json',
     'page arguments' => array('single', 3),
     'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
