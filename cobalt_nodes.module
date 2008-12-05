@@ -1,4 +1,5 @@
 <?php
+// $Id$
 
 function cobalt_nodes_init() {
   if (user_access('use cobalt')) {

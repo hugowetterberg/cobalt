@@ -1,4 +1,5 @@
 <?php
+// $Id$
 
 function cobalt_nodes_install() {
   drupal_install_schema('cobalt_nodes');

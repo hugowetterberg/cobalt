@@ -1,3 +1,4 @@
+; $Id$
 name = Cobalt
 version = "6.x-0.1"
 core = "6.x"

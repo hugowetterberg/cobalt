@@ -1,4 +1,5 @@
 <?php
+// $Id$
 
 function cobalt_settings() {
   $form = array();
