@@ -1,17 +1,17 @@
 <?php
 // $Id$
 
-function cobalt_users_init() {
+function cobaltusers_init() {
   if (user_access('use cobalt')) {
     drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.users.js');
   }
 }
 
-function cobalt_users_menu() {
+function cobaltusers_menu() {
   $items = array();
   $items['cobalt/data/users_json/%'] = array(
     'title' => 'Serialized users',
-    'page callback' => 'cobalt_users_json',
+    'page callback' => 'cobaltusers_json',
     'page arguments' => array(2),
     'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
@@ -19,7 +19,7 @@ function cobalt_users_menu() {
   return $items;
 }
 
-function cobalt_users_json($last_update) {
+function cobaltusers_json($last_update) {
   // We're just fetching the bare minimum of what we need for the
   // user_*_access methods and display.
   $res = db_query("SELECT uid, name, access, status FROM {users}

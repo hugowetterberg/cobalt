@@ -80,7 +80,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
     }
   });
   
-  cobalt.registerPlugin('cobalt_nodes', plugin);
+  cobalt.registerPlugin('cobaltnodes', plugin);
   
   var add_temporary_entries = function(nid, perm) {
     var rp = 'node/' + nid;

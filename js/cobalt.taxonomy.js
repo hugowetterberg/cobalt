@@ -90,6 +90,6 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
     }
   });
   
-  cobalt.registerPlugin('cobalt_taxonomy', plugin);
+  cobalt.registerPlugin('cobalttaxonomy', plugin);
 });
 

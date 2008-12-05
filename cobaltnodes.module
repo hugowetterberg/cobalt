@@ -1,24 +1,24 @@
 <?php
 // $Id$
 
-function cobalt_nodes_init() {
+function cobaltnodes_init() {
   if (user_access('use cobalt')) {
     drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.nodes.js');
   }
 }
 
-function cobalt_nodes_menu() {
+function cobaltnodes_menu() {
   $items = array();
   $items['cobalt/data/nodes_update/%'] = array(
     'title' => 'Serialized nodes',
-    'page callback' => 'cobalt_nodes_json',
+    'page callback' => 'cobaltnodes_json',
     'page arguments' => array('update', 3),
     'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
   );
   $items['cobalt/data/nodes_single/%'] = array(
     'title' => 'Serialized node',
-    'page callback' => 'cobalt_nodes_json',
+    'page callback' => 'cobaltnodes_json',
     'page arguments' => array('single', 3),
     'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
@@ -26,12 +26,12 @@ function cobalt_nodes_menu() {
   return $items;
 }
 
-function cobalt_nodes_cron() {
+function cobaltnodes_cron() {
   // Delete logged deletions older than two weeks
   db_query("DELETE FROM {cobalt_nodes_deletions} WHERE deleted<%d", time() - 86400*14);
 }
 
-function cobalt_nodes_nodeapi(&$node, $op, $teaser, $page) {
+function cobaltnodes_nodeapi(&$node, $op, $teaser, $page) {
   if (($page && $op!='alter') || $op == 'prepare') {
     drupal_add_js(array('cobalt' => array('nodes_current' => $node->nid)), 'setting');
   }
@@ -40,7 +40,7 @@ function cobalt_nodes_nodeapi(&$node, $op, $teaser, $page) {
   }
 }
 
-function cobalt_nodes_json($op, $value) {
+function cobaltnodes_json($op, $value) {
   $result = array();
   
   // We're skipping the status check on purpose. As we check with the node_access

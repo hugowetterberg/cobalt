@@ -59,5 +59,5 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
     }
   });
   
-  cobalt.registerPlugin('cobalt_users', plugin);
+  cobalt.registerPlugin('cobaltusers', plugin);
 });
