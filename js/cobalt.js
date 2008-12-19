@@ -160,7 +160,7 @@ $(document).ready(function(){
     }
   };
   
-  if (typeof(Drupal.settings.cobalt.update) != 'undefined') {
+  if (typeof(Drupal.settings.cobalt) != 'undefined' && typeof(Drupal.settings.cobalt.update) != 'undefined') {
    cobalt.updateVersion = function(transaction, name, version) {
       transaction.executeSql('UPDATE versions SET version=? WHERE name=?', [version, name], nullDataHandler,cobalt.dbErrorHandler);
     };
