@@ -38,5 +38,36 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
     }
   });
   
+  plugin['handlers'].push({
+    'id': 'menu_open_in_new_window',
+    'name': 'Open in new window',
+    'data_class': 'url_data',
+    'handler': function(text, item) {
+      var path = item.information;
+      if (path=='<front>') {
+        path = '';
+      }
+      
+      var form = document.createElement("form");
+      $(form).attr({
+        'method': 'GET',
+        'action': Drupal.settings.basePath + path,
+        'target': '_blank'
+      }).appendTo('body');
+      
+      try {
+        form.submit();
+      }
+      catch(e) {
+        var message = $('<div></div>');
+        message.append('<h1>Could not open window</h1>');
+        message.append('<p>You might be using a popup blocker, which stopped Cobalt from opening a new window.</p>');
+        cobalt.showHtml(message);
+      }
+      
+      $(form).remove();
+    }
+  });
+  
   cobalt.registerPlugin('cobalt_menu', plugin);
 });
