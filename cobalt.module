@@ -96,6 +96,7 @@ function cobalt_menu() {
   );
   $items['admin/settings/cobalt'] = array(
     'title' => 'Cobalt configuration',
+    'description' => 'Settings for cobalt appearance and behaviour',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('cobalt_settings'),
     'access arguments' => array('administer site configuration'),

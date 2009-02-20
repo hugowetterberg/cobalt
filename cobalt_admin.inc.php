@@ -20,6 +20,7 @@ function cobalt_settings() {
   $form['javascript_includes'] = array(
     '#type' => 'fieldset',
     '#title' => t('Javascript includes'),
+    '#description' => t('All the following libraries are needed for Cobalt to function properly. These options are here if you need Cobalt to play nice with any other modules or themes that use the same javascript libraries.'),
   );
 
   $form['javascript_includes']['cobalt_gears_init'] = array(
