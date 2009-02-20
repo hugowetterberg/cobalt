@@ -113,6 +113,26 @@ function cobalt_menu() {
     'type' => MENU_CALLBACK,
     'weight' => 0,
   );
+
+  // Menu callback for clearing the cache even when the devel module
+  // isn't installed.
+  $items['cobalt/clear-cache'] = array(
+    'title' => t('Clear cache'),
+    'page callback' => '_cobalt_clear_cache',
+    'file' => 'cobalt_admin.inc.php',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+  );
+
+  // Menuitem for rebuilding content permissions.
+  $items['cobalt/clear-cache'] = array(
+    'title' => t('Rebuild permissions'),
+    'page callback' => '_cobalt_rebuild_permissions',
+    'file' => 'cobalt_admin.inc.php',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
 
@@ -157,5 +177,18 @@ function _cobalt_menu_data_recursive($tree, &$data) {
         _cobalt_menu_data_recursive($item['below'], $data);
       }
     }
+  }
+}
+
+/**
+ * Implementation of hook_cobalt_menu_alter().
+ */
+function cobalt_cobalt_menu_alter(&$menuitems) {
+  if (!module_exists('devel') && user_access('administer site configuration')) {
+    $menuitems['cobalt-clear-cache'] = array('cobalt/clear-cache', t('Clear cache'));
+  }
+
+  if (module_exists('pathauto') && user_access('administer pathauto')) {
+    $menuitems['cobalt-pathauto'] = array('admin/build/path/pathauto', t('Automated alias settings'));
   }
 }
