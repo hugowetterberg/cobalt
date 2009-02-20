@@ -1,5 +1,5 @@
 <?php
-// $Id: cobalt_update.inc.php,v 1.2 2008/12/05 15:31:49 hugowetterberg Exp $
+// $Id$
 
 function cobalt_js_update() {
   $settings = array();
@@ -8,23 +8,23 @@ function cobalt_js_update() {
     $module = arg($i);
     $from = arg($i+1);
     $to = arg($i+2);
-    
+
     $settings[$module] = array($from, $to);
-    
+
     $up_file = drupal_get_path('module', $module) . '/' . $module . '_update.inc.php';
     if (file_exists($up_file)) {
       require_once($up_file);
     }
-    
+
     $up_function = $module . '_cobalt_js_update';
     if (is_callable($up_function)) {
       call_user_func($up_function, $from, $to);
     }
-    
+
     $out .= "<li>{$module} from {$from} to {$to}</li>";
   }
   $out .= '</ul>';
-  
+
   drupal_add_js(array('cobalt' => array('update' => $settings)), 'setting');
   return $out;
 }

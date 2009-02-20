@@ -1,5 +1,5 @@
 <?php
-// $Id: cobalttaxonomy.module,v 1.1 2008/12/05 16:00:25 hugowetterberg Exp $
+// $Id$
 
 function cobalttaxonomy_init() {
   if (user_access('use cobalt')) {

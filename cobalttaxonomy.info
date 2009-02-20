@@ -1,7 +1,7 @@
-; $Id: cobalttaxonomy.info,v 1.1 2008/12/05 16:00:25 hugowetterberg Exp $
+; $Id$
 name = Cobalt Taxonomy
-version = "6.x-0.1"
 core = "6.x"
 description = Provides access to taxonomies through cobalt
 dependencies[] = cobalt
 package = "Cobalt"
+project = cobalt

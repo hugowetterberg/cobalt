@@ -1,6 +1,5 @@
-; $Id: cobaltnodes.info,v 1.1 2008/12/05 16:00:25 hugowetterberg Exp $
+; $Id$
 name = Cobalt Nodes
-version = "6.x-0.1"
 core = "6.x"
 description = Provides access to nodes through cobalt
 dependencies[] = cobalt
