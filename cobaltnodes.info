@@ -1,4 +1,4 @@
-; $Id$
+; $Id: cobaltnodes.info,v 1.2 2009/02/20 17:30:14 hugowetterberg Exp $
 name = Cobalt Nodes
 core = "6.x"
 description = Provides access to nodes through cobalt

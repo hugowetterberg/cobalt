@@ -1,4 +1,4 @@
-$Id$
+$Id: README.txt,v 1.4 2009/02/20 17:30:14 hugowetterberg Exp $
 
 h1. COBALT
 
