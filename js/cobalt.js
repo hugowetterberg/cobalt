@@ -51,7 +51,8 @@ $(document).ready(function(){
   var nullDataHandler = function(transaction, results) { };
     
   var current_state = function() {
-    if (typeof(Drupal.settings.cobalt.state) != 'undefined') {
+    if (typeof(Drupal.settings.cobalt) != 'undefined' &&
+        typeof(Drupal.settings.cobalt.state) != 'undefined') {
       return Drupal.settings.cobalt.state;
     }
     else {

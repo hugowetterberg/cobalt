@@ -1,6 +1,5 @@
 ; $Id$
 name = Cobalt Nodes
-version = "6.x-0.1"
 core = "6.x"
 description = Provides access to nodes through cobalt
 dependencies[] = cobalt

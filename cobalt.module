@@ -1,27 +1,31 @@
 <?php
+// $Id$
 
+/**
+ * Implementation of hook_init().
+ */
 function cobalt_init() {
   if (user_access('use cobalt')) {
     global $user;
-    
+
     if (variable_get('cobalt_gears_init', 1)) {
       drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/gears_init.js');
     }
-    
+
     if (variable_get('cobalt_jquery_json', 1)) {
       drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/jquery.json-1.3.min.js');
     }
-    
+
     if (variable_get('cobalt_jquery_hotkeys', 1)) {
       drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/jquery.hotkeys.js');
     }
-    
+
     drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/minimal-gears-wrapper.js');
-    
+
     drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.js');
     drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.menu.js');
     drupal_add_js(array('cobalt' => array('state' => $user->uid, 'path' => $_GET['q'])), 'setting');
-    
+
     $themes = cobalt_themes();
     $theme_key = variable_get('cobalt_theme', '');
     foreach ($themes as $key => $info) {
@@ -30,7 +34,7 @@ function cobalt_init() {
         break;
       }
     }
-    
+
     if (!isset($theme) || !isset($theme['css']) || !isset($theme['replace']) || !$theme['replace']) {
       drupal_add_css(drupal_get_path('module', 'cobalt') . '/css/cobalt.css');
     }
@@ -40,9 +44,12 @@ function cobalt_init() {
   }
 }
 
+/**
+ * Implementation of hook_themes().
+ */
 function cobalt_themes() {
   static $themes;
-  
+
   if (!$themes) {
     $themes = array(
       '' => array(
@@ -51,7 +58,7 @@ function cobalt_themes() {
     );
     drupal_alter('cobalt_themes', $themes);
   }
-  
+
   return $themes;
 }
 
@@ -63,10 +70,16 @@ function cobalt_cobalt_themes_alter(&$themes) {
   );
 }
 
+/**
+ * Implementation of hook_perm().
+ */
 function cobalt_perm() {
   return array('use cobalt');
 }
 
+/**
+ * Implementation of hook_menu().
+ */
 function cobalt_menu() {
   $items = array();
   $items['cobalt/alias'] = array(

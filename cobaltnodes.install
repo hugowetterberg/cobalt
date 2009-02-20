@@ -11,7 +11,7 @@ function cobaltnodes_uninstall() {
 
 function cobaltnodes_schema() {
   $schema = array();
-  
+
   $schema['cobalt_nodes_deletions'] = array(
     'description' => t('Registers node deletions so that deleted nodes can be removed from the index.'),
     'fields' => array(
@@ -29,6 +29,6 @@ function cobaltnodes_schema() {
     ),
     'primary key' => array('nid'),
   );
-  
+
   return $schema;
 }
