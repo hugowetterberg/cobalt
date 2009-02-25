@@ -1,5 +1,5 @@
 <?php
-// $Id: cobalt_admin.inc.php,v 1.5 2009/02/20 23:51:31 hugowetterberg Exp $
+// $Id: cobalt_admin.inc.php,v 1.6 2009/02/25 08:20:45 hugowetterberg Exp $
 
 function cobalt_settings() {
   $form = array();
