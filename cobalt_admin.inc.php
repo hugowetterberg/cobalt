@@ -52,6 +52,5 @@ function _cobalt_clear_cache() {
 
 function _cobalt_rebuild_permissions() {
   node_access_rebuild();
-  drupal_set_message('Content permissions have been rebuilt.');
   drupal_goto();
 }

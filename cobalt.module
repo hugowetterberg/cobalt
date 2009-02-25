@@ -125,7 +125,7 @@ function cobalt_menu() {
   );
 
   // Menuitem for rebuilding content permissions.
-  $items['cobalt/clear-cache'] = array(
+  $items['cobalt/rebuild-permissions'] = array(
     'title' => t('Rebuild permissions'),
     'page callback' => '_cobalt_rebuild_permissions',
     'file' => 'cobalt_admin.inc.php',
@@ -186,6 +186,10 @@ function _cobalt_menu_data_recursive($tree, &$data) {
 function cobalt_cobalt_menu_alter(&$menuitems) {
   if (!module_exists('devel') && user_access('administer site configuration')) {
     $menuitems['cobalt-clear-cache'] = array('cobalt/clear-cache', t('Clear cache'));
+  }
+
+  if (user_access('administer site configuration')) {
+    $menuitems['cobalt-rebuild-permissions'] = array('cobalt/rebuild-permissions', t('Rebuild permissions'));
   }
 
   if (module_exists('pathauto') && user_access('administer pathauto')) {
