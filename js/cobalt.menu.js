@@ -27,7 +27,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   
   plugin['handlers'].push({
     'id': 'menu_goto',
-    'name': 'Go to',
+    'name': Drupal.t('Go to'),
     'data_class': 'url_data',
     'handler': function(text, item) {
       var path = item.information;
@@ -40,7 +40,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   
   plugin['handlers'].push({
     'id': 'menu_open_in_new_window',
-    'name': 'Open in new window',
+    'name': Drupal.t('Open in new window'),
     'data_class': 'url_data',
     'handler': function(text, item) {
       var path = item.information;
@@ -60,8 +60,8 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
       }
       catch(e) {
         var message = $('<div></div>');
-        message.append('<h1>Could not open window</h1>');
-        message.append('<p>You might be using a popup blocker, which stopped Cobalt from opening a new window.</p>');
+        message.append('<h1>' + Drupal.t('Could not open window') + '</h1>');
+        message.append('<p>' + Drupal.t('You might be using a popup blocker, which stopped Cobalt from opening a new window.') + '</p>');
         cobalt.showHtml(message);
       }
       

@@ -35,7 +35,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   // Register handlers
   plugin['handlers'].push({
     'id': 'vocabulary_list',
-    'name': 'List terms',
+    'name': Drupal.t('List terms'),
     'data_class': 'vocabulary',
     'applicable': function(text, item) {
       return item.information == 'w';
@@ -47,7 +47,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   
   plugin['handlers'].push({
     'id': 'vocabulary_edit',
-    'name': 'Edit',
+    'name': Drupal.t('Edit'),
     'data_class': 'vocabulary',
     'applicable': function(text, item) {
       return item.information == 'w';
@@ -59,7 +59,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   
   plugin['handlers'].push({
     'id': 'vocabulary_add',
-    'name': 'Add terms',
+    'name': Drupal.t('Add terms'),
     'data_class': 'vocabulary',
     'applicable': function(text, item) {
       return item.information == 'w';
@@ -71,7 +71,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   
   plugin['handlers'].push({
     'id': 'term_view',
-    'name': 'View',
+    'name': Drupal.t('View'),
     'data_class': 'term',
     'handler': function(text, item) {
       window.location.href = Drupal.settings.basePath + 'taxonomy/term/' + item.id;
@@ -80,7 +80,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   
   plugin['handlers'].push({
     'id': 'term_edit',
-    'name': 'Edit',
+    'name': Drupal.t('Edit'),
     'data_class': 'term',
     'applicable': function(text, item) {
       return item.information.perm == 'w';

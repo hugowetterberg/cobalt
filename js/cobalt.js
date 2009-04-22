@@ -30,7 +30,7 @@ $(document).ready(function(){
       var db = gears_db_html5_wrapper(gdb);
     }
     catch (err) {
-      log_msg('Failed to open database using the Google Gears api', err);
+      log_msg(Drupal.t('Failed to open database using the Google Gears api', err));
     }
   }
   
@@ -39,12 +39,12 @@ $(document).ready(function(){
       var db = openDatabase('cobalt', '1.0', 'Cobalt Database', 204800);
     }
     catch (err) {
-      log_msg('Failed to open database using the HTML5-api');
+      log_msg(Drupal.t('Failed to open database using the HTML5-api'));
     }
   }
   
   if (!db) {
-    log_error('Could not open a client-side database. Cobalt requires a browser that implements the HTML5 database api or had Google Gears installed');
+    log_error(Drupal.t('Could not open a client-side database. Cobalt requires a browser that implements the HTML5 database api or had Google Gears installed'));
     return;
   }
   
@@ -203,15 +203,15 @@ $(document).ready(function(){
     'handlers': [
       {
         'id': 'cobalt_show',
-        'name': 'Show',
+        'name': Drupal.t('Show'),
         'handler': function(text, item) {
           cobalt.showHtml('<h2>' + item.name + '</h2>' +
-            'text: <i>' + text + '</i><br/>' + 
-            'id: ' + item.id + '<br/>' + 
-            'catalog: ' + item.catalog + '<br/>' + 
-            'class: ' + item.data_class + '<br/>' + 
-            'data: ' + item.data + '<br/>' + 
-            'weight: ' + item.weight);
+            Drupal.t('text') + ': <i>' + text + '</i><br/>' + 
+            Drupal.t('id') + ': ' + item.id + '<br/>' + 
+            Drupal.t('catalog') + ': ' + item.catalog + '<br/>' + 
+            Drupal.t('class') + ': ' + item.data_class + '<br/>' + 
+            Drupal.t('data') + ': ' + item.data + '<br/>' + 
+            Drupal.t('weight') + ': ' + item.weight);
         }
       },
       {
@@ -220,8 +220,9 @@ $(document).ready(function(){
         'handler': function(text, item) {
           var cand =cobalt.actionCandidates(item);
           var out = $('<div class="shortcut-add"><h2>' + item.name + '</h2>' + 
-            'The keys <input class="key-combo" type="text" value="Ctrl+"/> should trigger the action:<br/> <select class="action-select"></select>' + 
-            '<p><button class="ok">Ok</button></p></div>');
+            Drupal.t('The keys !input should trigger the action:', {'!input': '<input class="key-combo" type="text" value="Ctrl+"/>'}) + 
+            '<br/> <select class="action-select"></select>' + 
+            '<p><button class="ok">' + Drupal.t('Ok') + '</button></p></div>');
           var actions = $(out).find('.action-select');
           var key_combo = $(out).find('.key-combo').css('width',50);
           var cand_count = cand.length;
@@ -666,8 +667,9 @@ $(document).ready(function(){
               var u = required_updates[i];
               update_url += '/' + u[0] + '/' + u[1] + '/' + u[2];
             }
-           cobalt.showHtml('<h1>Update required</h1><p>Cobalt must be updated before it can be used</p>' +
-              '<p><a class="cobalt-update-link" href="' + update_url + '">Click here to update</a></p>');
+           cobalt.showHtml('<h1>' + Drupal.t('Update required') + '</h1>' +
+            '<p>' + Drupal.t('Cobalt must be updated before it can be used') + '</p>' +
+            '<p><a class="cobalt-update-link" href="' + update_url + '">' + Drupal.t('Click here to update') + '</a></p>');
           };
           $(document).bind('click', function(){ toggle_output('hide'); })
             .bind('keydown', 'Alt+space', update_notice)
