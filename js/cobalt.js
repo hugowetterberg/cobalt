@@ -668,7 +668,7 @@ $(document).ready(function(){
               update_url += '/' + u[0] + '/' + u[1] + '/' + u[2];
             }
            cobalt.showHtml('<h1>' + Drupal.t('Update required') + '</h1>' +
-            '<p>' Drupal.t('Cobalt must be updated before it can be used') + '</p>' +
+            '<p>' + Drupal.t('Cobalt must be updated before it can be used') + '</p>' +
             '<p><a class="cobalt-update-link" href="' + update_url + '">' + Drupal.t('Click here to update') + '</a></p>');
           };
           $(document).bind('click', function(){ toggle_output('hide'); })
