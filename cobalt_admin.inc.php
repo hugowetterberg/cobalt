@@ -46,7 +46,7 @@ function cobalt_settings() {
 
 function _cobalt_clear_cache() {
   drupal_flush_all_caches();
-  drupal_set_message('Cache cleared.');
+  drupal_set_message(t('Cache cleared.'));
   drupal_goto();
 }
 

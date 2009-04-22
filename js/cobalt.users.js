@@ -25,7 +25,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   // Add handlers
   plugin['handlers'].push({
     'id': 'user_view',
-    'name': 'View',
+    'name': Drupal.t('View'),
     'data_class': 'user',
     'applicable': function(text, item) {
       return item.information.perm.indexOf('r') >= 0;
@@ -37,7 +37,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   
   plugin['handlers'].push({
     'id': 'user_edit',
-    'name': 'Edit',
+    'name': Drupal.t('Edit'),
     'data_class': 'user',
     'applicable': function(text, item) {
       return item.information.perm.indexOf('w') >= 0;
@@ -49,7 +49,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   
   plugin['handlers'].push({
     'id': 'user_delete',
-    'name': 'Delete',
+    'name': Drupal.t('Delete'),
     'data_class': 'user',
     'applicable': function(text, item) {
       return item.information.perm.indexOf('d') >= 0;
