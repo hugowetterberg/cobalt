@@ -25,16 +25,31 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
     'update_rate': 60000
   };
   
+  var uri_from_item = function(item) {
+    var path = item.information;
+    var destination = Drupal.settings.cobalt.path;
+    if (typeof(path) == 'object') {
+      destination = path.destination;
+      path = path.path;
+    }
+
+    if (path=='<front>') {
+      path = '';
+    }
+
+    if (destination) {
+      path = path + '?destination=' + destination;
+    }
+
+    return Drupal.settings.basePath + path;
+  };
+
   plugin['handlers'].push({
     'id': 'menu_goto',
     'name': Drupal.t('Go to'),
     'data_class': 'url_data',
     'handler': function(text, item) {
-      var path = item.information;
-      if (path=='<front>') {
-        path = '';
-      }
-      window.location.href = Drupal.settings.basePath + path + '?destination=' + Drupal.settings.cobalt.path;
+      window.location.href = uri_from_item(item);
     }
   });
   
@@ -43,15 +58,10 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
     'name': Drupal.t('Open in new window'),
     'data_class': 'url_data',
     'handler': function(text, item) {
-      var path = item.information;
-      if (path=='<front>') {
-        path = '';
-      }
-      
       var form = document.createElement("form");
       $(form).attr({
         'method': 'GET',
-        'action': Drupal.settings.basePath + path,
+        'action': uri_from_item(item),
         'target': '_blank'
       }).appendTo('body');
       
