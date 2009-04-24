@@ -216,7 +216,7 @@ $(document).ready(function(){
       },
       {
         'id': 'cobalt_abbrev',
-        'name': 'Assign shortcut',
+        'name': Drupal.t('Assign shortcut'),
         'handler': function(text, item) {
           var cand =cobalt.actionCandidates(item);
           var out = $('<div class="shortcut-add"><h2>' + item.name + '</h2>' + 
