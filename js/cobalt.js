@@ -30,7 +30,7 @@ $(document).ready(function(){
       var db = gears_db_html5_wrapper(gdb);
     }
     catch (err) {
-      log_msg(Drupal.t('Failed to open database using the Google Gears api', err));
+      log_msg(Drupal.t('Failed to open database using the Google Gears api'), err);
     }
   }
   
