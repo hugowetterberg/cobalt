@@ -25,7 +25,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
     'update_rate': 60000
   };
   
-  var uri_from_item = function(item) {
+  var uri_from_item = function(item, omitDestination) {
     var path = item.information;
     var destination = Drupal.settings.cobalt.path;
     if (typeof(path) == 'object') {
@@ -37,7 +37,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
       path = '';
     }
 
-    if (destination) {
+    if (destination && !omitDestination) {
       path = path + '?destination=' + destination;
     }
 
@@ -46,13 +46,22 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
 
   plugin['handlers'].push({
     'id': 'menu_goto',
-    'name': Drupal.t('Go to'),
+    'name': Drupal.t('Go to and return'),
     'data_class': 'url_data',
     'handler': function(text, item) {
       window.location.href = uri_from_item(item);
     }
   });
-  
+
+  plugin['handlers'].push({
+    'id': 'menu_goto_stay',
+    'name': Drupal.t('Go to'),
+    'data_class': 'url_data',
+    'handler': function(text, item) {
+      window.location.href = uri_from_item(item, true);
+    }
+  });
+
   plugin['handlers'].push({
     'id': 'menu_open_in_new_window',
     'name': Drupal.t('Open in new window'),
