@@ -94,7 +94,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
       cobalt.addTemporaryEntry('node_context_edit', Drupal.t('Edit current node'), ep, 'url_data');
     }
     if (perm.indexOf('d') >= 0 && Drupal.settings.cobalt.path != dp) {
-      cobalt.addTemporaryEntry('node_context_delete', Drupal.t('Delete current node'), dp, 'url_data');
+      cobalt.addTemporaryEntry('node_context_delete', Drupal.t('Delete current node'), {'path': dp, 'destination': false}, 'url_data');
     }
   };
   
