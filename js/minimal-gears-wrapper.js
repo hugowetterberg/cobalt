@@ -31,7 +31,9 @@ function gears_db_html5_wrapper(gears_db) {
             callback(null, wrap_results(res));
           }
           catch (err) {
-            on_error(null, err);
+            if (on_error) {
+              on_error(null, err);
+            }
           }
         }
       });
