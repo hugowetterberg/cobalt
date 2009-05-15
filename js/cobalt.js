@@ -178,10 +178,9 @@ $(document).ready(function(){
       handler.weight++;
       register_handler_use(handler, {id:0, catalog: ''}, transaction);
     }
-  }
+  };
 
   var register_use = function(text, item, handler) {
-    console.log(handler);
     db.transaction(function (transaction) {
       register_handler_use(handler, item, transaction);
       if (item.weight == null) {
@@ -471,11 +470,6 @@ $(document).ready(function(){
     
     action_candidates(item, function(candidates){
       actions = candidates;
-      var cc = candidates.length;
-      console.log('Candidates for "' + item.name + '" (' + item.id + ')');
-      for (var i=0; i<cc; i++) {
-        console.log(candidates[i].context_weight + ' ' +  candidates[i].name);
-      }
       set_handler(0, true);
     });
   };
@@ -573,7 +567,7 @@ $(document).ready(function(){
         handler.handler(text, item);
       }
       catch(err) {
-        log_error(Drupal.t("The handler threw a exception"), err)
+        log_error(Drupal.t("The handler threw a exception"), err);
       }
     }
     hide();
