@@ -5,3 +5,9 @@ description = Provides access to taxonomies through cobalt
 dependencies[] = cobalt
 package = "Cobalt"
 project = cobalt
+; Information added by drupal.org packaging script on 2009-05-15
+version = "6.x-1.3"
+core = "6.x"
+project = "cobalt"
+datestamp = "1242378635"
+
