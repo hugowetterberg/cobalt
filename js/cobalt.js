@@ -692,9 +692,19 @@ $(document).ready(function(){
       bind('keyup', function(){ action_keypress_reaction(); return false; }).
       bind('focus', function(){ cobalt_paging.hide(); cobalt_ac.hide(); cobalt_actions.show(); });
     cobalt_output.bind('click', function(e){ return false; });
-    $(document).bind('click', function(){ toggle('hide'); toggle_output('hide'); })
-      .bind('keydown', 'Alt+space', toggle)
-      .bind('keydown', 'Ctrl+space', toggle);
+    $(document).bind('click', function(){ toggle('hide'); toggle_output('hide'); });
+
+    if (Drupal && Drupal.settings && Drupal.settings.cobalt) {
+      var bindings = Drupal.settings.cobalt.bindings,
+        bind_count = bindings.length, i;
+      for (i=0; i<bind_count; i++) {
+        $(document).bind('keydown', bindings[i], toggle);
+      }
+    }
+    else {
+      $(document).bind('keydown', 'Alt+space', toggle)
+        .bind('keydown', 'Ctrl+space', toggle);
+    }
   };
   
   // Initialize GUI
@@ -741,9 +751,18 @@ $(document).ready(function(){
             '<p>' + Drupal.t('Cobalt must be updated before it can be used') + '</p>' +
             '<p><a class="cobalt-update-link" href="' + update_url + '">' + Drupal.t('Click here to update') + '</a></p>');
           };
-          $(document).bind('click', function(){ toggle_output('hide'); })
-            .bind('keydown', 'Alt+space', update_notice)
-            .bind('keydown', 'Ctrl+space', update_notice);
+          $(document).bind('click', function(){ toggle_output('hide'); });
+          if (Drupal && Drupal.settings && Drupal.settings.cobalt) {
+            var bindings = Drupal.settings.cobalt.bindings,
+              bind_count = bindings.length, i;
+            for (i=0; i<bind_count; i++) {
+              $(document).bind('keydown', bindings[i], update_notice);
+            }
+          }
+          else {
+            $(document).bind('keydown', 'Alt+space', update_notice)
+              .bind('keydown', 'Ctrl+space', update_notice);
+          }
         }
         else {
           init();

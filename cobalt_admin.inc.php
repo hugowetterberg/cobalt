@@ -1,5 +1,5 @@
 <?php
-// $Id: cobalt_admin.inc.php,v 1.7 2009/04/22 07:18:17 hugowetterberg Exp $
+// $Id: cobalt_admin.inc.php,v 1.8 2009/06/15 15:14:26 hugowetterberg Exp $
 
 function cobalt_settings() {
   $form = array();
@@ -15,6 +15,13 @@ function cobalt_settings() {
     '#options' => $theme_options,
     '#default_value' => variable_get('cobalt_theme', ''),
     '#title' => t('Select a theme for cobalt'),
+  );
+
+  $form['cobalt_shortcuts'] = array(
+    '#type' => 'textfield',
+    '#default_value' => variable_get('cobalt_shortcuts', 'Alt+space, Ctrl+space'),
+    '#title' => t('Shortcuts for activating cobalt'),
+    '#description' => t('The shortcuts that can be used to activate Cobalt should be separated by a comma, like this: "Alt+space, Ctrl+space".') . ' ' . l(t('See the live demo for jshotkeys to get some help'), 'http://jshotkeys.googlepages.com/test-static-01.html'),
   );
 
   $form['javascript_includes'] = array(
