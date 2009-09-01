@@ -4,5 +4,5 @@ description = Provides access to users through cobalt
 dependencies[] = cobalt
 package = Cobalt
 core = 7.x
-version = VERSION
+
 files[] = cobaltusers.module
