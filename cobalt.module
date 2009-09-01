@@ -1,5 +1,5 @@
 <?php
-// $Id: cobalt.module,v 1.7 2009/06/15 15:14:26 hugowetterberg Exp $
+// $Id: cobalt.module,v 1.7.2.1 2009/09/01 20:43:14 hugowetterberg Exp $
 
 /**
  * Implementation of hook_init().

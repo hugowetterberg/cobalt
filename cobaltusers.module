@@ -1,5 +1,5 @@
 <?php
-// $Id: cobaltusers.module,v 1.2 2009/02/20 17:30:14 hugowetterberg Exp $
+// $Id: cobaltusers.module,v 1.2.4.1 2009/09/01 20:43:14 hugowetterberg Exp $
 
 function cobaltusers_init() {
   if (user_access('use cobalt')) {
