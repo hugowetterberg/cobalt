@@ -198,4 +198,6 @@ function cobalt_cobalt_menu_alter(&$menuitems) {
   if (module_exists('pathauto') && user_access('administer pathauto')) {
     $menuitems['cobalt-pathauto'] = array('admin/build/path/pathauto', t('Automated alias settings'));
   }
+
+  $menuitems['direct-modules'] = array('admin/config/modules', t('Modules'));
 }

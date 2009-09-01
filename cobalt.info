@@ -1,7 +1,9 @@
 ; $Id: cobalt.info,v 1.5 2009/04/22 07:18:17 hugowetterberg Exp $
 name = Cobalt
-core = "6.x"
-description = "Cobalt is a javascript implementation of Quicksilver for Drupal"
-package = "Cobalt"
-project = "cobalt"
-version = "6.x-1.x-dev"
+description = Cobalt is a javascript implementation of Quicksilver for Drupal
+package = Cobalt
+core = 7.x
+version = VERSION
+files[] = cobalt.module
+files[] = cobalt_admin.inc.php
+files[] = cobalt_update.inc.php
