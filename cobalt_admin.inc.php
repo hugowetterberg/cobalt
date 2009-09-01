@@ -17,6 +17,13 @@ function cobalt_settings() {
     '#title' => t('Select a theme for cobalt'),
   );
 
+  $form['cobalt_shortcuts'] = array(
+    '#type' => 'textfield',
+    '#default_value' => variable_get('cobalt_shortcuts', 'Alt+space, Ctrl+space'),
+    '#title' => t('Shortcuts for activating cobalt'),
+    '#description' => t('The shortcuts that can be used to activate Cobalt should be separated by a comma, like this: "Alt+space, Ctrl+space".') . ' ' . l(t('See the live demo for jshotkeys to get some help'), 'http://jshotkeys.googlepages.com/test-static-01.html'),
+  );
+
   $form['javascript_includes'] = array(
     '#type' => 'fieldset',
     '#title' => t('Javascript includes'),
@@ -46,12 +53,11 @@ function cobalt_settings() {
 
 function _cobalt_clear_cache() {
   drupal_flush_all_caches();
-  drupal_set_message('Cache cleared.');
+  drupal_set_message(t('Cache cleared.'));
   drupal_goto();
 }
 
 function _cobalt_rebuild_permissions() {
   node_access_rebuild();
-  drupal_set_message('Content permissions have been rebuilt.');
   drupal_goto();
 }

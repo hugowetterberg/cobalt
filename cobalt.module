@@ -24,7 +24,13 @@ function cobalt_init() {
 
     drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.js');
     drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.menu.js');
-    drupal_add_js(array('cobalt' => array('state' => $user->uid, 'path' => $_GET['q'])), 'setting');
+
+    $settings = array(
+      'state' => $user->uid,
+      'path' => $_GET['q'],
+      'bindings' => preg_split('/,\s*/', variable_get('cobalt_shortcuts', 'Alt+space, Ctrl+space')),
+    );
+    drupal_add_js(array('cobalt' => $settings), 'setting');
 
     $themes = cobalt_themes();
     $theme_key = variable_get('cobalt_theme', '');
@@ -44,9 +50,6 @@ function cobalt_init() {
   }
 }
 
-/**
- * Implementation of hook_themes().
- */
 function cobalt_themes() {
   static $themes;
 
@@ -125,7 +128,7 @@ function cobalt_menu() {
   );
 
   // Menuitem for rebuilding content permissions.
-  $items['cobalt/clear-cache'] = array(
+  $items['cobalt/rebuild-permissions'] = array(
     'title' => t('Rebuild permissions'),
     'page callback' => '_cobalt_rebuild_permissions',
     'file' => 'cobalt_admin.inc.php',
@@ -186,6 +189,10 @@ function _cobalt_menu_data_recursive($tree, &$data) {
 function cobalt_cobalt_menu_alter(&$menuitems) {
   if (!module_exists('devel') && user_access('administer site configuration')) {
     $menuitems['cobalt-clear-cache'] = array('cobalt/clear-cache', t('Clear cache'));
+  }
+
+  if (user_access('administer site configuration')) {
+    $menuitems['cobalt-rebuild-permissions'] = array('cobalt/rebuild-permissions', t('Rebuild permissions'));
   }
 
   if (module_exists('pathauto') && user_access('administer pathauto')) {

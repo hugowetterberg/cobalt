@@ -46,7 +46,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   
   plugin['handlers'].push({
     'id': 'node_view',
-    'name': 'View',
+    'name': Drupal.t('View'),
     'data_class': 'node',
     'applicable': function(text, item) {
       return item.information.perm.indexOf('r') >= 0;
@@ -58,7 +58,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   
   plugin['handlers'].push({
     'id': 'node_edit',
-    'name': 'Edit',
+    'name': Drupal.t('Edit'),
     'data_class': 'node',
     'applicable': function(text, item) {
       return item.information.perm.indexOf('w') >= 0;
@@ -70,7 +70,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
   
   plugin['handlers'].push({
     'id': 'node_delete',
-    'name': 'Delete',
+    'name': Drupal.t('Delete'),
     'data_class': 'node',
     'applicable': function(text, item) {
       return item.information.perm.indexOf('d') >= 0;
@@ -88,13 +88,13 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
     var dp = 'node/' + nid + '/delete';
     
     if (perm.indexOf('r') >= 0 && Drupal.settings.cobalt.path != rp) {
-      cobalt.addTemporaryEntry('node_context_view', 'View current node', rp, 'url_data');
+      cobalt.addTemporaryEntry('node_context_view', Drupal.t('View current node'), rp, 'url_data');
     }
     if (perm.indexOf('w') >= 0 && Drupal.settings.cobalt.path != ep) {
-      cobalt.addTemporaryEntry('node_context_edit', 'Edit current node', ep, 'url_data');
+      cobalt.addTemporaryEntry('node_context_edit', Drupal.t('Edit current node'), ep, 'url_data');
     }
     if (perm.indexOf('d') >= 0 && Drupal.settings.cobalt.path != dp) {
-      cobalt.addTemporaryEntry('node_context_delete', 'Delete current node', dp, 'url_data');
+      cobalt.addTemporaryEntry('node_context_delete', Drupal.t('Delete current node'), {'path': dp, 'destination': false}, 'url_data');
     }
   };
   

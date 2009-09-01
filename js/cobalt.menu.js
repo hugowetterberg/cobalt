@@ -25,33 +25,52 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
     'update_rate': 60000
   };
   
+  var uri_from_item = function(item, omitDestination) {
+    var path = item.information;
+    var destination = Drupal.settings.cobalt.path;
+    if (typeof(path) == 'object') {
+      destination = path.destination;
+      path = path.path;
+    }
+
+    if (path=='<front>') {
+      path = '';
+    }
+
+    if (destination && !omitDestination) {
+      path = path + '?destination=' + destination;
+    }
+
+    return Drupal.settings.basePath + path;
+  };
+
   plugin['handlers'].push({
     'id': 'menu_goto',
-    'name': 'Go to',
+    'name': Drupal.t('Go to and return'),
     'data_class': 'url_data',
     'handler': function(text, item) {
-      var path = item.information;
-      if (path=='<front>') {
-        path = '';
-      }
-      window.location.href = Drupal.settings.basePath + path + '?destination=' + Drupal.settings.cobalt.path;
+      window.location.href = uri_from_item(item);
     }
   });
-  
+
   plugin['handlers'].push({
-    'id': 'menu_open_in_new_window',
-    'name': 'Open in new window',
+    'id': 'menu_goto_stay',
+    'name': Drupal.t('Go to'),
     'data_class': 'url_data',
     'handler': function(text, item) {
-      var path = item.information;
-      if (path=='<front>') {
-        path = '';
-      }
-      
+      window.location.href = uri_from_item(item, true);
+    }
+  });
+
+  plugin['handlers'].push({
+    'id': 'menu_open_in_new_window',
+    'name': Drupal.t('Open in new window'),
+    'data_class': 'url_data',
+    'handler': function(text, item) {
       var form = document.createElement("form");
       $(form).attr({
         'method': 'GET',
-        'action': Drupal.settings.basePath + path,
+        'action': uri_from_item(item),
         'target': '_blank'
       }).appendTo('body');
       
@@ -60,8 +79,8 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
       }
       catch(e) {
         var message = $('<div></div>');
-        message.append('<h1>Could not open window</h1>');
-        message.append('<p>You might be using a popup blocker, which stopped Cobalt from opening a new window.</p>');
+        message.append('<h1>' + Drupal.t('Could not open window') + '</h1>');
+        message.append('<p>' + Drupal.t('You might be using a popup blocker, which stopped Cobalt from opening a new window.') + '</p>');
         cobalt.showHtml(message);
       }
       
