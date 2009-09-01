@@ -5,6 +5,5 @@ dependencies[] = cobalt
 dependencies[] = taxonomy
 package = "Cobalt"
 core = "7.x"
-version = VERSION
 
 files[] = cobalttaxonomy.module
