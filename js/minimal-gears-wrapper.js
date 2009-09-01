@@ -11,7 +11,7 @@ function gears_db_html5_wrapper(gears_db) {
       res.next();
     }
     res.close();
-    
+
     return {
       'rows': {
         'length': items.length,
@@ -21,7 +21,7 @@ function gears_db_html5_wrapper(gears_db) {
       }
     };
   };
-  
+
   return {
     'transaction': function(action_callback) {
       action_callback({

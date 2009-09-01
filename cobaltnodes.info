@@ -1,6 +1,10 @@
 ; $Id$
 name = Cobalt Nodes
-core = "6.x"
 description = Provides access to nodes through cobalt
 dependencies[] = cobalt
 package = "Cobalt"
+core = "7.x"
+version = VERSION
+files[] = cobaltnodes.install
+files[] = cobaltnodes.module
+files[] = cobaltnodes_update.inc.php

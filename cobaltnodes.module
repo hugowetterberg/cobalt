@@ -4,6 +4,11 @@
 function cobaltnodes_init() {
   if (user_access('use cobalt')) {
     drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.nodes.js');
+
+    // Add the current node nid as a javascript setting
+    if (arg(0)=='node' && is_numeric(arg(1))) {
+      drupal_add_js(array('cobalt' => array('nodes_current' => arg(1))), 'setting');
+    }
   }
 }
 
@@ -28,43 +33,37 @@ function cobaltnodes_menu() {
 
 function cobaltnodes_cron() {
   // Delete logged deletions older than two weeks
-  db_query("DELETE FROM {cobalt_nodes_deletions} WHERE deleted<%d", time() - 86400*14);
+  db_query("DELETE FROM {cobalt_node_deletion} WHERE deleted<%d", time() - 86400*14);
 }
 
-function cobaltnodes_nodeapi(&$node, $op, $teaser, $page) {
-  if (($page && $op!='alter') || $op == 'prepare') {
-    drupal_add_js(array('cobalt' => array('nodes_current' => $node->nid)), 'setting');
-  }
-  if ($op=='delete') {
-    db_query("INSERT INTO {cobalt_nodes_deletions}(nid, deleted) VALUES(%d, %d)", $node->nid, time()-60*60*24*60*60);
-  }
+function cobaltnodes_node_delete($node) {
+  db_query("INSERT INTO {cobalt_node_deletion}(nid, deleted) VALUES(%d, %d)", $node->nid, time()-60*60*24*60*60);
 }
 
 function cobaltnodes_json($op, $value) {
   $result = array();
-  
+
   // We're skipping the status check on purpose. As we check with the node_access
   // function later this allows administrators to access unpublished nodes.
   if ($op=='update') {
-    $res = db_query("SELECT n.nid, n.title, n.type, n.uid, n.status, n.moderate, r.vid, r.format
-      FROM {node} n INNER JOIN {node_revisions} r
-      ON n.vid = r.vid
+    $res = db_query("SELECT n.nid, n.title, n.type, n.uid, n.status
+      FROM {node} n
       WHERE created > %d OR changed > %d
       ORDER BY created DESC
       LIMIT 100", $value, $value);
   }
   else if ($op=='single') {
-    $res = db_query("SELECT nid, title, type, uid, status, moderate FROM {node}
+    $res = db_query("SELECT nid, title, type, uid, status FROM {node}
       WHERE nid = %d", $value);
   }
-  
+
   $nodes = array();
   $access_types = array(
     'r' => 'view',
     'w' => 'update',
     'd' => 'delete',
   );
-  
+
   while ($node = db_fetch_object($res)) {
     $access = '';
     foreach ($access_types as $key => $permission) {
@@ -76,19 +75,19 @@ function cobaltnodes_json($op, $value) {
       $nodes[] = array($node->nid, $node->title, $access);
     }
   }
-  
+
   $result['nodes'] = $nodes;
-  
+
   if ($op=='update') {
     $deleted = array();
     // Get deletions
-    $res = db_query("SELECT nid FROM {cobalt_nodes_deletions} WHERE deleted>%d", $value);
+    $res = db_query("SELECT nid FROM {cobalt_node_deletion} WHERE deleted>%d", $value);
     while ($node = db_fetch_object($res)) {
       $deleted[] = $node->nid;
     }
     $result['deleted'] = $deleted;
   }
-  
+
   print drupal_to_js($result);
   exit;
 }

@@ -12,7 +12,7 @@ function cobaltnodes_uninstall() {
 function cobaltnodes_schema() {
   $schema = array();
 
-  $schema['cobalt_nodes_deletions'] = array(
+  $schema['cobalt_node_deletion'] = array(
     'description' => t('Registers node deletions so that deleted nodes can be removed from the index.'),
     'fields' => array(
       'nid' => array(
@@ -31,4 +31,12 @@ function cobaltnodes_schema() {
   );
 
   return $schema;
+}
+
+function cobaltnodes_update_7000() {
+  $ret = array();
+
+  db_rename_table($ret, 'cobalt_nodes_deletions', 'cobalt_node_deletion');
+
+  return $ret;
 }
