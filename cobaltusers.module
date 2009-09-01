@@ -26,7 +26,7 @@ function cobaltusers_json($last_update) {
     WHERE created > %d
     ORDER BY uid DESC
     LIMIT 100", $last_update);
-  
+
   $users = array();
   while ($account = db_fetch_object($res)) {
     if (user_access('administer users')) {
@@ -35,12 +35,12 @@ function cobaltusers_json($last_update) {
     else {
       $access = (user_view_access($account)?'r':'') . (user_edit_access($account)?'w':'');
     }
-    
+
     if (!empty($access)) {
       $users[] = array($account->uid, $account->name, $access);
     }
   }
-  
+
   print drupal_to_js($users);
   exit;
 }

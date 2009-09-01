@@ -32,7 +32,7 @@
 // issues. Applications that use the code below will continue to work seamlessly
 // when that happens.
 
-(function() {
+(function($) {
   // We are already defined. Hooray!
   if (window.google && google.gears) {
     return;
@@ -83,4 +83,4 @@
   if (!google.gears) {
     google.gears = {factory: factory};
   }
-})();
+})(jQuery);
