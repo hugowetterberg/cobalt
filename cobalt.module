@@ -151,7 +151,7 @@ function cobalt_forward_to_alias() {
 }
 
 function cobalt_menu_json() {
-  $menu_names = menu_get_names();
+  $menu_names = array_keys(menu_get_menus());
 
   $tree = array();
   foreach ($menu_names as $name) {
