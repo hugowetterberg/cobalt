@@ -33,11 +33,16 @@ function cobaltnodes_menu() {
 
 function cobaltnodes_cron() {
   // Delete logged deletions older than two weeks
-  db_query("DELETE FROM {cobalt_node_deletion} WHERE deleted<%d", time() - 86400*14);
+  db_query("DELETE FROM {cobalt_node_deletion} WHERE deleted<:time_ago", array(
+    ':time_ago' => time() - 86400*14,
+  ));
 }
 
 function cobaltnodes_node_delete($node) {
-  db_query("INSERT INTO {cobalt_node_deletion}(nid, deleted) VALUES(%d, %d)", $node->nid, time()-60*60*24*60*60);
+  db_query("INSERT INTO {cobalt_node_deletion}(nid, deleted) VALUES(:nid, :deleted)", array(
+    ':nid' => $node->nid, 
+    ':deleted' => time()-60*60*24*60*60,
+  ));
 }
 
 function cobaltnodes_json($op, $value) {
@@ -48,13 +53,17 @@ function cobaltnodes_json($op, $value) {
   if ($op=='update') {
     $res = db_query("SELECT n.nid, n.title, n.type, n.uid, n.status
       FROM {node} n
-      WHERE created > %d OR changed > %d
+      WHERE created > :since OR changed > :since
       ORDER BY created DESC
-      LIMIT 100", $value, $value);
+      LIMIT 100", array(
+        ':since' => $value,
+      ));
   }
   else if ($op=='single') {
     $res = db_query("SELECT nid, title, type, uid, status FROM {node}
-      WHERE nid = %d", $value);
+      WHERE nid = :nid", array(
+        ':nid' => $value,
+      ));
   }
 
   $nodes = array();
@@ -64,7 +73,7 @@ function cobaltnodes_json($op, $value) {
     'd' => 'delete',
   );
 
-  while ($node = db_fetch_object($res)) {
+  foreach ($res as $node) {
     $access = '';
     foreach ($access_types as $key => $permission) {
       if (node_access($permission, $node)) {
@@ -81,8 +90,10 @@ function cobaltnodes_json($op, $value) {
   if ($op=='update') {
     $deleted = array();
     // Get deletions
-    $res = db_query("SELECT nid FROM {cobalt_node_deletion} WHERE deleted>%d", $value);
-    while ($node = db_fetch_object($res)) {
+    $res = db_query("SELECT nid FROM {cobalt_node_deletion} WHERE deleted>:since", array(
+      ':since' => $value,
+    ));
+    foreach ($res as $node) {
       $deleted[] = $node->nid;
     }
     $result['deleted'] = $deleted;

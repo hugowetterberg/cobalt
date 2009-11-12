@@ -23,12 +23,14 @@ function cobaltusers_json($last_update) {
   // We're just fetching the bare minimum of what we need for the
   // user_*_access methods and display.
   $res = db_query("SELECT uid, name, access, status FROM {users}
-    WHERE created > %d
+    WHERE created > :last_update
     ORDER BY uid DESC
-    LIMIT 100", $last_update);
+    LIMIT 100", array(
+      ':last_update' => $last_update,
+    ));
 
   $users = array();
-  while ($account = db_fetch_object($res)) {
+  foreach ($res as $account) {
     if (user_access('administer users')) {
       $access = 'rwd';
     }
