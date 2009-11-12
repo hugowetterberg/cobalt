@@ -1,4 +1,4 @@
-; $Id$
+; $Id: cobalt.info,v 1.5.2.3 2009/11/12 18:08:43 hugowetterberg Exp $
 name = Cobalt
 description = Cobalt is a javascript implementation of Quicksilver for Drupal
 package = Cobalt

@@ -1,4 +1,4 @@
-; $Id$
+; $Id: cobaltusers.info,v 1.2.4.3 2009/11/12 18:08:43 hugowetterberg Exp $
 name = Cobalt Users
 description = Provides access to users through cobalt
 dependencies[] = cobalt

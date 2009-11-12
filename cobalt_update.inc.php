@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: cobalt_update.inc.php,v 1.3.4.1 2009/11/12 18:08:43 hugowetterberg Exp $
 
 function cobalt_js_update() {
   $settings = array();

@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: cobaltnodes.install,v 1.2.4.2 2009/11/12 18:08:43 hugowetterberg Exp $
 
 function cobaltnodes_install() {
   drupal_install_schema('cobaltnodes');
