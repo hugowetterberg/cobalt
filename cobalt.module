@@ -151,7 +151,7 @@ function cobalt_forward_to_alias() {
 }
 
 function cobalt_menu_json() {
-  $menu_names = menu_get_names();
+  $menu_names = array_keys(menu_get_menus());
 
   $tree = array();
   foreach ($menu_names as $name) {
@@ -167,7 +167,7 @@ function cobalt_menu_json() {
 
   drupal_alter('cobalt_menu', $data);
 
-  print drupal_to_js($data);
+  print drupal_json_encode($data);
   exit;
 }
 

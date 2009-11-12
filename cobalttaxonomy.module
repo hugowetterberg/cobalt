@@ -43,7 +43,7 @@ function cobalttaxonomy_json($op, $value) {
 
   $data = array('vocabularies' => $voc_data, 'terms' => $term_data, 'access' => user_access('administer taxonomy'));
 
-  print drupal_to_js($data);
+  print drupal_json_encode($data);
   exit;
 }
 

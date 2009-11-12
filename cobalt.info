@@ -4,6 +4,8 @@ description = Cobalt is a javascript implementation of Quicksilver for Drupal
 package = Cobalt
 core = 7.x
 
+dependencies[] = menu
+
 files[] = cobalt.module
 files[] = cobalt_admin.inc.php
 files[] = cobalt_update.inc.php
