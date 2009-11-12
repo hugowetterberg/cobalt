@@ -41,7 +41,7 @@ function cobaltnodes_cron() {
 function cobaltnodes_node_delete($node) {
   db_query("INSERT INTO {cobalt_node_deletion}(nid, deleted) VALUES(:nid, :deleted)", array(
     ':nid' => $node->nid, 
-    ':deleted' => time()-60*60*24*60*60,
+    ':deleted' => time()+60*1, // Add a minute for margin
   ));
 }
 
