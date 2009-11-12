@@ -41,6 +41,6 @@ function cobaltusers_json($last_update) {
     }
   }
 
-  print drupal_to_js($users);
+  print drupal_json_encode($users);
   exit;
 }

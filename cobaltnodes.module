@@ -88,6 +88,6 @@ function cobaltnodes_json($op, $value) {
     $result['deleted'] = $deleted;
   }
 
-  print drupal_to_js($result);
+  print drupal_json_encode($result);
   exit;
 }

@@ -167,7 +167,7 @@ function cobalt_menu_json() {
 
   drupal_alter('cobalt_menu', $data);
 
-  print drupal_to_js($data);
+  print drupal_json_encode($data);
   exit;
 }
 
