@@ -76,8 +76,12 @@ function cobalt_cobalt_themes_alter(&$themes) {
 /**
  * Implementation of hook_perm().
  */
-function cobalt_perm() {
-  return array('use cobalt');
+function cobalt_permissions() {
+  return array(
+    'use cobalt' => array(
+      'title' => t('Enables Cobalt for the user'),
+    ),
+  );
 }
 
 /**
