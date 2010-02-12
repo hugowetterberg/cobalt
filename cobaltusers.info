@@ -2,5 +2,5 @@
 name = Cobalt Users
 core = "6.x"
 description = Provides access to users through cobalt
-dependencies[] = cobalt
 package = "Cobalt"
+dependencies[] = cobalt

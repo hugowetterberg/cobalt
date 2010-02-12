@@ -2,5 +2,5 @@
 name = Cobalt Nodes
 core = "6.x"
 description = Provides access to nodes through cobalt
-dependencies[] = cobalt
 package = "Cobalt"
+dependencies[] = cobalt

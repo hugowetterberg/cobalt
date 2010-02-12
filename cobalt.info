@@ -3,5 +3,4 @@ name = Cobalt
 core = "6.x"
 description = "Cobalt is a javascript implementation of Quicksilver for Drupal"
 package = "Cobalt"
-project = "cobalt"
 version = "6.x-1.x-dev"
