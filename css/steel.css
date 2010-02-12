@@ -1,0 +1,170 @@
+#cobalt * { margin: 0; padding: 0; }
+
+#cobalt, #cobalt-out {
+  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.9);
+  background-image: -webkit-gradient(linear, 0% 100%, 0% 0%, color-stop(0.06, rgb(207, 207, 207)), color-stop(0.83, rgb(255, 255, 255))); background-repeat: initial; background-attachment: initial; -webkit-background-clip: initial; -webkit-background-origin: initial; background-color: initial; background-position: initial initial;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  box-shadow: rgba(255, 255, 255, 0.5) 1px 1px 5px;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0 0 15px;
+  border: 1px solid #999;
+
+  position: fixed;
+  top: 38%;
+  left: 50%;
+  margin: -85px 0 0 -165px;
+  width: 400px;
+  padding: 16px 5px 5px 5px;
+
+  font-size: 12px;
+  font-family: Helvetica, Arial, 'Lucida Grande', sans-serif;
+  line-height: 16px;
+
+  z-index: 1000;
+  }
+
+#cobalt-out { padding: 10px 0 15px 20px; }
+#cobalt-out select, #cobalt-out p { float: left; margin-right: 10px; }
+#cobalt-out select { margin-top: 9px; }
+#cobalt-out .ok { color: #000; }
+
+#cobalt-out input[type='text'] {
+  border: 1px solid #999;
+  outline: none;
+}
+
+#cobalt .cell {
+  position: relative;
+  background-color: #FFF;
+  background-color: rgba(255,255,255,0.5);
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  margin: 5px 5px 30px 5px;
+  width: 388px;
+  height: 58px;
+  font-family: Helvetica, Arial, 'Lucida Grande', sans-serif;
+  border: 1px solid #999;
+}
+
+#cobalt .cell input {
+  position: absolute;
+  top: -19px;
+  left: -1px;
+  font-size: 12px;
+  background-color: transparent;
+  border: 0;
+  outline: none;
+  font-weight: bold;
+  color: #000;
+  text-shadow: 1px 1px 1px #fff;
+  }
+
+#cobalt .inner {
+  overflow: hidden;
+  width: 383px;
+  height: 54px;
+}
+
+#cobalt .cell label {
+  display: none;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 377px;
+  height: 31px;
+  padding: 20px 3px 3px 3px;
+  text-align: center;
+  color: #efefef;
+  background-color: #000;
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1.0);
+  font-weight: bold;
+}
+
+#cobalt .cell .cobalt-item-url_data { background: url(bookmark.png) left center no-repeat; }
+#cobalt .cell .cobalt-item-node { background: url(node.png) left center no-repeat; }
+#cobalt .cell .cobalt-item-user { background: url(user.png) left center no-repeat; }
+#cobalt .cell .cobalt-item-vocabulary, #cobalt .cell .cobalt-item-term { background: url(voc.png) left center no-repeat; }
+
+#cobalt .cobalt-paging {
+  display: none;
+  margin: -15px auto auto auto;
+  padding: 2px 0;
+  clear: both;
+  text-align: center;
+  line-height: 16px;
+  background: #000;
+  background: rgba(0, 0, 0, 0.6);
+  width: 390px;
+
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+}
+
+#cobalt .cobalt-paging li {
+  display: inline-block;
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  opacity: .5;
+  background: url(whitedot.png) top left no-repeat;
+  width: 10px;
+  height: 10px;
+}
+
+#cobalt .cobalt-autocomplete, #cobalt .cobalt-actions {
+  display: none;
+  clear: both;
+  padding: 10px 5px;
+  color: #666;
+}
+
+#cobalt .cobalt-autocomplete li, #cobalt .cobalt-actions li {
+  display: block;
+  list-style: none;
+  padding: 5px 10px;
+  background-image: none;
+}
+
+#cobalt .cobalt-autocomplete li.active small {
+  color: #333;
+  color: rgba(256,256,256,0.8);
+  float: right;
+}
+
+#cobalt .cobalt-autocomplete li small {
+  color: #333;
+  color: rgba(45,45,45,0.8);
+  float: right;
+}
+
+#cobalt .right .cobalt-action-default { background: url(default_action.png) left center no-repeat; }
+
+#cobalt .cobalt-autocomplete li.active, #cobalt .cobalt-actions li.active {
+  background-color: #FFF;
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  color: #efefef;
+}
+
+#cobalt-out .cobalt-update-link {
+  text-transform: uppercase;
+  color: #FFF;
+}
+
+
+#cobalt-out h2 {
+  font: bold 16px Helvetica, Arial, sans-serif;
+  color: #000;
+  margin-bottom: 10px;
+  text-indent: -10px;
+}
