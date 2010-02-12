@@ -71,6 +71,11 @@ function cobalt_cobalt_themes_alter(&$themes) {
     'css' => drupal_get_path('module', 'cobalt') . '/css/cobalt_blue.css',
     'replace' => FALSE,
   );
+  $themes['steel'] = array(
+    'name' => t('Steel'),
+    'css' => drupal_get_path('module', 'cobalt') . '/css/steel.css',
+    'replace' => TRUE,
+  );
 }
 
 /**
