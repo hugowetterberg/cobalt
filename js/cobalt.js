@@ -575,7 +575,6 @@ $(document).ready(function(){
 
   var toggle = function(arg) {
     if (cobalt_visible) {
-      cobalt_h_input.focus();
       cb.hide();
       cobalt_visible = false;
     }
