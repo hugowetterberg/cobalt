@@ -6,6 +6,7 @@ $(document).bind('cobalt-update', function(evt, cobalt, db, updates) {
         // Update to version 1.
         db.transaction(function (transaction) {
           transaction.executeSql('ALTER TABLE entries ADD COLUMN extra TEXT DEFAULT ""', [], function(){}, cobalt.dbErrorHandler);
+          transaction.executeSql('ALTER TABLE usage_data ADD COLUMN last INTEGER', [], function(){}, cobalt.dbErrorHandler);
           cobalt.updateVersion(transaction, 'cobalt', 1);
         });
     }

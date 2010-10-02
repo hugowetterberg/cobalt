@@ -186,17 +186,18 @@ $(document).ready(function(){
   var register_use = function(text, item, handler) {
     db.transaction(function (transaction) {
       register_handler_use(handler, item, transaction);
+      transaction.executeSql("UPDATE usage_data SET last=null WHERE last = 1", [], nullDataHandler, cobalt.dbErrorHandler);
       if (item.weight == null) {
-        transaction.executeSql("INSERT INTO usage_data(catalog, id, weight, abbreviation) VALUES(?,?,?,?)", 
-          [item.catalog, item.id, 1, text], nullDataHandler,cobalt.dbErrorHandler);
+        transaction.executeSql("INSERT INTO usage_data(catalog, id, weight, abbreviation, last) VALUES(?,?,?,?,?)",
+          [item.catalog, item.id, 1, text, 1], nullDataHandler,cobalt.dbErrorHandler);
       }
       else {
-        transaction.executeSql("UPDATE usage_data SET weight=weight+1, abbreviation=? WHERE catalog=? AND id=?", 
+        transaction.executeSql("UPDATE usage_data SET weight=weight+1, abbreviation=?, last=1 WHERE catalog=? AND id=?",
           [text, item.catalog, item.id], nullDataHandler,cobalt.dbErrorHandler);
       }
     });
   };
-  
+
   var register_handler = function(handler) {
     if (typeof(handler['data_class'])=='undefined') {
       handler['data_class'] = null;
@@ -287,7 +288,7 @@ $(document).ready(function(){
       'state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, ' + 
       'CONSTRAINT pk_bindings PRIMARY KEY(binding, state));', [], nullDataHandler,cobalt.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS usage_data(catalog TEXT NOT NULL, id TEXT NOT NULL, ' + 
-      'weight INTEGER NOT NULL DEFAULT 0, abbreviation TEXT NOT NULL DEFAULT "",' +
+      'weight INTEGER NOT NULL DEFAULT 0, abbreviation TEXT NOT NULL DEFAULT "", last INTEGER, ' +
       'CONSTRAINT pk_usage_data PRIMARY KEY(catalog, id));', [], nullDataHandler,cobalt.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS handler_usage_data(catalog TEXT NOT NULL, id TEXT NOT NULL, ' + 
       'handler TEXT NOT NULL, weight INTEGER NOT NULL DEFAULT 0,' +
@@ -567,6 +568,14 @@ $(document).ready(function(){
     hide();
   };
 
+  var get_last_entry = function() {
+    db.transaction(function (transaction) {
+      transaction.executeSql("SELECT e.*, u.weight FROM entries AS e INNER JOIN usage_data AS u ON u.catalog = e.catalog AND u.id = e.id WHERE last = 1;", [], function(transaction, results) {
+        lookup_finished(transaction, results);
+      }, cobalt.dbErrorHandler);
+    });
+  };
+
   var toggle = function(arg) {
     if (cobalt_visible) {
       cb.hide();
@@ -597,6 +606,8 @@ $(document).ready(function(){
         }
       },cobalt.dbErrorHandler);
     });
+
+    get_last_entry(); 
 
     db.transaction(function (transaction) {
       transaction.executeSql("SELECT * FROM catalogs ORDER BY updated;", [ ], function(transaction, results) {
