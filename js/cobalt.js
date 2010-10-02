@@ -336,10 +336,6 @@ $(document).ready(function(){
     if($.trim(current_text)!='') {
       lookup();
     }
-    else {
-      cobalt_paging.empty();
-      clear_ac();
-    }
   };
   
   var action_keypress_reaction = function() {
@@ -379,11 +375,10 @@ $(document).ready(function(){
   };
 
   var lookup_finished = function(transaction, results) {
-    match_idx = 0;
-    $('#cobalt .left label').hide();
-    cobalt_ac.empty().hide();
-
     if (results.rows.length) {
+      match_idx = 0;
+      $('#cobalt .left label').hide();
+      cobalt_ac.empty().hide();
       for (var i=0; i<results.rows.length; i++) {
         var item = results.rows.item(i);
         item.information = $.evalJSON(item.data);
@@ -420,10 +415,6 @@ $(document).ready(function(){
         update_pager(matches.length);
       }
       cobalt_ac.show();
-    }
-    else {
-      clear_ac();
-      matches = [];
     }
 
     ac_select(0);
