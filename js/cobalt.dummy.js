@@ -17,7 +17,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
     'install': function() {
       console.log('Installing dummy entries');
       for (var i=0; i<sample_ac.length; i++) {
-       cobalt.addEntry(i, sample_ac[i], '', 'dummy', 'dummy');
+       cobalt.addEntry({id:i, name:sample_ac[i], information:'', catalog:'dummy', classname:'dummy'});
       }
     },
     'uninstall': function() {

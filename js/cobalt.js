@@ -131,17 +131,17 @@ $(document).ready(function(){
       });
     },
     'addTemporaryEntry': function(id, name, information, classname) {
-      cobalt.addEntry(id, name, information, '*temporary*', classname, 1, current_state());
+      cobalt.addEntry({id:id, name:name, information:information, catalog:'*temporary*', classname:classname, active:1, state:current_state()});
     },
-    'addEntry': function(id, name, information, catalog, classname, active, state) {
-      if (typeof(state)=='undefined') {
-        state = current_state();
+    'addEntry': function(data) {
+      if (typeof(data.state)=='undefined') {
+        data.state = current_state();
       }
-      if (typeof(active)=='undefined') {
-        active = 1;
+      if (typeof(data.active)=='undefined') {
+        data.active = 1;
       }
       db.transaction(function (transaction) {
-        transaction.executeSql("INSERT OR REPLACE INTO entries(id, name, data, catalog, data_class, state, active) VALUES(?,?,?,?,?,?,?);", [ id, name, $.toJSON(information), catalog, classname, state, active], nullDataHandler,cobalt.dbErrorHandler);
+        transaction.executeSql("INSERT OR REPLACE INTO entries(id, name, data, catalog, data_class, state, active) VALUES(?,?,?,?,?,?,?);", [data['id'], data['name'], $.toJSON(data.information), data.catalog, data.classname, data.state, data.active], nullDataHandler,cobalt.dbErrorHandler);
       });
     },
     'actionCandidates': function(item, callback) {
