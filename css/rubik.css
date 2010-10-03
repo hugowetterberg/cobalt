@@ -1,0 +1,148 @@
+#cobalt * {
+  margin: 0;
+  padding: 0;
+}
+
+#cobalt, #cobalt-out {
+  box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px;
+  -moz-box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px;
+  background: transparent;
+  border: none;
+  position: fixed;
+  top: 25%;
+  left: 50%;
+  margin-left: -195px;
+  width: 412px;
+  font-size: 12px;
+  font-family: 'Helvetica neue', Helvetica, sans-serif;
+  line-height: 1.2;
+  z-index: 1000;
+}
+
+#cobalt-out {
+  background-color: rgba(0,0,0,0.8);
+  padding: 10px;
+  color: #FFF;
+}
+#cobalt .cells {
+  overflow: hidden;
+  background-color: #e7e7e7;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ffffff), color-stop(0.9, #d9d9d9));
+  background-image: -moz-linear-gradient(top, #ffffff 0, #d9d9d9 90%);
+  padding: 0 10px;
+  border: 1px solid #ddd;
+}
+#cobalt .cell {
+  float: left;
+  height: 33px;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  padding-top: 7px;
+}
+
+#cobalt .left {
+  width: 249px;
+  border-right: 1px solid #d9d9d9;
+}
+#cobalt .right {
+  width: 139px;
+  border-left: 1px solid #fff;
+}
+#cobalt .icon {
+  float: left;
+  margin-top: -7px;
+}
+
+#cobalt .cell input {
+  position: absolute;
+  text-transform: uppercase;
+  font-size: 10px;
+  text-align: right;
+  top: 2px;
+  display: block;
+  line-height: 0;
+}
+#cobalt .left input {
+  right: 155px;
+  width: 245px;
+}
+#cobalt .right input {
+  right: 10px;
+  width: 140px;
+}
+
+#cobalt .inner {
+}
+
+#cobalt .cell label {
+  display: block;
+  font-weight: normal;
+  color: #333;
+  text-shadow: rgba(255, 255, 255, 1) 1px 1px 0px;;
+}
+#cobalt .left label {
+  margin-left: 35px;
+  margin-top: 6px;
+}
+#cobalt .right label {
+  margin-left: 10px;
+  margin-top: 6px;
+}
+
+#cobalt .cobalt-paging {
+  display: none;
+  clear: both;
+  text-align: center;
+  line-height: 0;
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+}
+
+#cobalt .cobalt-paging li {
+  display: inline-block;
+  list-style: none;
+  margin: 0 2px;
+  padding: 0;
+  opacity: .5;
+  background: url(greydot.png) top left no-repeat;
+  width: 5px;
+  height: 5px;
+}
+
+#cobalt .cobalt-paging li.current {
+  opacity: 1.0;
+}
+
+#cobalt .cobalt-autocomplete, #cobalt .cobalt-actions {
+  display: none;
+  clear: both;
+  color: #000;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+
+  padding-bottom: 10px;
+}
+
+#cobalt .cobalt-autocomplete li, #cobalt .cobalt-actions li {
+  display: block;
+  list-style: none;
+  padding: 5px 10px;
+  background-image: none;
+  font-size: 12px;
+}
+
+#cobalt .cobalt-autocomplete li small {
+  color: #444;
+  font-size: 11px;
+}
+
+#cobalt .cobalt-autocomplete li.active, #cobalt .cobalt-actions li.active {
+  background-color: #AFCDF9;
+}
+
+#cobalt-out .cobalt-update-link {
+  color: #FFF;
+  text-decoration: underline;
+}

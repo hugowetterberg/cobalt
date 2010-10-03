@@ -1,0 +1,115 @@
+/* Icon styling adoptet from the Rubik theme: http://drupal.org/project/rubik */
+
+/**
+ * Icons
+ */
+#cobalt span.icon {
+  width:30px;
+  height:30px;
+  display:block;
+
+  background-color:transparent;
+  background-image:url(icons.png);
+  background-repeat:no-repeat;
+  }
+
+/**
+ * Create content
+ */
+#cobalt .path-node-add span.icon                        { background-position:0px -240px; }
+#cobalt .path-node-add-page span.icon                   { background-position:-30px -240px; }
+#cobalt .path-node-add-forum span.icon                  { background-position:-60px -240px; }
+#cobalt .path-node-add-blog span.icon                   { background-position:-90px -240px; }
+#cobalt .path-node-add-story span.icon                  { background-position:-120px -240px; }
+#cobalt .path-node-add-poll span.icon                   { background-position:-150px -240px; }
+
+/**
+ * Sections
+ */
+#cobalt .path-admin span.icon                           { background-position:0px 0px; }
+#cobalt .path-admin-content span.icon                   { background-position:-30px 0px; }
+#cobalt .path-admin-build span.icon                     { background-position:-60px 0px; }
+#cobalt .path-admin-user span.icon                      { background-position:-90px 0px; }
+#cobalt .path-admin-reports span.icon                   { background-position:-120px 0px; }
+#cobalt .path-admin-settings span.icon                  { background-position:-150px 0px; }
+
+/**
+ * Help
+ */
+#cobalt .path-admin-help span.icon                      { background-position:-150px -120px; }
+
+/**
+ * Content
+ */
+#cobalt .path-admin-content-forum span.icon             { background-position:-90px -120px; }
+#cobalt .path-admin-content-aggregator span.icon        { background-position:-120px -120px; }
+#cobalt .path-admin-content-book span.icon              { background-position:-90px -60px; }
+#cobalt .path-admin-content-comment span.icon           { background-position:-90px -30px; }
+#cobalt .path-admin-content-node span.icon              { background-position:0px -30px; }
+#cobalt .path-admin-content-types span.icon,
+#cobalt .path-admin-content-node-type span.icon         { background-position:-30px -30px; }
+#cobalt .path-admin-content-taxonomy span.icon          { background-position:-60px -30px; }
+#cobalt .path-admin-content-node-settings span.icon     { background-position:0px -360px; }
+#cobalt .path-admin-content-rss-publishing span.icon    { background-position:-180px -330px; }
+
+/**
+ * Building
+ */
+#cobalt .path-admin-settings-filters span.icon          { background-position:-210px -60px; }
+#cobalt .path-admin-build-translate span.icon           { background-position:0px -90px; }
+#cobalt .path-admin-build-menu span.icon,
+#cobalt .path-admin-build-menu-customize span.icon      { background-position:-150px -30px; }
+#cobalt .path-admin-build-modules span.icon             { background-position:-210px -30px; }
+#cobalt .path-admin-build-themes span.icon              { background-position:-120px -30px; }
+#cobalt .path-admin-build-contact span.icon             { background-position:-60px -90px; }
+#cobalt .path-admin-build-block span.icon               { background-position:-180px -30px; }
+#cobalt .path-admin-settings-actions span.icon,
+#cobalt .path-admin-build-trigger span.icon             { background-position:-180px -60px; }
+#cobalt .path-admin-build-path span.icon                { background-position:-120px -90px; }
+
+/**
+ * User
+ */
+#cobalt .path-admin-user-permissions span.icon          { background-position:-30px -90px; }
+#cobalt .path-admin-user-rules span.icon                { background-position:0px -120px; }
+#cobalt .path-admin-user-roles span.icon                { background-position:-30px -120px; }
+#cobalt .path-admin-user-profile span.icon              { background-position:-60px -120px; }
+#cobalt .path-admin-user-user span.icon                 { background-position:-210px -90px; }
+#cobalt .path-admin-user-settings span.icon             { background-position:-120px -360px; }
+
+/**
+ * Reports
+ */
+#cobalt .path-admin-reports-dblog span.icon             { background-position:-210px -420px; }
+#cobalt .path-admin-reports-hits span.icon              { background-position:-120px -420px; }
+#cobalt .path-admin-reports-search span.icon            { background-position:0px -420px; }
+#cobalt .path-admin-reports-access-denied span.icon     { background-position:-180px -420px; }
+#cobalt .path-admin-reports-page-not-found span.icon    { background-position:-90px -420px; }
+#cobalt .path-admin-reports-referrers span.icon         { background-position:-150px -420px; }
+#cobalt .path-admin-reports-pages span.icon             { background-position:-30px -240px }
+#cobalt .path-admin-reports-visitors span.icon          { background-position:-60px -420px; }
+#cobalt .path-admin-reports-settings span.icon          { background-position:-90px -330px; }
+#cobalt .path-admin-reports-updates span.icon           { background-position:-150px -60px; }
+#cobalt .path-admin-reports-status span.icon            { background-position:-60px -60px; }
+
+/**
+ * Settings
+ */
+#cobalt .path-admin-settings-wysiwyg span.icon,
+#cobalt .path-admin-settings-fckeditor span.icon,
+#cobalt .path-admin-settings-tinymce span.icon          { background-position:-150px -330px; }
+#cobalt .path-admin-settings-date-time span.icon        { background-position:-150px -360px; }
+#cobalt .path-admin-settings-language span.icon         { background-position:-60px -330px; }
+#cobalt .path-admin-settings-performance span.icon      { background-position:0px -60px; }
+#cobalt .path-admin-settings-search span.icon           { background-position:-30px -60px; }
+#cobalt .path-admin-settings-devel span.icon            { background-position:-30px -330px; }
+#cobalt .path-admin-settings-site-maintenance span.icon { background-position:-180px -90px; }
+#cobalt .path-admin-settings-image-toolkit span.icon    { background-position:-210px -330px; }
+#cobalt .path-admin-settings-uploads span.icon          { background-position:-210px -360px; }
+#cobalt .path-admin-settings-logging span.icon          { background-position:-120px -60px; }
+#cobalt .path-admin-settings-clean-urls span.icon       { background-position:-60px -360px; }
+#cobalt .path-admin-settings-file-system span.icon      { background-position:-180px -360px; }
+#cobalt .path-admin-settings-error-reporting span.icon  { background-position:-90px -360px; }
+#cobalt .path-admin-settings-site-information span.icon { background-position:-120px -330px; }
+#cobalt .path-admin-settings-blogapi span.icon          { background-position:-30px -360px; }
+#cobalt .path-admin-settings-throttle span.icon         { background-position:-150px -90px; }

@@ -461,7 +461,23 @@ $(document).ready(function(){
 
     $('#cobalt .ac-opt-' + match_idx).removeClass('active');
     match_idx = idx;
-    $('#cobalt .left .inner').attr('class','inner cobalt-item-' + item.data_class);
+    // Generate path specific classes that can be used for icons.
+    // Matches the classes used in the Rubik admin theme.
+    var classes = '';
+    if (item.data_class === 'url_data') {
+      var path = $.evalJSON(item.data);
+      if (typeof(path) == 'object') {
+        path = path.path;
+      }
+      classes = [];
+      var args = path.split('/');
+      while(args.length) {
+        classes[args.length - 1] = 'path-' + args.join('-');
+        args.pop();
+      }
+      classes = classes.join(' ');
+    };
+    $('#cobalt .left .inner').attr('class','inner cobalt-item-' + item.data_class + ' ' + classes);
     $('#cobalt .left label').text(item.name).show();
     $('#cobalt .ac-opt-' + match_idx).addClass('active');
     
@@ -717,7 +733,7 @@ $(document).ready(function(){
   
   // Initialize GUI
   var cb = $('<div id="cobalt">'+
-    '<div class="cells"><div class="cell left"><div class="inner"><input type="text" id="cobalt-input" /><label></label></div></div>'+ 
+    '<div class ="cells"><div class="cell left"><div class="inner"><span class="icon"></span><input type="text" id="cobalt-input" /><label></label></div></div>'+ 
     '<div class="cell right"><div class="inner"><input type="text" id="cobalt-handler-input" /><label></label></div></div></div>'+
     '<ol class="cobalt-paging"></ol><ul class="cobalt-autocomplete"></ul><ul class="cobalt-actions"></ul></div>').appendTo('body').hide();
   var cobalt_input = $('#cobalt-input');

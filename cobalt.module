@@ -45,7 +45,14 @@ function cobalt_init() {
       drupal_add_css(drupal_get_path('module', 'cobalt') . '/css/cobalt.css');
     }
     if (isset($theme) && isset($theme['css'])) {
-      drupal_add_css($theme['css']);
+      if (is_array($theme['css'])) {
+        foreach ($theme['css'] as $css) {
+          drupal_add_css($css);
+        }
+      }
+      else {
+        drupal_add_css($theme['css']);
+      }
     }
   }
 }
@@ -74,6 +81,14 @@ function cobalt_cobalt_themes_alter(&$themes) {
   $themes['steel'] = array(
     'name' => t('Steel'),
     'css' => drupal_get_path('module', 'cobalt') . '/css/steel.css',
+    'replace' => TRUE,
+  );
+  $themes['rubik'] = array(
+    'name' => t('Rubik'),
+    'css' => array(
+      drupal_get_path('module', 'cobalt') . '/css/rubik.css',
+      drupal_get_path('module', 'cobalt') . '/css/icons.css',
+    ),
     'replace' => TRUE,
   );
 }
