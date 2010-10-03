@@ -28,3 +28,7 @@ function cobalt_js_update() {
   drupal_add_js(array('cobalt' => array('update' => $settings)), 'setting');
   return $out;
 }
+
+function cobalt_cobalt_js_update($from, $to) {
+  drupal_add_js(drupal_get_path('module', 'cobalt') . '/js/cobalt.update.js');
+}

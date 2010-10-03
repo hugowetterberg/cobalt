@@ -10,7 +10,7 @@ $(document).bind('cobalt-load', function(evt, cobalt) {
       $.getJSON(Drupal.settings.basePath + 'cobalt/data/menu_json', {}, function (data) {
        cobalt.emptyCatalog('menu');
         for (var id in data) {
-          cobalt.addEntry({id:id, name:data[id][1], information: data[id][0], catalog:'menu', classname:'url_data'});
+          cobalt.addEntry({id:id, name:data[id][1], extra:data[id][0], information: data[id][0], catalog:'menu', classname:'url_data'});
         }
         callback(false);
       });

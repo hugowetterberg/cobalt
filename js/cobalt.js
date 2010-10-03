@@ -140,8 +140,11 @@ $(document).ready(function(){
       if (typeof(data.active)=='undefined') {
         data.active = 1;
       }
+      if (typeof(data.extra)=='undefined') {
+        data.extra = '';
+      }
       db.transaction(function (transaction) {
-        transaction.executeSql("INSERT OR REPLACE INTO entries(id, name, data, catalog, data_class, state, active) VALUES(?,?,?,?,?,?,?);", [data['id'], data['name'], $.toJSON(data.information), data.catalog, data.classname, data.state, data.active], nullDataHandler,cobalt.dbErrorHandler);
+        transaction.executeSql("INSERT OR REPLACE INTO entries(id, name, extra, data, catalog, data_class, state, active) VALUES(?,?,?,?,?,?,?,?);", [data['id'], data['name'], data.extra, $.toJSON(data.information), data.catalog, data.classname, data.state, data.active], nullDataHandler,cobalt.dbErrorHandler);
       });
     },
     'actionCandidates': function(item, callback) {
@@ -226,7 +229,7 @@ $(document).ready(function(){
   $(document).trigger('cobalt-load', cobalt);
   
   cobalt.registerPlugin('cobalt', {
-    'version': 0,
+    'version': 1,
     'handlers': [
       {
         'id': 'cobalt_show',
@@ -275,7 +278,7 @@ $(document).ready(function(){
       'name TEXT NOT NULL, version INTEGER NOT NULL DEFAULT 0, ' + 
       'CONSTRAINT pk_versions PRIMARY KEY(name));', [], nullDataHandler,cobalt.dbErrorHandler);
     transaction.executeSql('CREATE TABLE IF NOT EXISTS entries(' +
-      'catalog TEXT NOT NULL, id TEXT NOT NULL, name TEXT NOT NULL, data TEXT NOT NULL DEFAULT "", data_class TEXT NOT NULL, ' + 
+      'catalog TEXT NOT NULL, id TEXT NOT NULL, name TEXT NOT NULL, extra TEXT DEFAULT "", data TEXT NOT NULL DEFAULT "", data_class TEXT NOT NULL, ' + 
       'state INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, ' + 
       'CONSTRAINT pk_entries PRIMARY KEY(catalog, id));', [], nullDataHandler,cobalt.dbErrorHandler);
     transaction.executeSql('DELETE FROM entries WHERE catalog=?', ['*temporary*'], nullDataHandler, cobalt.dbErrorHandler);
@@ -368,9 +371,9 @@ $(document).ready(function(){
     db.transaction(function (transaction) {
       transaction.executeSql("SELECT e.*, u.weight FROM entries AS e " + 
         "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
-        "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?) " + 
+        "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ? OR e.extra LIKE ?) " +
         "ORDER BY nullif(?,u.abbreviation), nullif(?,e.name), u.weight DESC LIMIT ?,?;", [ 
-        current_text, like_expr, current_text, current_text, match_offset, match_page_size ], lookup_finished,cobalt.dbErrorHandler);
+        current_text, like_expr, like_expr, current_text, current_text, match_offset, match_page_size ], lookup_finished,cobalt.dbErrorHandler);
     });
   };
 
@@ -402,8 +405,8 @@ $(document).ready(function(){
         db.transaction(function (transaction) {
           transaction.executeSql("SELECT COUNT(*) as match_count FROM entries AS e " + 
             "LEFT OUTER JOIN usage_data AS u ON (e.catalog=u.catalog AND e.id=u.id) " +
-            "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ?);", [ 
-            current_text, like_expr ], function(transaction, results) {
+            "WHERE e.active=1 AND (u.abbreviation = ? OR e.name LIKE ? OR e.extra LIKE ?);", [
+            current_text, like_expr, like_expr], function(transaction, results) {
               if (results.rows.length) {
                 match_count = results.rows.item(0).match_count;
                 update_pager(match_count);
