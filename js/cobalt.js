@@ -715,8 +715,8 @@ $(document).ready(function(){
   
   // Initialize GUI
   var cb = $('<div id="cobalt">'+
-    '<div class="cell left"><div class="inner"><input type="text" id="cobalt-input" /><label></label></div></div>'+ 
-    '<div class="cell right"><div class="inner"><input type="text" id="cobalt-handler-input" /><label></label></div></div>'+
+    '<div class="cells"><div class="cell left"><div class="inner"><input type="text" id="cobalt-input" /><label></label></div></div>'+ 
+    '<div class="cell right"><div class="inner"><input type="text" id="cobalt-handler-input" /><label></label></div></div></div>'+
     '<ol class="cobalt-paging"></ol><ul class="cobalt-autocomplete"></ul><ul class="cobalt-actions"></ul></div>').appendTo('body').hide();
   var cobalt_input = $('#cobalt-input');
   var cobalt_h_input = $('#cobalt-handler-input');
