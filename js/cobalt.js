@@ -188,7 +188,9 @@ $(document).ready(function(){
       register_handler_use(handler, item, transaction);
       transaction.executeSql("UPDATE usage_data SET last=null WHERE last = 1", [], nullDataHandler, cobalt.dbErrorHandler);
       if (item.weight == null) {
-        transaction.executeSql("INSERT INTO usage_data(catalog, id, weight, abbreviation, last) VALUES(?,?,?,?,?)",
+        // IGNORE in the rare event a handler that don't refresh the page
+        // (e.g "show") is used multiple times and the weight initially was null.
+        transaction.executeSql("INSERT OR IGNORE INTO usage_data(catalog, id, weight, abbreviation, last) VALUES(?,?,?,?,?)",
           [item.catalog, item.id, 1, text, 1], nullDataHandler,cobalt.dbErrorHandler);
       }
       else {
