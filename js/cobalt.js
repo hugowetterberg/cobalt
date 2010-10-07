@@ -698,6 +698,8 @@ $(document).ready(function(){
       bind('keyup', function(){ action_keypress_reaction(); return false; }).
       bind('focus', function(){ cobalt_paging.hide(); cobalt_ac.hide(); cobalt_actions.show(); });
     cobalt_output.bind('click', function(e){ return false; });
+    $('.cell.left', cb).bind('click', function(){ cobalt_input[0].focus(); });
+    $('.cell.right', cb).bind('click', function(){ cobalt_h_input[0].focus(); });
     $(document).bind('click', function(){ toggle('hide'); toggle_output('hide'); });
 
     if (Drupal && Drupal.settings && Drupal.settings.cobalt) {
