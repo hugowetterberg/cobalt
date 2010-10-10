@@ -62,6 +62,9 @@
   top: 2px;
   display: block;
   line-height: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
 }
 #cobalt .left input {
   right: 155px;
