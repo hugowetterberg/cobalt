@@ -1,4 +1,3 @@
-; $Id$
 name = Cobalt
 description = Cobalt is a javascript implementation of Quicksilver for Drupal
 package = Cobalt

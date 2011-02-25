@@ -1,4 +1,3 @@
-; $Id$
 name = Cobalt Users
 description = Provides access to users through cobalt
 dependencies[] = cobalt
