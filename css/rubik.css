@@ -4,9 +4,9 @@
 }
 
 #cobalt, #cobalt-out {
-  box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px;
-  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px;
-  -moz-box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px;
+  box-shadow: rgba(0, 0, 0, 0.4) 2px 2px 8px;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.4) 2px 2px 8px;
+  -moz-box-shadow: rgba(0, 0, 0, 0.4) 2px 2px 8px;
   background: transparent;
   border: none;
   position: fixed;
