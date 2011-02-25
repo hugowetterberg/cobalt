@@ -1,4 +1,3 @@
-$Id$
 
 h1. COBALT
 
