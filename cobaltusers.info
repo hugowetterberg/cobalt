@@ -1,4 +1,3 @@
-; $Id$
 name = Cobalt Users
 core = "6.x"
 description = Provides access to users through cobalt

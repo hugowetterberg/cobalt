@@ -1,4 +1,3 @@
-; $Id$
 name = Cobalt Nodes
 core = "6.x"
 description = Provides access to nodes through cobalt
