@@ -695,8 +695,8 @@
 
       $(document).trigger('cobalt-post-init', cobalt);
 
-      cb.bind('click', function(e){ return false; }).
-        bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); return false; }).
+      cb.bind('click', function(e){ return false; });
+      $([cobalt_input[0], cobalt_h_input[0]]).bind('keydown', 'esc', function(){ toggle('hide'); toggle_output('hide'); return false; }).
         bind('keydown', 'return', function(){ run_handler(); return false; });
       cobalt_input.bind('keydown', 'up', function(){ ac_select(match_idx-1); return false; }).
         bind('keydown', 'down', function(){ ac_select(match_idx+1); return false; }).
