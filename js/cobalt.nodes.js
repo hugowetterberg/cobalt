@@ -14,7 +14,7 @@
         if (typeof(data.nodes)!='undefined') {
           var num_nodes = data.nodes.length;
           for (var i=0; i<num_nodes; i++) {
-           cobalt.addEntry(data.nodes[i][0], data.nodes[i][1], {'perm': data.nodes[i][2]}, 'nodes', 'node');
+            cobalt.addEntry({id:data.nodes[i][0], name:data.nodes[i][1], information:{'perm': data.nodes[i][2]}, catalog:'nodes', classname:'node'});
           }
         }
 

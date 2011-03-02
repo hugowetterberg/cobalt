@@ -44,7 +44,14 @@ function cobalt_init() {
       drupal_add_css(drupal_get_path('module', 'cobalt') . '/css/cobalt.css');
     }
     if (isset($theme) && isset($theme['css'])) {
-      drupal_add_css($theme['css']);
+      if (is_array($theme['css'])) {
+        foreach ($theme['css'] as $css) {
+          drupal_add_css($css);
+        }
+      }
+      else {
+        drupal_add_css($theme['css']);
+      }
     }
   }
 }

@@ -11,7 +11,7 @@
         $.getJSON(Drupal.settings.basePath + 'cobalt/data/users_json/' + Math.round((last_update/1000)), {}, function (data) {
           var num_nodes = data.length;
           for (var i=0; i<num_nodes; i++) {
-           cobalt.addEntry(data[i][0], data[i][1], {'perm': data[i][2]}, 'users', 'user');
+            cobalt.addEntry({id:data[i][0], name:data[i][1], information:{'perm': data[i][2]}, catalog:'users', classname:'user'});
           }
           callback(true);
         });

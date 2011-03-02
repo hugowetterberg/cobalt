@@ -12,11 +12,11 @@
          cobalt.emptyCatalog('vocabularies');
           var access = data.access ? 'w' : '';
           for (var id in data.vocabularies) {
-           cobalt.addEntry(id, data.vocabularies[id], access, 'vocabularies', 'vocabulary');
+            cobalt.addEntry({id:id, name:data.vocabularies[id], information:access, catalog:'vocabularies', classname:'vocabulary'});
           }
          cobalt.emptyCatalog('terms');
           for (var id in data.terms) {
-           cobalt.addEntry(id, data.terms[id][0], {'perm': access, 'vid': data.terms[id][1]}, 'terms', 'term');
+            cobalt.addEntry({id:id, name:data.terms[id][0], information:{'perm': access, 'vid': data.terms[id][1]}, catalog:'terms', classname:'term'});
           }
           callback(false);
         });
