@@ -107,9 +107,9 @@ function cobalt_menu() {
     'access arguments' => array('use cobalt'),
     'type' => MENU_CALLBACK,
   );
-  $items['admin/settings/cobalt'] = array(
-    'title' => 'Cobalt configuration',
-    'description' => 'Settings for cobalt appearance and behaviour',
+  $items['admin/config/system/cobalt'] = array(
+    'title' => 'Cobalt',
+    'description' => 'Configure Cobalt appearance and behaviour.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('cobalt_settings'),
     'access arguments' => array('administer site configuration'),

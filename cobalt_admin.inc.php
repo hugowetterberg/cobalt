@@ -13,7 +13,7 @@ function cobalt_settings() {
     '#type' => 'select',
     '#options' => $theme_options,
     '#default_value' => variable_get('cobalt_theme', ''),
-    '#title' => t('Select a theme for cobalt'),
+    '#title' => t('Select a theme for Cobalt'),
   );
 
   $form['cobalt_shortcuts'] = array(
