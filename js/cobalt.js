@@ -28,7 +28,7 @@
       try {
         var gdb = google.gears.factory.create('beta.database');
         gdb.open('cobalt');
-        var db = gears_db_html5_wrapper(gdb);
+        db = gears_db_html5_wrapper(gdb);
       }
       catch (err) {
         log_msg(Drupal.t('Failed to open database using the Google Gears api'), err);
@@ -37,10 +37,15 @@
 
     if (!db && typeof(openDatabase)=='function') {
       try {
-        var db = openDatabase('cobalt', '1.0', 'Cobalt Database', 204800);
+        db = openDatabase('cobalt', '1.0', 'Cobalt Database', 204800);
       }
       catch (err) {
-        log_msg(Drupal.t('Failed to open database using the HTML5-api'));
+        if (err.name === 'SECURITY_ERR') {
+          log_msg(Drupal.t('Failed to open database using the HTML5-api due to a security-related error.'));
+        }
+        else {
+          log_msg(Drupal.t('Failed to open database using the HTML5-api.'));
+        }
       }
     }
 
